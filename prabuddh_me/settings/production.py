@@ -97,6 +97,7 @@ STORAGES = {
             "bucket_name": GS_BUCKET_NAME,
             "project_id": GS_PROJECT_ID,
             "file_overwrite": False,
+            "querystring_auth": False,
         },
     },
     "staticfiles": {
@@ -106,6 +107,7 @@ STORAGES = {
             "project_id": GS_PROJECT_ID,
             "location": "static",
             "file_overwrite": True,
+            "querystring_auth": False,
         },
     },
 }
