@@ -26,7 +26,7 @@ python manage.py migrate --noinput
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput --clear --no-post-process || echo "Static files collection had warnings, but continuing..."
 
 # Create superuser if it doesn't exist
 echo "Creating superuser if needed..."

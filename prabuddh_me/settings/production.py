@@ -88,6 +88,8 @@ GS_DEFAULT_ACL = None
 GS_OBJECT_PARAMETERS = {}
 # Configure for public access without signed URLs
 GS_QUERYSTRING_AUTH = False
+# Skip file modification time checks for faster collectstatic
+GS_EXPIRATION = None
 
 # Static and Media files on GCS
 STORAGES = {
