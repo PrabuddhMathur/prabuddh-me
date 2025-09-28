@@ -15,7 +15,6 @@ steps:
     env:
       - 'DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production'
       - 'GCP_PROJECT=$PROJECT_ID'
-      - 'PRABUDDH_ME_SECRETS=$$PRABUDDH_ME_SECRETS'
       - 'CLOUD_RUN=true'
       - 'DEBUG=False'
     secretEnv: ['PRABUDDH_ME_SECRETS']
@@ -27,7 +26,6 @@ steps:
     env:
       - 'DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production'
       - 'GCP_PROJECT=$PROJECT_ID'
-      - 'PRABUDDH_ME_SECRETS=$$PRABUDDH_ME_SECRETS'
       - 'CLOUD_RUN=true'
       - 'DEBUG=False'
     secretEnv: ['PRABUDDH_ME_SECRETS']
@@ -39,7 +37,6 @@ steps:
     env:
       - 'DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production'
       - 'GCP_PROJECT=$PROJECT_ID'
-      - 'PRABUDDH_ME_SECRETS=$$PRABUDDH_ME_SECRETS'
       - 'CLOUD_RUN=true'
       - 'DEBUG=False'
     secretEnv: ['PRABUDDH_ME_SECRETS']
