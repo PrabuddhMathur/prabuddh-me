@@ -83,7 +83,9 @@ SECRET_KEY = get_secret('SECRET_KEY')
 GS_BUCKET_NAME = get_secret('GS_BUCKET_NAME')
 GS_PROJECT_ID = get_secret('GCP_PROJECT')
 GS_FILE_OVERWRITE = False
-GS_DEFAULT_ACL = 'publicRead'
+# Remove ACL settings for uniform bucket-level access
+GS_DEFAULT_ACL = None
+GS_OBJECT_PARAMETERS = {}
 
 # Static and Media files on GCS
 STORAGES = {
