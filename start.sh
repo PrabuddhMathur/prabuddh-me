@@ -39,7 +39,6 @@ exec gunicorn prabuddh_me.wsgi:application \
     --worker-class gthread \
     --worker-connections 1000 \
     --timeout 300 \
-    --keepalive 2 \
     --max-requests 1000 \
     --max-requests-jitter 100 \
     --access-logfile - \
