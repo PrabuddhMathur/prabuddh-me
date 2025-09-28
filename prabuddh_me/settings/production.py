@@ -5,30 +5,8 @@ import os
 # Production settings
 DEBUG = False
 
-# Function to parse secrets from Secret Manager
-def parse_env_secrets():
-    """Parse environment variables from Secret Manager secret"""
-    secrets_content = config('PRABUDDH_ME_SECRETS', default='')
-    if secrets_content:
-        # Parse the .env file content from Secret Manager
-        env_vars = {}
-        for line in secrets_content.strip().split('\n'):
-            if line and not line.startswith('#') and '=' in line:
-                key, value = line.split('=', 1)
-                env_vars[key.strip()] = value.strip()
-        return env_vars
-    return {}
-
-# Get secrets from Secret Manager if available
-secrets = parse_env_secrets()
-
-# Use secrets from Secret Manager or fallback to regular config
-def get_secret(key, default=None, cast=None):
-    """Get secret from parsed secrets or fallback to regular config"""
-    value = secrets.get(key) or config(key, default=default)
-    if cast and value:
-        return cast(value)
-    return value
+# In Cloud Run with Secret Manager, secrets are automatically injected as environment variables
+# No need for custom parsing - just use config() directly
 
 # Security settings
 SECURE_SSL_REDIRECT = True
@@ -61,11 +39,11 @@ else:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_secret('DB_NAME'),
-        'USER': get_secret('DB_USER'),
-        'PASSWORD': get_secret('DB_PASSWORD'),
-        'HOST': get_secret('DB_HOST'),
-        'PORT': get_secret('DB_PORT', default='5432'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', default='5432'),
         'OPTIONS': {
             'sslmode': 'require',
         },
@@ -74,11 +52,11 @@ DATABASES = {
 }
 
 # Override SECRET_KEY with secret from Secret Manager
-SECRET_KEY = get_secret('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
 # Google Cloud Storage configuration for production
-GS_BUCKET_NAME = get_secret('GS_BUCKET_NAME')
-GS_PROJECT_ID = get_secret('GCP_PROJECT')
+GS_BUCKET_NAME = config('GS_BUCKET_NAME')
+GS_PROJECT_ID = config('GCP_PROJECT')
 GS_FILE_OVERWRITE = False
 GS_DEFAULT_ACL = 'publicRead'
 
@@ -151,17 +129,16 @@ LOGGING = {
 }
 
 # Email configuration (using SendGrid or another service)
-email_host = get_secret('EMAIL_HOST')
+email_host = config('EMAIL_HOST', default='')
 if email_host:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = email_host
-    EMAIL_PORT = get_secret('EMAIL_PORT', default=587, cast=int)
-    EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_TLS = get_secret('EMAIL_USE_TLS', default=True, cast=bool)
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 
 # Wagtail settings for production
-WAGTAILADMIN_BASE_URL = get_secret('WAGTAILADMIN_BASE_URL', default='https://prabuddh.in')
+WAGTAILADMIN_BASE_URL = config('WAGTAILADMIN_BASE_URL', default='https://prabuddh.in')
 
 # Performance optimizations
 SESSION_COOKIE_SECURE = True
