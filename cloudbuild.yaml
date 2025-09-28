@@ -47,7 +47,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'prabuddh-me-website'
+      - 'prabuddh-me-cloud-run'
       - '--image=gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
       - '--region=asia-east1'
       - '--platform=managed'
