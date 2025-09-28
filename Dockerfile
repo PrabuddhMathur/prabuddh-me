@@ -30,7 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=wagtail:wagtail . .
 
 # Collect static files (Cloud Run ephemeral filesystem, only needed for container)
-RUN python manage.py collectstatic --noinput --clear
+RUN python manage.py collectstatic --noinput --clear --no-post-process
 
 # Ensure non-root user owns files
 RUN chown -R wagtail:wagtail /app
