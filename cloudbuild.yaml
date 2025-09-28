@@ -49,7 +49,7 @@ steps:
       - 'deploy'
       - 'prabuddh-me-website'
       - '--image=gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
-      - '--region=asia-south1'
+      - '--region=asia-east1'
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--set-env-vars=DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production'
