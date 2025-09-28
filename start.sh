@@ -24,6 +24,10 @@ fi
 echo "Running database migrations..."
 python manage.py migrate --noinput
 
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --noinput --clear
+
 # Create superuser if it doesn't exist
 echo "Creating superuser if needed..."
 python manage.py create_superuser
