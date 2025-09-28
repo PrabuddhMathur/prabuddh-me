@@ -21,13 +21,20 @@ help:
 	@echo "Local Development Targets:"
 	@echo "  dev                   Run Django dev server"
 	@echo "  migrate-local         Run local database migrations"
+	@echo "  makemigrations        Create database migrations"
 	@echo "  superuser-local       Create local superuser"
 	@echo "  tailwind-build-local  Build Tailwind CSS locally"
+	@echo "  test                  Run tests"
+	@echo "  check                 Check for Django issues"
+	@echo "  collectstatic         Collect static files"
+	@echo "  shell-local           Open Django shell (local)"
+	@echo "  dbshell               Open database shell"
 	@echo ""
 	@echo "Cloud Run / Production Targets:"
 	@echo "  build            Build Docker image"
 	@echo "  push             Push image to GCP Container Registry"
 	@echo "  deploy           Build, push, deploy, run migrations & superuser on Cloud Run"
+	@echo "  deploy-cloudbuild Deploy using Cloud Build (CI/CD)"
 	@echo "  tailwind-build   Build Tailwind CSS inside container"
 	@echo "  shell            Open Django shell inside container"
 	@echo "  logs             Show Cloud Run logs"
@@ -43,9 +50,33 @@ dev:
 migrate-local:
 	python manage.py migrate
 
+.PHONY: makemigrations
+makemigrations:
+	python manage.py makemigrations
+
 .PHONY: superuser-local
 superuser-local:
 	python manage.py createsuperuser
+
+.PHONY: test
+test:
+	python manage.py test
+
+.PHONY: check
+check:
+	python manage.py check
+
+.PHONY: collectstatic
+collectstatic:
+	python manage.py collectstatic --noinput
+
+.PHONY: shell-local
+shell-local:
+	python manage.py shell
+
+.PHONY: dbshell
+dbshell:
+	python manage.py dbshell
 
 .PHONY: tailwind-build-local
 tailwind-build-local:
@@ -81,6 +112,14 @@ deploy: build push
 	gcloud run jobs execute superuser-job --image $(IMAGE_NAME) --region $(REGION)
 	@echo "Deployment complete!"
 
+# Deploy using Cloud Build (recommended for CI/CD)
+.PHONY: deploy-cloudbuild
+deploy-cloudbuild:
+	@echo "Deploying using Cloud Build..."
+	@echo "Note: Make sure to set SECRET_KEY, DB_PASSWORD, and SUPERUSER_PASSWORD in your Cloud Build trigger environment variables"
+	gcloud builds submit --config cloudbuild.yaml
+	@echo "Cloud Build deployment complete!"
+
 .PHONY: tailwind-build
 tailwind-build:
 	docker run --rm -it \
@@ -106,3 +145,10 @@ stop:
 .PHONY: clean
 clean:
 	docker rmi $(IMAGE_NAME) || true
+	find . -path "./venv" -prune -o -name "*.pyc" -delete
+	find . -path "./venv" -prune -o -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+	rm -rf .pytest_cache/
+	rm -rf htmlcov/
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info/

@@ -1,3 +1,22 @@
 Django>=5.2,<5.3
 wagtail>=7.1,<7.2
 django-tailwind
+
+# Database
+psycopg2-binary>=2.9.9
+
+# Google Cloud Storage
+django-storages[google]>=1.14.2
+google-cloud-storage>=2.10.0
+
+# Environment variables
+python-decouple>=3.8
+
+# Cloud SQL Proxy (for local development)
+cloud-sql-python-connector[pg8000]>=1.4.3
+
+# Production server
+gunicorn>=21.2.0
+
+# Security and utilities
+whitenoise>=6.5.0

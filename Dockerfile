@@ -10,7 +10,7 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PORT=8080 \
-    DJANGO_SETTINGS_MODULE=prabuddh_me.settings
+    DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production
 
 # Install system dependencies
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
@@ -29,8 +29,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY --chown=wagtail:wagtail . .
 
-# Collect static files (Cloud Run ephemeral filesystem, only needed for container)
-RUN python manage.py collectstatic --noinput --clear --no-post-process
+# Make startup script executable
+RUN chmod +x start.sh
+
+# Create media directory for file storage fallback
+RUN mkdir -p /app/media && chown wagtail:wagtail /app/media
+
+# Ensure non-root user owns files
+RUN chown -R wagtail:wagtail /app
 
 # Ensure non-root user owns files
 RUN chown -R wagtail:wagtail /app
@@ -41,5 +47,5 @@ USER wagtail
 # Expose port 8080 (Cloud Run default)
 EXPOSE 8080
 
-# Runtime command: Gunicorn app server
-CMD ["gunicorn", "prabuddh_me.wsgi:application", "--bind", "0.0.0.0:8080"]
+# Runtime command: Use startup script
+CMD ["./start.sh"]
