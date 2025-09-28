@@ -156,7 +156,8 @@ if GS_BUCKET_NAME:
     DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
     STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
     GS_FILE_OVERWRITE = False
-    GS_DEFAULT_ACL = 'publicRead'
+    # ACL settings removed for uniform bucket-level access compatibility
+    GS_DEFAULT_ACL = None
     
     # Default storage settings for GCS
     STORAGES = {
@@ -165,7 +166,6 @@ if GS_BUCKET_NAME:
             "OPTIONS": {
                 "bucket_name": GS_BUCKET_NAME,
                 "file_overwrite": False,
-                "default_acl": "publicRead",
             },
         },
         "staticfiles": {
@@ -174,7 +174,6 @@ if GS_BUCKET_NAME:
                 "bucket_name": GS_BUCKET_NAME,
                 "location": "static",
                 "file_overwrite": True,
-                "default_acl": "publicRead",
             },
         },
     }
