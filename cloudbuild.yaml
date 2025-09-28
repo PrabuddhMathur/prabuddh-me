@@ -2,14 +2,14 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA', '.']
+    args: ['build', '-t', 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/prabuddh-me:$COMMIT_SHA', '.']
 
-  # Push the container image to Container Registry
+  # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA']
+    args: ['push', 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/prabuddh-me:$COMMIT_SHA']
 
   # Collect static files to GCS
-  - name: 'gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
+  - name: 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/prabuddh-me:$COMMIT_SHA'
     entrypoint: 'python'
     args: ['manage.py', 'collectstatic', '--noinput', '--clear']
     env:
@@ -20,7 +20,7 @@ steps:
     secretEnv: ['PRABUDDH_ME_SECRETS']
 
   # Run database migrations
-  - name: 'gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
+  - name: 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/prabuddh-me:$COMMIT_SHA'
     entrypoint: 'python'
     args: ['manage.py', 'migrate', '--noinput']
     env:
@@ -31,7 +31,7 @@ steps:
     secretEnv: ['PRABUDDH_ME_SECRETS']
 
   # Create superuser if needed
-  - name: 'gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
+  - name: 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/prabuddh-me:$COMMIT_SHA'
     entrypoint: 'python'
     args: ['manage.py', 'create_superuser']
     env:
@@ -48,7 +48,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'prabuddh-me-cloud-run'
-      - '--image=gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
+      - '--image=asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/prabuddh-me:$COMMIT_SHA'
       - '--region=asia-east1'
       - '--platform=managed'
       - '--allow-unauthenticated'
