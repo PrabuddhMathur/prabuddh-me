@@ -86,6 +86,8 @@ GS_FILE_OVERWRITE = False
 # Remove ACL settings for uniform bucket-level access
 GS_DEFAULT_ACL = None
 GS_OBJECT_PARAMETERS = {}
+# Configure for public access without signed URLs
+GS_QUERYSTRING_AUTH = False
 
 # Static and Media files on GCS
 STORAGES = {
