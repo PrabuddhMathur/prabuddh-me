@@ -50,7 +50,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'prabuddh-me'
+      - 'prabuddh-me-website'
       - '--image=gcr.io/$PROJECT_ID/prabuddh-me:$COMMIT_SHA'
       - '--region=asia-south1'
       - '--platform=managed'
@@ -65,6 +65,7 @@ steps:
       - '--cpu=1'
       - '--max-instances=10'
       - '--port=8080'
+      - '--timeout=300'
 
 # Define secrets from Secret Manager
 availableSecrets:

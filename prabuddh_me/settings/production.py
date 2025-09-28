@@ -55,7 +55,7 @@ if config('GAE_ENV', default=None) == 'standard' or config('CLOUD_RUN', default=
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 else:
     # Custom production deployment
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
 # Database configuration for production
 DATABASES = {
@@ -75,13 +75,6 @@ DATABASES = {
 
 # Override SECRET_KEY with secret from Secret Manager
 SECRET_KEY = get_secret('SECRET_KEY')
-
-# Override ALLOWED_HOSTS
-allowed_hosts = get_secret('ALLOWED_HOSTS', default='*')
-if allowed_hosts == '*':
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',') if host.strip()]
 
 # Google Cloud Storage configuration for production
 GS_BUCKET_NAME = get_secret('GS_BUCKET_NAME')
