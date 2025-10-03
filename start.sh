@@ -28,9 +28,9 @@ python manage.py migrate --noinput
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear --no-post-process || echo "Static files collection had warnings, but continuing..."
 
-# Create superuser if it doesn't exist
+# Create superuser if it doesn't exist (Django automatically uses DJANGO_SUPERUSER_* env vars)
 echo "Creating superuser if needed..."
-python manage.py create_superuser
+python manage.py createsuperuser --noinput || echo "Superuser creation skipped (likely already exists)"
 
 echo "Starting Gunicorn server..."
 exec gunicorn prabuddh_me.wsgi:application \
