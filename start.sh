@@ -14,23 +14,24 @@ echo "PORT: ${PORT:-'not set'}"
 echo "GCP_PROJECT: ${GCP_PROJECT:-'not set'}"
 
 # Check if secret is accessible
-if [ -n "$PRABUDDH_ME_SECRETS" ]; then
-    echo "Secret Manager secrets loaded successfully"
+if [ -n "$SECRET_KEY" ]; then
+    echo "Secrets loaded successfully"
 else
-    echo "WARNING: PRABUDDH_ME_SECRETS not found"
+    echo "WARNING: SECRET_KEY not found - checking secrets..."
+    echo "Available env vars:"
+    env | grep -E "DB_|SECRET|GCP" | sed 's/=.*/=***/' || echo "No secrets found"
 fi
 
-# Run database migrations
-echo "Running database migrations..."
-python manage.py migrate --noinput
+# Skip migrations on startup - run them separately via Cloud Run jobs
+# This allows the container to start and be healthy even if migrations fail
+echo "Skipping migrations on startup (run separately via jobs/manual deployment)..."
 
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear --no-post-process || echo "Static files collection had warnings, but continuing..."
 
-# Create superuser if it doesn't exist (Django automatically uses DJANGO_SUPERUSER_* env vars)
-echo "Creating superuser if needed..."
-python manage.py createsuperuser --noinput || echo "Superuser creation skipped (likely already exists)"
+# Skip superuser creation on startup too
+echo "Skipping superuser creation on startup..."
 
 echo "Starting Gunicorn server..."
 exec gunicorn prabuddh_me.wsgi:application \
