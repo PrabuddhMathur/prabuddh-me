@@ -40,6 +40,12 @@ help:
 	@echo "  logs             Show Cloud Run logs"
 	@echo "  stop             Delete Cloud Run service"
 	@echo "  clean            Remove local Docker image"
+	@echo ""
+	@echo "Secret Manager Targets:"
+	@echo "  secret-upload      Upload all .env variables to Secret Manager"
+	@echo "  secret-update      Update existing secrets in Secret Manager"
+	@echo "  secret-list        List all secrets in Secret Manager"
+	@echo "  secret-delete-all  Delete all secrets (use with caution!)"
 
 # --- Local Development ---
 .PHONY: dev
@@ -136,7 +142,7 @@ shell:
 
 .PHONY: logs
 logs:
-	gcloud logs read --project $(GCP_PROJECT) --limit 50 --sort-by timestamp
+	gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=$(SERVICE_NAME)" --project $(GCP_PROJECT) --limit 50 --format=json
 
 .PHONY: stop
 stop:
@@ -152,3 +158,58 @@ clean:
 	rm -rf build/
 	rm -rf dist/
 	rm -rf *.egg-info/
+
+# --- Secret Manager ---
+.PHONY: secret-upload
+secret-upload:
+	@echo "Uploading .env variables to Google Secret Manager..."
+	@while IFS='=' read -r key value; do \
+		if [ ! -z "$$key" ] && [ "$${key:0:1}" != "#" ]; then \
+			cleaned_key=$$(echo "$$key" | xargs); \
+			cleaned_value=$$(echo "$$value" | sed 's/#.*//' | xargs); \
+			if [ ! -z "$$cleaned_value" ]; then \
+				echo "Uploading $$cleaned_key..."; \
+				echo -n "$$cleaned_value" | gcloud secrets create "$$cleaned_key" \
+					--project=$(GCP_PROJECT) \
+					--data-file=- \
+					--replication-policy="automatic" 2>/dev/null || \
+				echo -n "$$cleaned_value" | gcloud secrets versions add "$$cleaned_key" \
+					--project=$(GCP_PROJECT) \
+					--data-file=-; \
+			fi \
+		fi \
+	done < .env
+	@echo "✓ All secrets uploaded successfully"
+
+.PHONY: secret-update
+secret-update:
+	@echo "Updating .env variables in Google Secret Manager..."
+	@while IFS='=' read -r key value; do \
+		if [ ! -z "$$key" ] && [ "$${key:0:1}" != "#" ]; then \
+			cleaned_key=$$(echo "$$key" | xargs); \
+			cleaned_value=$$(echo "$$value" | sed 's/#.*//' | xargs); \
+			if [ ! -z "$$cleaned_value" ]; then \
+				echo "Updating $$cleaned_key..."; \
+				echo -n "$$cleaned_value" | gcloud secrets versions add "$$cleaned_key" \
+					--project=$(GCP_PROJECT) \
+					--data-file=-; \
+			fi \
+		fi \
+	done < .env
+	@echo "✓ All secrets updated successfully"
+
+.PHONY: secret-list
+secret-list:
+	@gcloud secrets list --project=$(GCP_PROJECT)
+
+.PHONY: secret-delete-all
+secret-delete-all:
+	@echo "⚠️  This will delete ALL secrets in the project!"
+	@read -p "Are you sure? (yes/no): " confirm; \
+	if [ "$$confirm" = "yes" ]; then \
+		gcloud secrets list --project=$(GCP_PROJECT) --format="value(name)" | \
+		xargs -I {} gcloud secrets delete {} --project=$(GCP_PROJECT) --quiet; \
+		echo "✓ All secrets deleted"; \
+	else \
+		echo "Cancelled"; \
+	fi

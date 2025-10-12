@@ -27,18 +27,15 @@ MIDDLEWARE = [
 ]
 
 # Static files configuration for development
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-# For local development, use local file storage if GCS is not configured
-if not config('GS_BUCKET_NAME', default=None):
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
+# Force local file storage for development (override GCS settings from base.py)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Database for development (can use Cloud SQL Proxy or local PostgreSQL)
 if config('USE_CLOUD_SQL_PROXY', default=False, cast=bool):
@@ -51,6 +48,14 @@ if config('USE_CLOUD_SQL_PROXY', default=False, cast=bool):
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': '127.0.0.1',  # Cloud SQL Proxy runs locally
             'PORT': '5432',
+        }
+    }
+else:
+    # Default to SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 
