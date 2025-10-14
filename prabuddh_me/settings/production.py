@@ -74,6 +74,9 @@ GS_QUERYSTRING_AUTH = False
 # Skip file modification time checks for faster collectstatic
 GS_EXPIRATION = None
 
+SESSION_COOKIE_NAME = "__session"
+CSRF_USE_SESSIONS = True
+
 # Static and Media files on GCS
 STORAGES = {
     "default": {
@@ -168,7 +171,6 @@ CSRF_COOKIE_HTTPONLY = False  # Must be False for CSRF to work through proxies
 SESSION_COOKIE_SAMESITE = 'None'  # Required for multi-proxy setups
 CSRF_COOKIE_SAMESITE = 'None'  # Required for multi-proxy setups
 
-SESSION_COOKIE_NAME = 'sessionid'
 CSRF_COOKIE_NAME = 'csrftoken'
 
 SESSION_COOKIE_DOMAIN = ".prabuddh.in"
