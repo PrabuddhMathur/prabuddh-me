@@ -8,6 +8,9 @@ DEBUG = False
 # In Cloud Run, secrets are injected as individual environment variables
 # Just use config() directly - no need for custom parsing
 
+# CSRF trusted origins - critical for admin login
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
+
 # Security settings
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -151,6 +154,15 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
+
+# Cookie settings for proper session handling behind Cloudflare/proxy
+SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cookies on same-site navigation
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_NAME = 'sessionid'  # Explicit session cookie name
+CSRF_COOKIE_NAME = 'csrftoken'  # Explicit CSRF cookie name
+
+# Don't set SESSION_COOKIE_DOMAIN - let Django handle it automatically
+# This ensures cookies work properly behind Cloudflare
 
 # Data upload settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
