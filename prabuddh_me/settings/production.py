@@ -12,7 +12,9 @@ DEBUG = False
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 
 # Security settings
-SECURE_SSL_REDIRECT = True
+# Disable SSL redirect since Cloudflare handles HTTPS
+SECURE_SSL_REDIRECT = False
+# Trust the X-Forwarded-Proto header from Cloudflare/Cloud Run
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -150,8 +152,9 @@ if email_host:
 WAGTAILADMIN_BASE_URL = config('WAGTAILADMIN_BASE_URL', default='https://blog.prabuddh.in')
 
 # Performance optimizations
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Temporarily disable secure cookies for debugging
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
