@@ -14,13 +14,14 @@ CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 # Security settings
 # Disable SSL redirect since Cloudflare handles HTTPS
 SECURE_SSL_REDIRECT = False
-# Trust the X-Forwarded-Proto header from Cloudflare/Cloud Run
+# Trust the X-Forwarded-Proto header from Cloudflare/Firebase/Cloud Run
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# Disable HSTS temporarily to avoid issues with multi-proxy setup
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 
 # Force HTTPS
 USE_TLS = True
@@ -152,20 +153,22 @@ if email_host:
 WAGTAILADMIN_BASE_URL = config('WAGTAILADMIN_BASE_URL', default='https://blog.prabuddh.in')
 
 # Performance optimizations
-# Temporarily disable secure cookies for debugging
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+# Cookie settings for multi-proxy setup (Cloudflare → Firebase → Cloud Run)
+SESSION_COOKIE_SECURE = True  # HTTPS enforced
+CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False  # Must be False for CSRF to work through proxies
 
-# Cookie settings for proper session handling behind Cloudflare/proxy
-SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cookies on same-site navigation
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_NAME = 'sessionid'  # Explicit session cookie name
-CSRF_COOKIE_NAME = 'csrftoken'  # Explicit CSRF cookie name
+# Critical: Use 'None' for SameSite to allow cookies through multiple proxies
+SESSION_COOKIE_SAMESITE = 'None'  # Required for multi-proxy setups
+CSRF_COOKIE_SAMESITE = 'None'  # Required for multi-proxy setups
+
+SESSION_COOKIE_NAME = 'sessionid'
+CSRF_COOKIE_NAME = 'csrftoken'
 
 # Don't set SESSION_COOKIE_DOMAIN - let Django handle it automatically
-# This ensures cookies work properly behind Cloudflare
+# Allow forwarded host headers from proxies
+USE_X_FORWARDED_HOST = True
 
 # Data upload settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
