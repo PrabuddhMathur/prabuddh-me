@@ -9,8 +9,11 @@ DEBUG = False
 # Just use config() directly - no need for custom parsing
 
 # CSRF trusted origins - critical for admin login
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
-
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://blog.prabuddh.in,https://*.blog.prabuddh.in',
+    cast=Csv()
+)
 # Security settings
 # Disable SSL redirect since Cloudflare handles HTTPS
 SECURE_SSL_REDIRECT = False
@@ -23,8 +26,7 @@ SECURE_HSTS_SECONDS = 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 
-# Force HTTPS
-USE_TLS = True
+
 
 # Cloud Run specific settings
 if config('GAE_ENV', default=None) == 'standard' or config('CLOUD_RUN', default=False, cast=bool):
@@ -39,7 +41,7 @@ if config('GAE_ENV', default=None) == 'standard' or config('CLOUD_RUN', default=
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 else:
     # Custom production deployment
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=['blog.prabuddh.in', '.prabuddh.in'], cast=Csv())
 
 # Database configuration for production
 DATABASES = {
@@ -140,6 +142,9 @@ LOGGING = {
     },
 }
 
+SESSION_COOKIE_PATH = '/'
+CSRF_COOKIE_PATH = '/'
+
 # Email configuration (using SendGrid or another service)
 email_host = config('EMAIL_HOST', default=None)
 if email_host:
@@ -166,7 +171,8 @@ CSRF_COOKIE_SAMESITE = 'None'  # Required for multi-proxy setups
 SESSION_COOKIE_NAME = 'sessionid'
 CSRF_COOKIE_NAME = 'csrftoken'
 
-# Don't set SESSION_COOKIE_DOMAIN - let Django handle it automatically
+SESSION_COOKIE_DOMAIN = ".prabuddh.in"
+CSRF_COOKIE_DOMAIN = ".prabuddh.in"
 # Allow forwarded host headers from proxies
 USE_X_FORWARDED_HOST = True
 
