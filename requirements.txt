@@ -20,3 +20,4 @@ gunicorn>=21.2.0
 
 # Security and utilities
 whitenoise>=6.5.0
+requests>=2.31.0  # For health checks and API calls

@@ -30,8 +30,25 @@ echo "Skipping migrations on startup (run separately via jobs/manual deployment)
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear --no-post-process || echo "Static files collection had warnings, but continuing..."
 
-# Skip superuser creation on startup too
-echo "Skipping superuser creation on startup..."
+# Create superuser if environment variables are set
+if [ -n "$SUPERUSER_NAME" ] && [ -n "$SUPERUSER_EMAIL" ] && [ -n "$SUPERUSER_PASSWORD" ]; then
+    echo "Creating superuser if it doesn't exist..."
+    python manage.py shell <<EOF
+from django.contrib.auth import get_user_model
+User = get_user_model()
+username = "$SUPERUSER_NAME"
+email = "$SUPERUSER_EMAIL"
+password = "$SUPERUSER_PASSWORD"
+
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username=username, email=email, password=password)
+    print(f"✓ Superuser '{username}' created successfully")
+else:
+    print(f"✓ Superuser '{username}' already exists")
+EOF
+else
+    echo "Skipping superuser creation (environment variables not set)"
+fi
 
 echo "Starting Gunicorn server..."
 exec gunicorn prabuddh_me.wsgi:application \

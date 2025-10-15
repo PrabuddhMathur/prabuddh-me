@@ -19,16 +19,17 @@ help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Local Development Targets:"
-	@echo "  dev                   Run Django dev server"
-	@echo "  migrate-local         Run local database migrations"
+	@echo "  dev                   Run Django dev server (dev.py settings)"
+	@echo "  migrate-local         Run local database migrations (SQLite or Cloud SQL Proxy)"
 	@echo "  makemigrations        Create database migrations"
 	@echo "  superuser-local       Create local superuser"
 	@echo "  tailwind-build-local  Build Tailwind CSS locally"
 	@echo "  test                  Run tests"
 	@echo "  check                 Check for Django issues"
-	@echo "  collectstatic         Collect static files"
+	@echo "  collectstatic         Collect static files (production settings)"
 	@echo "  shell-local           Open Django shell (local)"
 	@echo "  dbshell               Open database shell"
+	@echo "  cloudsql-proxy        Start Cloud SQL Proxy for local PostgreSQL access"
 	@echo ""
 	@echo "Cloud Run / Production Targets:"
 	@echo "  build            Build Docker image"
@@ -39,54 +40,80 @@ help:
 	@echo "  shell            Open Django shell inside container"
 	@echo "  logs             Show Cloud Run logs"
 	@echo "  stop             Delete Cloud Run service"
-	@echo "  clean            Remove local Docker image"
+	@echo "  clean            Remove local Docker image and Python cache files"
 	@echo ""
 	@echo "Secret Manager Targets:"
 	@echo "  secret-upload      Upload all .env variables to Secret Manager"
 	@echo "  secret-update      Update existing secrets in Secret Manager"
 	@echo "  secret-list        List all secrets in Secret Manager"
 	@echo "  secret-delete-all  Delete all secrets (use with caution!)"
+	@echo ""
+	@echo "Environment Variables (from .env):"
+	@echo "  Required for local dev:"
+	@echo "    - DEBUG=true (default)"
+	@echo "    - USE_CLOUD_SQL_PROXY=false (default, set true to use Cloud SQL locally)"
+	@echo "  Required for production:"
+	@echo "    - SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST"
+	@echo "    - GS_BUCKET_NAME, GCP_PROJECT"
+	@echo "    - ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS"
+	@echo "    - WAGTAILADMIN_BASE_URL"
 
 # --- Local Development ---
 .PHONY: dev
 dev:
-	python manage.py runserver 0.0.0.0:8000
+	@echo "Starting Django development server (using dev settings)..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py runserver 0.0.0.0:8000
 
 .PHONY: migrate-local
 migrate-local:
-	python manage.py migrate
+	@echo "Running migrations locally (SQLite unless USE_CLOUD_SQL_PROXY=true)..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py migrate
 
 .PHONY: makemigrations
 makemigrations:
-	python manage.py makemigrations
+	@echo "Creating new migrations..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py makemigrations
 
 .PHONY: superuser-local
 superuser-local:
-	python manage.py createsuperuser
+	@echo "Creating superuser locally..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py createsuperuser
 
 .PHONY: test
 test:
-	python manage.py test
+	@echo "Running tests..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py test
 
 .PHONY: check
 check:
-	python manage.py check
+	@echo "Running Django system checks..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py check
 
 .PHONY: collectstatic
 collectstatic:
-	python manage.py collectstatic --noinput
+	@echo "Collecting static files (uses production settings)..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production python manage.py collectstatic --noinput
 
 .PHONY: shell-local
 shell-local:
-	python manage.py shell
+	@echo "Opening Django shell (dev settings)..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py shell
 
 .PHONY: dbshell
 dbshell:
-	python manage.py dbshell
+	@echo "Opening database shell..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py dbshell
 
 .PHONY: tailwind-build-local
 tailwind-build-local:
-	python manage.py tailwind build
+	@echo "Building Tailwind CSS locally..."
+	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py tailwind build
+
+.PHONY: cloudsql-proxy
+cloudsql-proxy:
+	@echo "Starting Cloud SQL Proxy for local development..."
+	@echo "Make sure USE_CLOUD_SQL_PROXY=true in your .env"
+	cloud-sql-proxy --port 5432 $(CLOUD_SQL_CONNECTION_NAME)
 
 # --- Docker / Cloud Run ---
 .PHONY: build
@@ -100,13 +127,23 @@ push:
 # Deploy: build, push, deploy, migrate, create superuser
 .PHONY: deploy
 deploy: build push
-	@echo "Deploying $(SERVICE_NAME) to Cloud Run..."
+	@echo "Deploying $(SERVICE_NAME) to Cloud Run (production settings)..."
 	gcloud run deploy $(SERVICE_NAME) \
 		--image $(IMAGE_NAME) \
 		--region $(REGION) \
 		--platform managed \
 		--allow-unauthenticated \
-		--update-env-vars-file .env \
+		--set-env-vars DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production \
+		--set-env-vars SECRET_KEY=$(SECRET_KEY) \
+		--set-env-vars DB_NAME=$(DB_NAME) \
+		--set-env-vars DB_USER=$(DB_USER) \
+		--set-env-vars DB_PASSWORD=$(DB_PASSWORD) \
+		--set-env-vars DB_HOST=$(DB_HOST) \
+		--set-env-vars GS_BUCKET_NAME=$(GS_BUCKET_NAME) \
+		--set-env-vars GCP_PROJECT=$(GCP_PROJECT) \
+		--set-env-vars ALLOWED_HOSTS=$(ALLOWED_HOSTS) \
+		--set-env-vars CSRF_TRUSTED_ORIGINS=$(CSRF_TRUSTED_ORIGINS) \
+		--set-env-vars WAGTAILADMIN_BASE_URL=$(WAGTAILADMIN_BASE_URL) \
 		--add-cloudsql-instances $(CLOUD_SQL_CONNECTION_NAME) \
 		--memory 1Gi \
 		--port 8080
@@ -121,22 +158,29 @@ deploy: build push
 # Deploy using Cloud Build (recommended for CI/CD)
 .PHONY: deploy-cloudbuild
 deploy-cloudbuild:
-	@echo "Deploying using Cloud Build..."
-	@echo "Note: Make sure to set SECRET_KEY, DB_PASSWORD, and SUPERUSER_PASSWORD in your Cloud Build trigger environment variables"
+	@echo "Deploying using Cloud Build (production settings)..."
+	@echo "Note: Ensure these secrets are set in Secret Manager:"
+	@echo "  - SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST"
+	@echo "  - GS_BUCKET_NAME, GCP_PROJECT"
+	@echo "  - ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, WAGTAILADMIN_BASE_URL"
 	gcloud builds submit --config cloudbuild.yaml
 	@echo "Cloud Build deployment complete!"
 
 .PHONY: tailwind-build
 tailwind-build:
+	@echo "Building Tailwind CSS inside container (production settings)..."
 	docker run --rm -it \
 		--env-file .env \
+		-e DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production \
 		$(IMAGE_NAME) \
 		python manage.py tailwind build
 
 .PHONY: shell
 shell:
+	@echo "Opening Django shell inside container (production settings)..."
 	docker run --rm -it \
 		--env-file .env \
+		-e DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production \
 		$(IMAGE_NAME) \
 		python manage.py shell
 
