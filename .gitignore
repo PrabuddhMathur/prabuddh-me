@@ -12,6 +12,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+!/theme/static/css/dist/
 downloads/
 eggs/
 .eggs/
@@ -221,7 +222,7 @@ prabuddh_me/settings/local.py
 # Static and media files in development
 /static/
 /media/
-
+! /theme/static
 # Cloud SQL Proxy
 cloud_sql_proxy
 
