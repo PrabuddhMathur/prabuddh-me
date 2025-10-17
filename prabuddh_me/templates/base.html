@@ -1,9 +1,19 @@
-{% load static wagtailcore_tags wagtailuserbar %}
+{% load static wagtailcore_tags wagtailuserbar tailwind_tags %}
+{% tailwind_css %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
     <head>
         <meta charset="utf-8" />
+        
+        <!-- Theme initialization script (must run before body renders to prevent flash) -->
+        <script>
+            // Initialize theme from localStorage before page renders
+            (function() {
+                const theme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+            })();
+        </script>
         <title>
             {% block title %}
             {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
@@ -31,13 +41,84 @@
         {% endblock %}
     </head>
 
-    <body class="{% block body_class %}{% endblock %}">
+    <body class="min-h-screen bg-base-100 {% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
+
+        <!-- Navigation -->
+        <nav class="navbar bg-base-100 shadow-lg">
+            <div class="navbar-start">
+                <div class="dropdown">
+                    <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+                        </svg>
+                    </div>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                    </ul>
+                </div>
+                <a href="/" class="btn btn-ghost text-xl">{% wagtail_site as current_site %}{{ current_site.site_name|default:"Prabuddh" }}</a>
+            </div>
+            <div class="navbar-center hidden lg:flex">
+                <ul class="menu menu-horizontal px-1">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/blog/">Blog</a></li>
+                </ul>
+            </div>
+            <div class="navbar-end">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="btn btn-ghost btn-circle" aria-label="Toggle theme">
+                    <svg id="theme-icon-light" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
 
         {% block content %}{% endblock %}
 
         {# Global javascript #}
         <script type="text/javascript" src="{% static 'js/prabuddh_me.js' %}"></script>
+        
+        <script>
+            // Theme toggle functionality
+            (function() {
+                const themeToggle = document.getElementById('theme-toggle');
+                const themeIconLight = document.getElementById('theme-icon-light');
+                const themeIconDark = document.getElementById('theme-icon-dark');
+                
+                // Function to update icon based on current theme
+                function updateThemeIcon(theme) {
+                    if (theme === 'dark') {
+                        themeIconLight.classList.add('hidden');
+                        themeIconDark.classList.remove('hidden');
+                    } else {
+                        themeIconLight.classList.remove('hidden');
+                        themeIconDark.classList.add('hidden');
+                    }
+                }
+                
+                // Initialize icon based on current theme
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                updateThemeIcon(currentTheme);
+                
+                // Toggle theme on button click
+                themeToggle.addEventListener('click', function() {
+                    const html = document.documentElement;
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    
+                    // Update theme
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateThemeIcon(newTheme);
+                });
+            })();
+        </script>
 
         {% block extra_js %}
         {# Override this in templates to add extra javascript #}

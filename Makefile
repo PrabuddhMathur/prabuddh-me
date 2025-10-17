@@ -61,8 +61,8 @@ help:
 # --- Local Development ---
 .PHONY: dev
 dev:
-	@echo "Starting Django development server (using dev settings)..."
-	DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py runserver 0.0.0.0:8000
+	@echo "Starting Django + Tailwind development servers..."
+	@DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py tailwind dev
 
 .PHONY: migrate-local
 migrate-local:

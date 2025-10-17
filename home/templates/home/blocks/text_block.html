@@ -1,0 +1,9 @@
+{% load wagtailcore_tags %}
+
+<div class="prose prose-lg max-w-none text-{{ value.alignment }} 
+    {% if value.size == 'small' %}text-sm
+    {% elif value.size == 'large' %}text-xl
+    {% elif value.size == 'xl' %}text-2xl
+    {% endif %}">
+    {{ value.text|richtext }}
+</div>

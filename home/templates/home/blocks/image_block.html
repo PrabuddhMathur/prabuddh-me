@@ -1,0 +1,39 @@
+{% load wagtailimages_tags %}
+
+<figure class="
+    {% if value.alignment == 'left' %}text-left
+    {% elif value.alignment == 'center' %}text-center mx-auto
+    {% elif value.alignment == 'right' %}text-right ml-auto
+    {% elif value.alignment == 'full' %}w-full
+    {% endif %}
+    
+    {% if value.size == 'small' %}max-w-xs
+    {% elif value.size == 'medium' %}max-w-2xl
+    {% elif value.size == 'large' %}max-w-4xl
+    {% elif value.size == 'full' %}w-full
+    {% endif %}
+    
+    my-6
+">
+    <div class="
+        {% if value.rounded %}rounded-lg{% endif %}
+        {% if value.shadow %}shadow-lg hover:shadow-xl transition-shadow duration-300{% endif %}
+        overflow-hidden
+    ">
+        {% if value.size == 'full' %}
+            {% image value.image original class="w-full h-auto object-cover" alt=value.alt_text %}
+        {% elif value.size == 'large' %}
+            {% image value.image width-900 class="w-full h-auto" alt=value.alt_text %}
+        {% elif value.size == 'medium' %}
+            {% image value.image width-600 class="w-full h-auto" alt=value.alt_text %}
+        {% elif value.size == 'small' %}
+            {% image value.image width-300 class="w-full h-auto" alt=value.alt_text %}
+        {% endif %}
+    </div>
+    
+    {% if value.caption %}
+        <figcaption class="text-sm text-base-content/60 mt-2 italic text-center">
+            {{ value.caption }}
+        </figcaption>
+    {% endif %}
+</figure>

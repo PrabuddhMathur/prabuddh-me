@@ -41,13 +41,17 @@ MIDDLEWARE = [
 # =====================================================
 # ✅ Static & Media Storage
 # =====================================================
-# Force local filesystem for development
+# Force local filesystem for development - use simple static files storage
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
     },
 }
+
+# Override static files configuration for development
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Different from STATICFILES_DIRS
 
 # =====================================================
 # ✅ Database

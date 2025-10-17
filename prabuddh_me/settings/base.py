@@ -8,13 +8,13 @@ import os
 from decouple import config, Csv
 
 # =====================================================
-# ✅ Core Paths
+# Core Paths
 # =====================================================
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 # =====================================================
-# ✅ Core Django Configuration
+# Core Django Configuration
 # =====================================================
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-key-change-in-production")
 DEBUG = config("DEBUG", default=True, cast=bool)
@@ -23,12 +23,18 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv(
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 
 # =====================================================
-# ✅ Installed Apps
+# Installed Apps
 # =====================================================
 INSTALLED_APPS = [
     # Project apps
-    "home",
+    "blog",
+    "core",
     "search",
+    "home",
+
+    # Tailwind CSS
+    "tailwind",
+    "theme",
 
     # Wagtail
     "wagtail.contrib.forms",
@@ -58,7 +64,7 @@ INSTALLED_APPS = [
 ]
 
 # =====================================================
-# ✅ Middleware
+# Middleware
 # =====================================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -72,7 +78,7 @@ MIDDLEWARE = [
 ]
 
 # =====================================================
-# ✅ URLs / Templates / WSGI
+# URLs / Templates / WSGI
 # =====================================================
 ROOT_URLCONF = "prabuddh_me.urls"
 
@@ -95,7 +101,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "prabuddh_me.wsgi.application"
 
 # =====================================================
-# ✅ Password Validation
+# Password Validation
 # =====================================================
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -105,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # =====================================================
-# ✅ Internationalization
+# Internationalization
 # =====================================================
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -128,7 +134,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 # =====================================================
-# ✅ Storage (Google Cloud Storage or Local Fallback)
+# Storage (Google Cloud Storage or Local Fallback)
 # =====================================================
 GS_BUCKET_NAME = config("GS_BUCKET_NAME", default=None)
 
@@ -155,14 +161,14 @@ else:
     }
 
 # =====================================================
-# ✅ Upload Limits
+# Upload Limits
 # =====================================================
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
 # =====================================================
-# ✅ Wagtail Configuration
+# Wagtail Configuration
 # =====================================================
-WAGTAIL_SITE_NAME = "prabuddh_me"
+WAGTAIL_SITE_NAME = "Prabuddh's Blog"
 
 WAGTAILSEARCH_BACKENDS = {"default": {"BACKEND": "wagtail.search.backends.database"}}
 
@@ -171,4 +177,11 @@ WAGTAILADMIN_BASE_URL = config("WAGTAILADMIN_BASE_URL", default="http://example.
 WAGTAILDOCS_EXTENSIONS = [
     "csv", "docx", "key", "odt", "pdf", "pptx", "rtf", "txt", "xlsx", "zip",
 ]
+# =====================================================
+
+# =====================================================
+# Tailwind Configuration
+# =====================================================
+TAILWIND_APP_NAME = 'theme'
+# TAILWIND_CSS_PATH = 'theme/static/css/dist/styles.css'
 # =====================================================
