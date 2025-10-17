@@ -27,8 +27,8 @@ CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 # =====================================================
 INSTALLED_APPS = [
     # Project apps
-    "blog",
-    "core",
+    # "blog",
+    # "core",
     "search",
     "home",
 
@@ -183,5 +183,4 @@ WAGTAILDOCS_EXTENSIONS = [
 # Tailwind Configuration
 # =====================================================
 TAILWIND_APP_NAME = 'theme'
-# TAILWIND_CSS_PATH = 'theme/static/css/dist/styles.css'
 # =====================================================
