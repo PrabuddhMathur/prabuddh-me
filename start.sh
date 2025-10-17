@@ -83,9 +83,6 @@ python manage.py migrate --noinput || {
     echo "ERROR: Migrations failed!"
     exit 1
 }
-# Build Tailwind CSS
-echo "Building Tailwind CSS..."
-python manage.py tailwind build
 
 # Collect static files
 echo "Collecting static files..."
