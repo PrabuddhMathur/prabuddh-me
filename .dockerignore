@@ -1,6 +1,7 @@
 # Django project
 /media/
 /static/
+!/theme/static/
 *.sqlite3
 db.sqlite3-journal
 
@@ -51,6 +52,7 @@ env/
 build/
 develop-eggs/
 dist/
+!/theme/static/css/dist/
 downloads/
 eggs/
 .eggs/
