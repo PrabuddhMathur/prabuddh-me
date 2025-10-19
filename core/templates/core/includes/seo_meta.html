@@ -1,0 +1,52 @@
+{% load wagtailcore_tags wagtailsettings_tags %}
+{% get_settings %}
+
+{# SEO Meta Tags Template #}
+{# Basic Meta Tags #}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{# SEO Meta Tags #}
+<meta name="description" content="{{ page.meta_description|default:settings.core.SiteSettings.default_meta_description|default:'Welcome to our site' }}">
+{% if page.meta_keywords %}
+    <meta name="keywords" content="{{ page.meta_keywords }}">
+{% endif %}
+
+{# Open Graph Meta Tags (Facebook, LinkedIn) #}
+<meta property="og:title" content="{{ page.og_title|default:page.title }}">
+<meta property="og:description" content="{{ page.og_description|default:page.meta_description|default:settings.core.SiteSettings.default_meta_description }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if page.og_image %}
+    {% load wagtailimages_tags %}
+    {% image page.og_image fill-1200x630 as og_img %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+{% endif %}
+{% if settings.core.SiteSettings.site_name %}
+    <meta property="og:site_name" content="{{ settings.core.SiteSettings.site_name }}">
+{% endif %}
+
+{# Twitter Card Meta Tags #}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page.og_title|default:page.title }}">
+<meta name="twitter:description" content="{{ page.og_description|default:page.meta_description|default:settings.core.SiteSettings.default_meta_description }}">
+{% if page.og_image %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}">
+{% endif %}
+
+{# Canonical URL #}
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+{# Google Analytics #}
+{% if settings.core.SiteSettings.google_analytics_id %}
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.core.SiteSettings.google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ settings.core.SiteSettings.google_analytics_id }}');
+    </script>
+{% endif %}
