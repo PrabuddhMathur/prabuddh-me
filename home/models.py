@@ -1,6 +1,8 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, TabbedInterface, ObjectList
+import logging
 
 # Import base blocks and models from core
 from core.models import (
@@ -14,6 +16,9 @@ from core.models import (
     BaseQuoteBlock,
     BaseSpacerBlock,
 )
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 
 # =====================================================
@@ -31,7 +36,8 @@ class HomePage(BasePage):
     hero_title = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Main hero title (optional, can also use StreamField hero)"
+        help_text="Main hero title (optional, can also use StreamField hero)",
+        db_index=True,
     )
     hero_subtitle = models.CharField(
         max_length=300,
@@ -122,11 +128,13 @@ class HomePage(BasePage):
     )
     number_of_featured_posts = models.IntegerField(
         default=3,
-        help_text="Number of featured posts to display"
+        help_text="Number of featured posts to display",
+        db_index=True,
     )
     show_featured_posts = models.BooleanField(
         default=True,
-        help_text="Display featured posts section"
+        help_text="Display featured posts section",
+        db_index=True,
     )
     
     # Recent Posts Configuration  
@@ -137,11 +145,13 @@ class HomePage(BasePage):
     )
     number_of_recent_posts = models.IntegerField(
         default=5,
-        help_text="Number of recent posts to display"
+        help_text="Number of recent posts to display",
+        db_index=True,
     )
     show_recent_posts = models.BooleanField(
         default=True,
-        help_text="Display recent posts section"
+        help_text="Display recent posts section",
+        db_index=True,
     )
     
     # SEO and Social Sharing (inherited from BasePage)
@@ -220,7 +230,10 @@ class HomePage(BasePage):
     
     # Template Context
     def get_context(self, request):
-        """Add extra context for template rendering."""
+        """
+        Add extra context for template rendering.
+        Includes blog posts if available, with graceful degradation.
+        """
         context = super().get_context(request)
         
         # Try to import and get blog posts (graceful fallback if blog app doesn't exist)
@@ -229,21 +242,53 @@ class HomePage(BasePage):
             
             # Get recent posts
             if self.show_recent_posts:
-                recent_posts = BlogPage.objects.live().public().order_by('-first_published_at')[:self.number_of_recent_posts]
-                context['recent_posts'] = recent_posts
+                try:
+                    recent_posts = (
+                        BlogPage.objects
+                        .live()
+                        .public()
+                        .order_by('-first_published_at')[:self.number_of_recent_posts]
+                    )
+                    context['recent_posts'] = recent_posts
+                    logger.debug(f"Loaded {recent_posts.count()} recent posts for homepage")
+                except Exception as e:
+                    logger.warning(f"Error fetching recent posts: {e}")
+                    context['recent_posts'] = []
             
             # Get featured posts (assuming there's a featured field on BlogPage)
             if self.show_featured_posts:
                 try:
-                    featured_posts = BlogPage.objects.live().public().filter(featured=True)[:self.number_of_featured_posts]
+                    featured_posts = (
+                        BlogPage.objects
+                        .live()
+                        .public()
+                        .filter(featured=True)[:self.number_of_featured_posts]
+                    )
                     context['featured_posts'] = featured_posts
-                except:
+                    logger.debug(f"Loaded {featured_posts.count()} featured posts for homepage")
+                except Exception as e:
                     # Fallback to recent posts if no featured field exists
-                    featured_posts = BlogPage.objects.live().public().order_by('-first_published_at')[:self.number_of_featured_posts]
-                    context['featured_posts'] = featured_posts
+                    logger.info(f"Featured field not available, using recent posts: {e}")
+                    try:
+                        featured_posts = (
+                            BlogPage.objects
+                            .live()
+                            .public()
+                            .order_by('-first_published_at')[:self.number_of_featured_posts]
+                        )
+                        context['featured_posts'] = featured_posts
+                    except Exception as fallback_error:
+                        logger.warning(f"Error in fallback featured posts query: {fallback_error}")
+                        context['featured_posts'] = []
                     
         except ImportError:
             # Blog app doesn't exist yet, set empty querysets
+            logger.info("Blog app not found, setting empty post lists")
+            context['recent_posts'] = []
+            context['featured_posts'] = []
+        except Exception as e:
+            # Catch any other unexpected errors
+            logger.error(f"Unexpected error in get_context: {e}", exc_info=True)
             context['recent_posts'] = []
             context['featured_posts'] = []
         
@@ -279,4 +324,53 @@ class HomePage(BasePage):
     class Meta:
         verbose_name = "Homepage"
         verbose_name_plural = "Homepages"
+        ordering = ['-first_published_at']
+    
+    def clean(self):
+        """Validate model fields."""
+        super().clean()
+        
+        # Validate featured posts count
+        if self.number_of_featured_posts < 0:
+            raise ValidationError({
+                'number_of_featured_posts': 'Number of featured posts cannot be negative.'
+            })
+        
+        if self.number_of_featured_posts > 20:
+            raise ValidationError({
+                'number_of_featured_posts': 'Number of featured posts cannot exceed 20.'
+            })
+        
+        # Validate recent posts count
+        if self.number_of_recent_posts < 0:
+            raise ValidationError({
+                'number_of_recent_posts': 'Number of recent posts cannot be negative.'
+            })
+        
+        if self.number_of_recent_posts > 50:
+            raise ValidationError({
+                'number_of_recent_posts': 'Number of recent posts cannot exceed 50.'
+            })
+        
+        # Validate CTA button - both text and link must be provided together
+        if self.hero_cta_text and not self.hero_cta_link:
+            raise ValidationError({
+                'hero_cta_link': 'CTA link is required when CTA text is provided.'
+            })
+        
+        if self.hero_cta_link and not self.hero_cta_text:
+            raise ValidationError({
+                'hero_cta_text': 'CTA button text is required when CTA link is provided. Use meaningful text for screen reader users.'
+            })
+        
+        # Validate CTA text is meaningful (not just whitespace)
+        if self.hero_cta_text and not self.hero_cta_text.strip():
+            raise ValidationError({
+                'hero_cta_text': 'CTA button text cannot be empty or only whitespace. Use meaningful text for screen reader users.'
+            })
+        
+        # Validate social media URLs format
+        if self.email_address:
+            # Basic email validation is handled by EmailField
+            pass
 

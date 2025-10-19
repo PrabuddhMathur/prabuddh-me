@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from wagtail.models import Page
 from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
@@ -104,11 +105,11 @@ class BaseImageBlock(blocks.StructBlock):
 
 
 class BaseButtonBlock(blocks.StructBlock):
-    """Reusable button block with styling options."""
+    """Reusable button block with styling options and accessibility validation."""
     button_text = CharBlock(
         required=True,
         max_length=50,
-        help_text="Button text"
+        help_text="Button text (required for accessibility)"
     )
     button_url = URLBlock(
         required=True,
@@ -140,6 +141,20 @@ class BaseButtonBlock(blocks.StructBlock):
         default=False,
         help_text="Open link in new tab"
     )
+    
+    def clean(self, value):
+        """Validate button has meaningful text for accessibility."""
+        errors = {}
+        
+        if not value.get('button_text') or not value.get('button_text').strip():
+            errors['button_text'] = ValidationError(
+                'Button text is required and cannot be empty. Use meaningful text for screen reader users.'
+            )
+        
+        if errors:
+            raise ValidationError('Validation error in button block', params=errors)
+        
+        return super().clean(value)
     
     class Meta:
         icon = 'link'
@@ -225,6 +240,33 @@ class BaseHeroBlock(blocks.StructBlock):
         help_text="Button style"
     )
     
+    def clean(self, value):
+        """Validate hero CTA button text for accessibility."""
+        errors = {}
+        
+        # If CTA link is provided, text must also be provided
+        if value.get('cta_link') and not value.get('cta_text'):
+            errors['cta_text'] = ValidationError(
+                'CTA button text is required when CTA link is provided. Use meaningful text for screen reader users.'
+            )
+        
+        # If CTA text is provided but empty/whitespace
+        if value.get('cta_text') and not value.get('cta_text').strip():
+            errors['cta_text'] = ValidationError(
+                'CTA button text cannot be empty or only whitespace. Use meaningful text for screen reader users.'
+            )
+        
+        # If CTA text is provided, link must also be provided
+        if value.get('cta_text') and not value.get('cta_link'):
+            errors['cta_link'] = ValidationError(
+                'CTA link is required when CTA button text is provided.'
+            )
+        
+        if errors:
+            raise ValidationError('Validation error in Hero block', params=errors)
+        
+        return super().clean(value)
+    
     class Meta:
         icon = 'view'
         label = 'Hero Section'
@@ -284,6 +326,20 @@ class BaseCallToActionBlock(blocks.StructBlock):
         default='center',
         help_text="Text alignment"
     )
+    
+    def clean(self, value):
+        """Validate CTA button has meaningful text for accessibility."""
+        errors = {}
+        
+        if not value.get('button_text') or not value.get('button_text').strip():
+            errors['button_text'] = ValidationError(
+                'Button text is required and cannot be empty. Use meaningful text for screen reader users.'
+            )
+        
+        if errors:
+            raise ValidationError('Validation error in CTA block', params=errors)
+        
+        return super().clean(value)
     
     class Meta:
         icon = 'plus-inverse'
@@ -433,7 +489,8 @@ class SiteSettings(BaseSiteSetting):
     site_name = models.CharField(
         max_length=255,
         default="My Site",
-        help_text="Name of the site"
+        help_text="Name of the site",
+        db_index=True,
     )
     
     tagline = models.CharField(
@@ -543,6 +600,10 @@ class SiteSettings(BaseSiteSetting):
     
     class Meta:
         verbose_name = 'Site Settings'
+    
+    def __str__(self):
+        """String representation of SiteSettings."""
+        return f"Site Settings for {self.site_name}"
 
 
 # =====================================================
@@ -562,7 +623,8 @@ class BasePage(Page):
     meta_keywords = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Comma-separated keywords for SEO"
+        help_text="Comma-separated keywords for SEO",
+        db_index=True,
     )
     
     # Social sharing fields
@@ -763,6 +825,10 @@ class HeaderSettings(BaseSiteSetting):
     class Meta:
         verbose_name = "Header Settings"
     
+    def __str__(self):
+        """String representation of HeaderSettings."""
+        return f"Header Settings - {self.site_title}"
+    
     def get_navigation_links(self):
         """Return a list of navigation links for template iteration."""
         links = []
@@ -911,6 +977,10 @@ class FooterSettings(BaseSiteSetting):
     
     class Meta:
         verbose_name = "Footer Settings"
+    
+    def __str__(self):
+        """String representation of FooterSettings."""
+        return f"Footer Settings - {self.copyright_text[:50]}"
     
     def get_footer_links(self):
         """Return a list of footer links for template iteration."""

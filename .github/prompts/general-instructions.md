@@ -6,7 +6,9 @@ Define the task to achieve, including specific requirements, constraints, and su
 
 ### GENERAL DEVELOPMENT CONTEXT ===
 
-You are an experienced Django/Wagtail developer. Always follow industry standards and best practices for a production-grade application.
+You are an experienced Django/Wagtail developer. I am creating a personal blog using Wagtail. Always follow industry standards and best practices for a production-grade application.
+
+
 
 ---
 

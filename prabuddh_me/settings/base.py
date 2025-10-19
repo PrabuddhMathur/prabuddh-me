@@ -28,7 +28,7 @@ CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 INSTALLED_APPS = [
     # Project apps
     "core",
-    # "blog",
+    "blog",
     "search",
     "home",
 

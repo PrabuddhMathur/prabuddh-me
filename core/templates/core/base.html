@@ -5,6 +5,15 @@
 <head>
     {% include "core/includes/seo_meta.html" %}
     
+    <!-- Theme initialization script (must run before body renders to prevent flash) -->
+    <script>
+        // Initialize theme from localStorage before page renders
+        (function() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    
     <title>{% block title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}{% endblock %}</title>
     
     {# Tailwind CSS #}
@@ -21,7 +30,7 @@
         {% include "core/includes/header.html" %}
     {% endblock %}
     
-    {# Main Content #}
+    {# Main Content - Add top padding when navbar is sticky to prevent content from being hidden behind it #}
     <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
@@ -30,6 +39,45 @@
     {% block footer %}
         {% include "core/includes/footer.html" %}
     {% endblock %}
+    
+    {# Theme Toggle JavaScript #}
+    <script>
+        // Theme toggle functionality
+        (function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIconLight = document.getElementById('theme-icon-light');
+            const themeIconDark = document.getElementById('theme-icon-dark');
+            
+            if (!themeToggle) return; // Exit if toggle button doesn't exist
+            
+            // Function to update icon based on current theme
+            function updateThemeIcon(theme) {
+                if (theme === 'dark') {
+                    themeIconLight.classList.add('hidden');
+                    themeIconDark.classList.remove('hidden');
+                } else {
+                    themeIconLight.classList.remove('hidden');
+                    themeIconDark.classList.add('hidden');
+                }
+            }
+            
+            // Initialize icon based on current theme
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            updateThemeIcon(currentTheme);
+            
+            // Toggle theme on button click
+            themeToggle.addEventListener('click', function() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                // Update theme
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+        })();
+    </script>
     
     {# Extra JavaScript #}
     {% block extra_js %}{% endblock %}

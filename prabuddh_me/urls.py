@@ -7,12 +7,24 @@ from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
+from blog import views as blog_views
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
+    
+    # Blog URLs (order matters: most specific first)
+    path("blog/", blog_views.blog_listing, name="blog_listing"),
+    path("blog/author/<slug:author_slug>/", blog_views.blog_author_archive, name="blog_author_archive"),
+    path("blog/tag/<slug:tag_slug>/", blog_views.blog_tag_archive, name="blog_tag_archive"),
+    
+    # Blog date-based URLs
+    path("<int:year>/<int:month>/<int:day>/<slug:slug>/", blog_views.blog_post_detail, name="blog_post_detail"),
+    path("<int:year>/<int:month>/<int:day>/", blog_views.blog_day_archive, name="blog_day_archive"),
+    path("<int:year>/<int:month>/", blog_views.blog_month_archive, name="blog_month_archive"),
+    path("<int:year>/", blog_views.blog_year_archive, name="blog_year_archive"),
 ]
 
 

@@ -1,4 +1,4 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags blog_tags %}
 
 <section class="my-12">
     <div class="flex items-center mb-8">
@@ -7,8 +7,8 @@
     </div>
     
     {% comment %}
-    This block will fetch recent posts dynamically when blog app is available.
-    For now, it provides a placeholder structure that matches the homepage template.
+    This block fetches recent posts dynamically from the blog app.
+    Uses the blog_tags template tag library.
     {% endcomment %}
     
     {% get_recent_blog_posts value.number_of_posts as recent_posts %}
@@ -22,9 +22,9 @@
         {% for post in recent_posts %}
             {% if value.layout_style == 'list' %}
                 <article class="card card-side bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    {% if value.show_featured_image and post.hero_image %}
+                    {% if value.show_featured_image and post.featured_image %}
                     <figure class="w-32 flex-shrink-0">
-                        {% image post.hero_image fill-128x128 class="w-full h-full object-cover" %}
+                        {% image post.featured_image fill-128x128 class="w-full h-full object-cover" %}
                     </figure>
                     {% endif %}
                     
@@ -33,8 +33,8 @@
                             <a href="{% pageurl post %}" class="link link-hover">{{ post.title }}</a>
                         </h3>
                         
-                        {% if value.show_excerpt and post.excerpt %}
-                        <p class="text-sm text-base-content/70">{{ post.excerpt|truncatewords:15 }}</p>
+                        {% if value.show_excerpt and post.intro %}
+                        <p class="text-sm text-base-content/70">{{ post.intro|truncatewords:15 }}</p>
                         {% endif %}
                         
                         <div class="card-actions justify-between items-center">
@@ -57,12 +57,12 @@
             
             {% else %}
                 <article class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                    {% if value.show_featured_image and post.hero_image %}
+                    {% if value.show_featured_image and post.featured_image %}
                     <figure class="h-48">
                         {% if value.layout_style == 'grid' %}
-                            {% image post.hero_image fill-300x192 class="w-full h-full object-cover" %}
+                            {% image post.featured_image fill-300x192 class="w-full h-full object-cover" %}
                         {% else %}
-                            {% image post.hero_image fill-400x192 class="w-full h-full object-cover" %}
+                            {% image post.featured_image fill-400x192 class="w-full h-full object-cover" %}
                         {% endif %}
                     </figure>
                     {% endif %}
@@ -72,8 +72,8 @@
                             <a href="{% pageurl post %}" class="link link-hover">{{ post.title }}</a>
                         </h3>
                         
-                        {% if value.show_excerpt and post.excerpt %}
-                        <p class="text-base-content/70">{{ post.excerpt|truncatewords:20 }}</p>
+                        {% if value.show_excerpt and post.intro %}
+                        <p class="text-base-content/70">{{ post.intro|truncatewords:20 }}</p>
                         {% endif %}
                         
                         <div class="card-actions justify-between items-center mt-4">
