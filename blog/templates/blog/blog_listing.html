@@ -1,0 +1,124 @@
+{% extends "core/base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    {# Header with View Controls #}
+    <div class="mb-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <nav class="text-sm breadcrumbs mb-4">
+                    <ul>
+                        <li><a href="/" class="hover:text-primary">Home</a></li>
+                        <li class="text-base-content/60">Blog</li>
+                    </ul>
+                </nav>
+                <h1 class="text-4xl md:text-5xl font-bold text-primary">All Blog Posts</h1>
+                <p class="text-base-content/70 mt-2">Browse {{ paginator.count }} posts</p>
+            </div>
+            
+            {# View Mode Toggle #}
+            <div class="flex gap-2">
+                <div class="join">
+                    <a href="?view=grid-2{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                       class="btn btn-sm join-item {% if view_mode == 'grid-2' %}btn-primary{% else %}btn-outline{% endif %}"
+                       title="2 Column Grid">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                    </a>
+                    <a href="?view=grid-3{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                       class="btn btn-sm join-item {% if view_mode == 'grid-3' %}btn-primary{% else %}btn-outline{% endif %}"
+                       title="3 Column Grid">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                        </svg>
+                    </a>
+                    <a href="?view=masonry{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                       class="btn btn-sm join-item {% if view_mode == 'masonry' %}btn-primary{% else %}btn-outline{% endif %}"
+                       title="Masonry Grid">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z" />
+                        </svg>
+                    </a>
+                    <a href="?view=list{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                       class="btn btn-sm join-item {% if view_mode == 'list' %}btn-primary{% else %}btn-outline{% endif %}"
+                       title="List View">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Blog Posts #}
+    {% if posts %}
+        {# Grid View (2 columns) #}
+        {% if view_mode == 'grid-2' %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            {% for post in posts %}
+            {% include "blog/includes/post_card.html" with post=post %}
+            {% endfor %}
+        </div>
+        
+        {# Grid View (3 columns) #}
+        {% elif view_mode == 'grid-3' %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {% for post in posts %}
+            {% include "blog/includes/post_card.html" with post=post %}
+            {% endfor %}
+        </div>
+        
+        {# Masonry Grid #}
+        {% elif view_mode == 'masonry' %}
+        <div class="columns-1 md:columns-2 lg:columns-3 gap-6 mb-12">
+            {% for post in posts %}
+            <div class="break-inside-avoid mb-6">
+                {% include "blog/includes/post_card.html" with post=post %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        {# List View #}
+        {% else %}
+        <div class="space-y-6 mb-12">
+            {% for post in posts %}
+            {% include "blog/includes/post_list_item.html" with post=post %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Pagination #}
+        {% if posts.has_other_pages %}
+        <div class="flex justify-center mt-12">
+            <div class="btn-group">
+                {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}{% if view_mode != 'grid-2' %}&view={{ view_mode }}{% endif %}" class="btn btn-outline">
+                    « Previous
+                </a>
+                {% endif %}
+                
+                <button class="btn btn-outline">
+                    Page {{ posts.number }} of {{ paginator.num_pages }}
+                </button>
+                
+                {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}{% if view_mode != 'grid-2' %}&view={{ view_mode }}{% endif %}" class="btn btn-outline">
+                    Next »
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>No blog posts found.</span>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

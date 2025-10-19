@@ -1,0 +1,11 @@
+{% load wagtailcore_tags %}
+
+{# Base Rich Text Block Template #}
+<div class="prose max-w-none
+    {% if value.alignment == 'left' %}text-left{% endif %}
+    {% if value.alignment == 'center' %}text-center{% endif %}
+    {% if value.alignment == 'right' %}text-right{% endif %}
+    {% if value.alignment == 'justify' %}text-justify{% endif %}
+">
+    {{ value.text|richtext }}
+</div>

@@ -1,0 +1,10 @@
+{% load wagtailcore_tags %}
+
+{# Base Heading Block Template #}
+<{{ value.heading_level }} class="
+    {% if value.alignment == 'left' %}text-left{% endif %}
+    {% if value.alignment == 'center' %}text-center{% endif %}
+    {% if value.alignment == 'right' %}text-right{% endif %}
+">
+    {{ value.heading_text }}
+</{{ value.heading_level }}>

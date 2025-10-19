@@ -1,0 +1,9 @@
+{% load wagtailcore_tags %}
+
+{# Base Spacer Block Template #}
+<div class="
+    {% if value.height == 'small' %}h-4{% endif %}
+    {% if value.height == 'medium' %}h-8{% endif %}
+    {% if value.height == 'large' %}h-16{% endif %}
+    {% if value.height == 'xlarge' %}h-24{% endif %}
+"></div>

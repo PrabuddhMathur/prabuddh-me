@@ -1,0 +1,24 @@
+{% load wagtailimages_tags %}
+
+{# Base Image Block Template #}
+<figure class="
+    {% if value.alignment == 'left' %}text-left{% endif %}
+    {% if value.alignment == 'center' %}mx-auto text-center{% endif %}
+    {% if value.alignment == 'right' %}ml-auto text-right{% endif %}
+    {% if value.alignment == 'full' %}w-full{% else %}max-w-4xl{% endif %}
+">
+    {% image value.image fill-1200x800 as img %}
+    <img 
+        src="{{ img.url }}" 
+        alt="{{ value.alt_text|default:value.caption|default:'Image' }}"
+        class="{% if value.alignment == 'full' %}w-full{% else %}max-w-full h-auto{% endif %} rounded-lg shadow-lg"
+        width="{{ img.width }}"
+        height="{{ img.height }}"
+    />
+    
+    {% if value.caption %}
+        <figcaption class="mt-2 text-sm text-gray-600">
+            {{ value.caption }}
+        </figcaption>
+    {% endif %}
+</figure>

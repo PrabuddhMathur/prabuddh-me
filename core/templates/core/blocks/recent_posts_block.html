@@ -1,0 +1,109 @@
+{% load wagtailcore_tags wagtailimages_tags blog_tags %}
+
+<section class="my-12">
+    <div class="flex items-center mb-8">
+        <h2 class="text-3xl font-bold text-base-content">{{ value.title }}</h2>
+        <div class="flex-1 h-px bg-base-300 ml-4"></div>
+    </div>
+    
+    {% comment %}
+    This block fetches recent posts dynamically from the blog app.
+    Uses the blog_tags template tag library.
+    {% endcomment %}
+    
+    {% get_recent_blog_posts value.number_of_posts as recent_posts %}
+    
+    <div class="
+        {% if value.layout_style == 'grid' %}grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6
+        {% elif value.layout_style == 'cards' %}grid grid-cols-1 md:grid-cols-2 gap-6
+        {% elif value.layout_style == 'list' %}space-y-4
+        {% endif %}
+    ">
+        {% for post in recent_posts %}
+            {% if value.layout_style == 'list' %}
+                <article class="card card-side bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    {% if value.show_featured_image and post.featured_image %}
+                    <figure class="w-32 flex-shrink-0">
+                        {% image post.featured_image fill-128x128 class="w-full h-full object-cover" %}
+                    </figure>
+                    {% endif %}
+                    
+                    <div class="card-body p-4">
+                        <h3 class="card-title text-lg">
+                            <a href="{% pageurl post %}" class="link link-hover">{{ post.title }}</a>
+                        </h3>
+                        
+                        {% if value.show_excerpt and post.intro %}
+                        <p class="text-sm text-base-content/70">{{ post.intro|truncatewords:15 }}</p>
+                        {% endif %}
+                        
+                        <div class="card-actions justify-between items-center">
+                            <div class="text-xs text-base-content/60 space-x-2">
+                                {% if value.show_date and post.first_published_at %}
+                                <time datetime="{{ post.first_published_at|date:'c' }}">
+                                    {{ post.first_published_at|date:"M d, Y" }}
+                                </time>
+                                {% endif %}
+                                
+                                {% if value.show_author and post.author %}
+                                <span>by {{ post.author }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <a href="{% pageurl post %}" class="btn btn-outline btn-xs">Read</a>
+                        </div>
+                    </div>
+                </article>
+            
+            {% else %}
+                <article class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    {% if value.show_featured_image and post.featured_image %}
+                    <figure class="h-48">
+                        {% if value.layout_style == 'grid' %}
+                            {% image post.featured_image fill-300x192 class="w-full h-full object-cover" %}
+                        {% else %}
+                            {% image post.featured_image fill-400x192 class="w-full h-full object-cover" %}
+                        {% endif %}
+                    </figure>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <a href="{% pageurl post %}" class="link link-hover">{{ post.title }}</a>
+                        </h3>
+                        
+                        {% if value.show_excerpt and post.intro %}
+                        <p class="text-base-content/70">{{ post.intro|truncatewords:20 }}</p>
+                        {% endif %}
+                        
+                        <div class="card-actions justify-between items-center mt-4">
+                            <div class="text-sm text-base-content/60 space-x-2">
+                                {% if value.show_date and post.first_published_at %}
+                                <time datetime="{{ post.first_published_at|date:'c' }}">
+                                    {{ post.first_published_at|date:"M d, Y" }}
+                                </time>
+                                {% endif %}
+                                
+                                {% if value.show_author and post.author %}
+                                <span>by {{ post.author }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <a href="{% pageurl post %}" class="btn btn-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </article>
+            {% endif %}
+        {% empty %}
+            <div class="text-center py-12 col-span-full">
+                <div class="text-base-content/50 text-lg">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p>No blog posts available yet.</p>
+                    <p class="text-sm mt-2">Check back soon for new content!</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>

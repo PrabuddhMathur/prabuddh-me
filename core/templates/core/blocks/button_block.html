@@ -1,0 +1,20 @@
+{% load wagtailcore_tags %}
+
+{# Base Button Block Template - Using DaisyUI button styles #}
+<a 
+    href="{{ value.button_url }}" 
+    class="btn 
+        {% if value.button_style == 'primary' %}btn-primary{% endif %}
+        {% if value.button_style == 'secondary' %}btn-secondary{% endif %}
+        {% if value.button_style == 'accent' %}btn-accent{% endif %}
+        {% if value.button_style == 'ghost' %}btn-ghost{% endif %}
+        {% if value.button_style == 'link' %}btn-link{% endif %}
+        {% if value.button_size == 'xs' %}btn-xs{% endif %}
+        {% if value.button_size == 'sm' %}btn-sm{% endif %}
+        {% if value.button_size == 'md' %}btn-md{% endif %}
+        {% if value.button_size == 'lg' %}btn-lg{% endif %}
+    "
+    {% if value.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+>
+    {{ value.button_text }}
+</a>
