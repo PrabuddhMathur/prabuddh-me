@@ -7,22 +7,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 {# SEO Meta Tags #}
-<meta name="description" content="{{ page.meta_description|default:settings.core.SiteSettings.default_meta_description|default:'Welcome to our site' }}">
+<meta name="description" content="{{ page.meta_description|default:page.intro|default:page.search_description|default:settings.core.SiteSettings.default_meta_description|default:page.title }}">
 {% if page.meta_keywords %}
     <meta name="keywords" content="{{ page.meta_keywords }}">
 {% endif %}
 
 {# Open Graph Meta Tags (Facebook, LinkedIn) #}
 <meta property="og:title" content="{{ page.og_title|default:page.title }}">
-<meta property="og:description" content="{{ page.og_description|default:page.meta_description|default:settings.core.SiteSettings.default_meta_description }}">
+<meta property="og:description" content="{{ page.og_description|default:page.meta_description|default:page.intro|default:page.search_description|default:settings.core.SiteSettings.default_meta_description|default:page.title }}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% load wagtailimages_tags %}
 {% if page.og_image %}
-    {% load wagtailimages_tags %}
     {% image page.og_image fill-1200x630 as og_img %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}">
+    <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
+{% elif page.featured_image %}
+    {% image page.featured_image fill-1200x630 as og_img %}
+    <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
+{% elif page.hero_image %}
+    {% image page.hero_image fill-1200x630 as og_img %}
+    <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
 {% endif %}
 {% if settings.core.SiteSettings.site_name %}
     <meta property="og:site_name" content="{{ settings.core.SiteSettings.site_name }}">
@@ -31,9 +44,16 @@
 {# Twitter Card Meta Tags #}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ page.og_title|default:page.title }}">
-<meta name="twitter:description" content="{{ page.og_description|default:page.meta_description|default:settings.core.SiteSettings.default_meta_description }}">
+<meta name="twitter:description" content="{{ page.og_description|default:page.meta_description|default:page.intro|default:page.search_description|default:settings.core.SiteSettings.default_meta_description|default:page.title }}">
 {% if page.og_image %}
-    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}">
+    {% image page.og_image fill-1200x630 as twitter_img %}
+    <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+{% elif page.featured_image %}
+    {% image page.featured_image fill-1200x630 as twitter_img %}
+    <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+{% elif page.hero_image %}
+    {% image page.hero_image fill-1200x630 as twitter_img %}
+    <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
 {% endif %}
 
 {# Canonical URL #}
