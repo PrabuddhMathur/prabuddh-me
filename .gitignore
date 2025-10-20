@@ -222,7 +222,7 @@ prabuddh_me/settings/local.py
 # Static and media files in development
 /static/
 /media/
-! /theme/static
+/documentation/
 # Cloud SQL Proxy
 cloud_sql_proxy
 
