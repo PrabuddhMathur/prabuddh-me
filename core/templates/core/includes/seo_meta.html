@@ -20,22 +20,43 @@
 {% load wagtailimages_tags %}
 {% if page.og_image %}
     {% image page.og_image fill-1200x630 as og_img %}
-    <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+    {% if "://" in og_img.url %}
+        {# URL is already absolute (contains ://) - use as-is #}
+        <meta property="og:image" content="{{ og_img.url }}">
+        <meta property="og:image:secure_url" content="{{ og_img.url }}">
+    {% else %}
+        {# URL is relative - prepend domain #}
+        <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+        <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
+    {% endif %}
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
 {% elif page.featured_image %}
     {% image page.featured_image fill-1200x630 as og_img %}
-    <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+    {% if "://" in og_img.url %}
+        {# URL is already absolute (contains ://) - use as-is #}
+        <meta property="og:image" content="{{ og_img.url }}">
+        <meta property="og:image:secure_url" content="{{ og_img.url }}">
+    {% else %}
+        {# URL is relative - prepend domain #}
+        <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+        <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
+    {% endif %}
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
 {% elif page.hero_image %}
     {% image page.hero_image fill-1200x630 as og_img %}
-    <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+    {% if "://" in og_img.url %}
+        {# URL is already absolute (contains ://) - use as-is #}
+        <meta property="og:image" content="{{ og_img.url }}">
+        <meta property="og:image:secure_url" content="{{ og_img.url }}">
+    {% else %}
+        {# URL is relative - prepend domain #}
+        <meta property="og:image" content="https://{{ request.get_host }}{{ og_img.url }}">
+        <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
+    {% endif %}
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ og_img.url }}">
 {% endif %}
 {% if settings.core.SiteSettings.site_name %}
     <meta property="og:site_name" content="{{ settings.core.SiteSettings.site_name }}">
@@ -47,13 +68,31 @@
 <meta name="twitter:description" content="{{ page.og_description|default:page.meta_description|default:page.intro|default:page.search_description|default:settings.core.SiteSettings.default_meta_description|default:page.title }}">
 {% if page.og_image %}
     {% image page.og_image fill-1200x630 as twitter_img %}
-    <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+    {% if "://" in twitter_img.url %}
+        {# URL is already absolute - use as-is #}
+        <meta name="twitter:image" content="{{ twitter_img.url }}">
+    {% else %}
+        {# URL is relative - prepend domain #}
+        <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+    {% endif %}
 {% elif page.featured_image %}
     {% image page.featured_image fill-1200x630 as twitter_img %}
-    <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+    {% if "://" in twitter_img.url %}
+        {# URL is already absolute - use as-is #}
+        <meta name="twitter:image" content="{{ twitter_img.url }}">
+    {% else %}
+        {# URL is relative - prepend domain #}
+        <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+    {% endif %}
 {% elif page.hero_image %}
     {% image page.hero_image fill-1200x630 as twitter_img %}
-    <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+    {% if "://" in twitter_img.url %}
+        {# URL is already absolute - use as-is #}
+        <meta name="twitter:image" content="{{ twitter_img.url }}">
+    {% else %}
+        {# URL is relative - prepend domain #}
+        <meta name="twitter:image" content="https://{{ request.get_host }}{{ twitter_img.url }}">
+    {% endif %}
 {% endif %}
 
 {# Canonical URL #}
