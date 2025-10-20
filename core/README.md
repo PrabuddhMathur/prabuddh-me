@@ -401,6 +401,10 @@ python manage.py validate_templates
 ## Changelog
 
 ### Latest Changes (October 2025)
+- ✅ Enhanced SEO meta template to support both Wagtail pages and seo_meta dictionaries
+- ✅ Fixed SEO meta template to work with blog archive views without MockPage
+- ✅ Fixed SEO meta template to remove `page.intro` reference causing errors on HomePage
+- ✅ Improved meta description fallback chain to use only universal fields
 - ✅ Removed all duplicate templates from home app
 - ✅ Centralized all reusable blocks in core
 - ✅ Added production-grade error handling and caching to blog
@@ -433,6 +437,9 @@ python manage.py validate_templates
 
 **Issue**: Settings not loading in templates  
 **Solution**: Add `{% load wagtailsettings_tags %}` and `{% get_settings %}` at the top
+
+**Issue**: VariableDoesNotExist error for `page.intro`  
+**Solution**: The `intro` field only exists on `BlogPage` and `BlogIndexPage`, not on all page types. The SEO meta template now uses a universal fallback chain that works for all page types.
 
 **Issue**: Blocks not rendering  
 **Solution**: Check block template paths match the `template` attribute in block Meta class

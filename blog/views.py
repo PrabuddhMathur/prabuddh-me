@@ -11,9 +11,6 @@ def blog_listing(request):
     """
     Main blog listing page showing all posts with grid view options.
     """
-    from wagtail.models import Site
-    from collections import namedtuple
-    
     # Get view preference from session (default to 'grid-2')
     view_mode = request.session.get('blog_view_mode', 'grid-2')
     
@@ -31,21 +28,14 @@ def blog_listing(request):
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
-    # Create a mock page object for SEO meta
-    MockPage = namedtuple('MockPage', ['title', 'seo_title', 'meta_description', 'meta_keywords', 
-                                        'og_title', 'og_description', 'og_image'])
-    mock_page = MockPage(
-        title='Blog',
-        seo_title='Blog - All Posts',
-        meta_description='Browse all blog posts',
-        meta_keywords='',
-        og_title='Blog - All Posts',
-        og_description='Browse all blog posts',
-        og_image=None
-    )
+    # SEO metadata
+    seo_meta = {
+        'title': 'Blog - All Posts',
+        'description': 'Browse all blog posts',
+    }
     
     return render(request, 'blog/blog_listing.html', {
-        'page': mock_page,
+        'seo_meta': seo_meta,
         'posts': posts_page,
         'paginator': paginator,
         'view_mode': view_mode,
@@ -57,7 +47,6 @@ def blog_author_archive(request, author_slug):
     View function for displaying all posts by a specific author.
     """
     from django.utils.text import slugify
-    from collections import namedtuple
     
     # Get author name from slug
     author_name = author_slug.replace('-', ' ').title()
@@ -84,21 +73,14 @@ def blog_author_archive(request, author_slug):
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
-    # Create a mock page object for SEO meta
-    MockPage = namedtuple('MockPage', ['title', 'seo_title', 'meta_description', 'meta_keywords', 
-                                        'og_title', 'og_description', 'og_image'])
-    mock_page = MockPage(
-        title=f'Posts by {author_name}',
-        seo_title=f'Posts by {author_name}',
-        meta_description=f'All blog posts written by {author_name}',
-        meta_keywords='',
-        og_title=f'Posts by {author_name}',
-        og_description=f'All blog posts written by {author_name}',
-        og_image=None
-    )
+    # SEO metadata
+    seo_meta = {
+        'title': f'Posts by {author_name}',
+        'description': f'All blog posts written by {author_name}',
+    }
     
     return render(request, 'blog/blog_archive.html', {
-        'page': mock_page,
+        'seo_meta': seo_meta,
         'posts': posts_page,
         'paginator': paginator,
         'archive_type': 'author',
@@ -110,8 +92,6 @@ def blog_tag_archive(request, tag_slug):
     """
     View function for displaying all posts with a specific tag.
     """
-    from collections import namedtuple
-    
     # Get the tag
     tag = get_object_or_404(Tag, slug=tag_slug)
     
@@ -125,21 +105,14 @@ def blog_tag_archive(request, tag_slug):
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
-    # Create a mock page object for SEO meta
-    MockPage = namedtuple('MockPage', ['title', 'seo_title', 'meta_description', 'meta_keywords', 
-                                        'og_title', 'og_description', 'og_image'])
-    mock_page = MockPage(
-        title=f'Posts tagged "{tag.name}"',
-        seo_title=f'Posts tagged "{tag.name}"',
-        meta_description=f'All blog posts tagged with {tag.name}',
-        meta_keywords='',
-        og_title=f'Posts tagged "{tag.name}"',
-        og_description=f'All blog posts tagged with {tag.name}',
-        og_image=None
-    )
+    # SEO metadata
+    seo_meta = {
+        'title': f'Posts tagged "{tag.name}"',
+        'description': f'All blog posts tagged with {tag.name}',
+    }
     
     return render(request, 'blog/blog_archive.html', {
-        'page': mock_page,
+        'seo_meta': seo_meta,
         'posts': posts_page,
         'paginator': paginator,
         'archive_type': 'tag',
@@ -168,9 +141,6 @@ def blog_year_archive(request, year):
     """
     View function for displaying blog posts from a specific year.
     """
-    from wagtail.models import Site
-    from collections import namedtuple
-    
     # Get all published blog posts for the year
     posts = BlogPage.objects.live().public().filter(
         date__year=year
@@ -181,21 +151,14 @@ def blog_year_archive(request, year):
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
-    # Create a mock page object for SEO meta
-    MockPage = namedtuple('MockPage', ['title', 'seo_title', 'meta_description', 'meta_keywords', 
-                                        'og_title', 'og_description', 'og_image'])
-    mock_page = MockPage(
-        title=f'Posts from {year}',
-        seo_title=f'Blog Archive - {year}',
-        meta_description=f'Blog posts from {year}',
-        meta_keywords='',
-        og_title=f'Blog Archive - {year}',
-        og_description=f'Blog posts from {year}',
-        og_image=None
-    )
+    # SEO metadata
+    seo_meta = {
+        'title': f'Blog Archive - {year}',
+        'description': f'Blog posts from {year}',
+    }
     
     return render(request, 'blog/blog_archive.html', {
-        'page': mock_page,
+        'seo_meta': seo_meta,
         'posts': posts_page,
         'paginator': paginator,
         'year': year,
@@ -207,9 +170,7 @@ def blog_month_archive(request, year, month):
     """
     View function for displaying blog posts from a specific month.
     """
-    from wagtail.models import Site
     from datetime import date
-    from collections import namedtuple
     
     # Get all published blog posts for the month
     posts = BlogPage.objects.live().public().filter(
@@ -226,21 +187,14 @@ def blog_month_archive(request, year, month):
     month_date = date(year, month, 1)
     month_name = month_date.strftime('%B')
     
-    # Create a mock page object for SEO meta
-    MockPage = namedtuple('MockPage', ['title', 'seo_title', 'meta_description', 'meta_keywords', 
-                                        'og_title', 'og_description', 'og_image'])
-    mock_page = MockPage(
-        title=f'Posts from {month_name} {year}',
-        seo_title=f'Blog Archive - {month_name} {year}',
-        meta_description=f'Blog posts from {month_name} {year}',
-        meta_keywords='',
-        og_title=f'Blog Archive - {month_name} {year}',
-        og_description=f'Blog posts from {month_name} {year}',
-        og_image=None
-    )
+    # SEO metadata
+    seo_meta = {
+        'title': f'Blog Archive - {month_name} {year}',
+        'description': f'Blog posts from {month_name} {year}',
+    }
     
     return render(request, 'blog/blog_archive.html', {
-        'page': mock_page,
+        'seo_meta': seo_meta,
         'posts': posts_page,
         'paginator': paginator,
         'year': year,
@@ -254,9 +208,7 @@ def blog_day_archive(request, year, month, day):
     """
     View function for displaying blog posts from a specific day.
     """
-    from wagtail.models import Site
     from datetime import date
-    from collections import namedtuple
     
     # Get all published blog posts for the day
     posts = BlogPage.objects.live().public().filter(
@@ -275,21 +227,14 @@ def blog_day_archive(request, year, month, day):
     date_string = archive_date.strftime('%B %d, %Y')
     month_name = archive_date.strftime('%B')
     
-    # Create a mock page object for SEO meta
-    MockPage = namedtuple('MockPage', ['title', 'seo_title', 'meta_description', 'meta_keywords', 
-                                        'og_title', 'og_description', 'og_image'])
-    mock_page = MockPage(
-        title=f'Posts from {date_string}',
-        seo_title=f'Blog Archive - {date_string}',
-        meta_description=f'Blog posts from {date_string}',
-        meta_keywords='',
-        og_title=f'Blog Archive - {date_string}',
-        og_description=f'Blog posts from {date_string}',
-        og_image=None
-    )
+    # SEO metadata
+    seo_meta = {
+        'title': f'Blog Archive - {date_string}',
+        'description': f'Blog posts from {date_string}',
+    }
     
     return render(request, 'blog/blog_archive.html', {
-        'page': mock_page,
+        'seo_meta': seo_meta,
         'posts': posts_page,
         'paginator': paginator,
         'year': year,
