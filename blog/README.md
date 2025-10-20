@@ -496,6 +496,13 @@ Potential additions:
 
 ## Changelog
 
+### Version 1.1.0 (October 2025)
+- ✅ Removed MockPage hack from all archive views
+- ✅ Simplified views to use `seo_meta` dictionary instead of fake page objects
+- ✅ Updated templates to support both Wagtail pages and archive views
+- ✅ Improved SEO meta template to handle multiple context types
+- ✅ Fixed VariableDoesNotExist errors on blog listing and archive pages
+
 ### Version 1.0.0 (Initial Release)
 - BlogIndexPage with pagination and filtering
 - BlogPage with StreamField content
