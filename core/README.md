@@ -148,6 +148,28 @@ The master template that all other templates extend:
 #### Template Structure
 ```
 core/templates/
+├── 404.html                      # Custom 404 error page
+├── 500.html                      # Custom 500 error page
+└── core/
+    ├── base.html                 # Master template
+    ├── blocks/                   # Block templates
+    │   ├── author_bio_block.html
+    │   ├── button_block.html
+    │   ├── cta_block.html
+    │   ├── heading_block.html
+    │   ├── hero_block.html
+    │   ├── image_block.html
+    │   ├── quote_block.html
+    │   ├── recent_posts_block.html
+    │   ├── rich_text_block.html
+    │   └── spacer_block.html
+    └── includes/                 # Reusable partials
+        ├── footer.html
+        ├── header.html
+        └── seo_meta.html
+```
+```
+core/templates/
 ├── core/
 │   ├── base.html                 # Master template
 │   ├── blocks/                   # Block templates
@@ -344,6 +366,8 @@ core/
 │   ├── 0002_footersettings_headersettings.py
 │   └── 0003_alter_sitesettings_site_name.py
 ├── templates/
+│   ├── 404.html              # Custom 404 error page
+│   ├── 500.html              # Custom 500 error page
 │   └── core/
 │       ├── base.html         # Master template
 │       ├── blocks/           # All StreamField block templates
@@ -400,7 +424,11 @@ python manage.py validate_templates
 
 ## Changelog
 
-### Latest Changes (October 2025)
+### Latest Changes (October 20, 2025)
+- ✅ Moved 404 and 500 error pages to core app templates
+- ✅ Removed unused `prabuddh_me/templates` directory
+- ✅ Updated Django settings to remove custom TEMPLATES DIRS configuration
+- ✅ Updated search template to extend from `core/base.html` with Tailwind styling
 - ✅ Enhanced SEO meta template to support both Wagtail pages and seo_meta dictionaries
 - ✅ Fixed SEO meta template to work with blog archive views without MockPage
 - ✅ Fixed SEO meta template to remove `page.intro` reference causing errors on HomePage
