@@ -48,7 +48,7 @@ CSRF_COOKIE_SAMESITE = "None"
 USE_X_FORWARDED_HOST = True
 
 # =====================================================
-# ✅ Database (PostgreSQL over SSL)
+# ✅ Database (PostgreSQL on VM with SSL)
 # =====================================================
 DATABASES = {
     "default": {
@@ -57,8 +57,13 @@ DATABASES = {
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", default="5432"),
-        "OPTIONS": {"sslmode": "require"},
+        "PORT": config("DB_PORT", default="5432", cast=int),
+        "OPTIONS": {
+            "sslmode": "verify-full",
+            "sslrootcert": config("DB_SSLROOTCERT"),
+            "sslcert": config("DB_SSLCERT"),
+            "sslkey": config("DB_SSLKEY"),
+        },
         "CONN_MAX_AGE": 60,
     }
 }

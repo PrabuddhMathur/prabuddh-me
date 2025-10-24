@@ -31,6 +31,13 @@ urlpatterns = [
 if settings.DEBUG:
     from django.conf.urls.static import static
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    from core.test_error_views import test_404, test_500
+
+    # Test URLs for error pages
+    urlpatterns += [
+        path("test-404/", test_404, name="test_404"),
+        path("test-500/", test_500, name="test_500"),
+    ]
 
     # Serve static and media files from development server
     urlpatterns += staticfiles_urlpatterns()

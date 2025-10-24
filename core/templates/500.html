@@ -1,0 +1,21 @@
+{% load static tailwind_tags %}
+{% tailwind_css %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <title>Internal Server Error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body class="min-h-screen flex items-center justify-center bg-base-100">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="text-center">
+            <h1 class="text-6xl font-bold text-error mb-4">500</h1>
+            <h2 class="text-3xl font-semibold mb-6">Internal Server Error</h2>
+            <p class="text-lg mb-8">Sorry, there seems to be an error. Please try again soon.</p>
+            <a href="/" class="btn btn-primary">Go to Home</a>
+        </div>
+    </div>
+</body>
+</html>

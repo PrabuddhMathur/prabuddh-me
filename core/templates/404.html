@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+{% load static wagtailcore_tags %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16 max-w-4xl">
+    <div class="text-center">
+        <h1 class="text-6xl font-bold text-primary mb-4">404</h1>
+        <h2 class="text-3xl font-semibold mb-6">Page Not Found</h2>
+        <p class="text-lg mb-8">Sorry, the page you are looking for could not be found.</p>
+        <a href="/" class="btn btn-primary">Go to Home</a>
+    </div>
+</div>
+{% endblock %}
