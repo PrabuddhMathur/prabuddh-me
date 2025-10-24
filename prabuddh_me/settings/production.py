@@ -57,12 +57,12 @@ DATABASES = {
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", default="5432", cast=int),
+        "PORT": config("DB_PORT", default="443", cast=int),
         "OPTIONS": {
             "sslmode": "verify-full",
-            "sslrootcert": config("DB_SSLROOTCERT"),
-            "sslcert": config("DB_SSLCERT"),
-            "sslkey": config("DB_SSLKEY"),
+            "sslrootcert": os.getenv("DB_SSLROOTCERT", "/var/secrets/db-ca-cert"),
+            "sslcert": os.getenv("DB_SSLCERT", "/var/secrets/db-client-cert"),
+            "sslkey": os.getenv("DB_SSLKEY", "/var/secrets/db-client-key"),
         },
         "CONN_MAX_AGE": 60,
     }
