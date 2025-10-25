@@ -15,19 +15,15 @@ echo "GCP_PROJECT: ${GCP_PROJECT:-'not set'}"
 
 if [ -d "/var/secrets/db-ca-cert" ]; then
     echo "Setting up SSL certificates..."
+    umask 077
     mkdir -p /tmp/db-certs
     
-    cp /var/secrets/db-client-key/db-client-key /tmp/db-certs/client-key.pem
-    cp /var/secrets/db-client-cert/db-client-cert /tmp/db-certs/client-cert.pem
-    cp /var/secrets/db-ca-cert/db-ca-cert /tmp/db-certs/ca-cert.pem
-    
-    chmod 600 /tmp/db-certs/client-key.pem
-    chmod 644 /tmp/db-certs/client-cert.pem
-    chmod 644 /tmp/db-certs/ca-cert.pem
-    
-    # Export env vars for Django to use
-    export DB_SSLCERT=/tmp/db-certs/client-cert.pem
+    install -m 600 /var/secrets/db-client-key/db-client-key /tmp/db-certs/client-key.pem
+    install -m 644 /var/secrets/db-client-cert/db-client-cert /tmp/db-certs/client-cert.pem
+    install -m 644 /var/secrets/db-ca-cert/db-ca-cert     /tmp/db-certs/ca-cert.pem
+
     export DB_SSLKEY=/tmp/db-certs/client-key.pem
+    export DB_SSLCERT=/tmp/db-certs/client-cert.pem
     export DB_SSLROOTCERT=/tmp/db-certs/ca-cert.pem
     
     echo "✓ SSL certificates configured"
