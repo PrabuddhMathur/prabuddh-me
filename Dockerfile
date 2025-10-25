@@ -36,11 +36,6 @@ RUN chmod +x start.sh
 # Create media directory for file storage fallback
 RUN mkdir -p /app/media && chown wagtail:wagtail /app/media
 
-# Fix permissions for SSL certificate files
-RUN chmod 600 /var/secrets/db-client-key/db-client-key && \
-    chmod 644 /var/secrets/db-ca-cert/db-ca-cert && \
-    chmod 644 /var/secrets/db-client-cert/db-client-cert
-
 # Switch to non-root user
 USER wagtail
 
@@ -52,4 +47,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 EXPOSE 8080
 
 # Runtime command: Use startup script
-CMD ["./start.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
