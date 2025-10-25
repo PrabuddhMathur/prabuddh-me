@@ -13,6 +13,9 @@ echo "DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-'not set'}"
 echo "PORT: ${PORT:-'not set'}"
 echo "GCP_PROJECT: ${GCP_PROJECT:-'not set'}"
 
+echo "Checking mounted secrets..."
+ls -R /var/secrets/
+
 # Check if secret is accessible
 if [ -n "$SECRET_KEY" ]; then
     echo "Secrets loaded successfully"
