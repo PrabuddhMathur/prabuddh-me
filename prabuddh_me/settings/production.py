@@ -60,9 +60,9 @@ DATABASES = {
         "PORT": config("DB_PORT", default="443", cast=int),
         "OPTIONS": {
             "sslmode": "verify-full",
-            "sslrootcert": os.getenv("DB_SSLROOTCERT", "/var/secrets/db-ca-cert"),
-            "sslcert": os.getenv("DB_SSLCERT", "/var/secrets/db-client-cert"),
-            "sslkey": os.getenv("DB_SSLKEY", "/var/secrets/db-client-key"),
+            "sslrootcert": os.getenv("DB_SSLROOTCERT"),  # /tmp/certs/ca.crt
+            "sslcert": os.getenv("DB_SSLCERT"),          # /tmp/certs/client.crt
+            "sslkey": os.getenv("DB_SSLKEY"),            # /tmp/certs/client.key
         },
         "CONN_MAX_AGE": 60,
     }
