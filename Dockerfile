@@ -30,8 +30,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy project files (respects .dockerignore)
 COPY --chown=wagtail:wagtail . .
 
-# Make startup script executable
-RUN chmod +x start.sh
+# Copy and make entrypoint.sh executable as root
+COPY --chown=root:root entrypoint.sh ./
+RUN chmod +x ./entrypoint.sh
 
 # Create media directory for file storage fallback
 RUN mkdir -p /app/media && chown wagtail:wagtail /app/media
