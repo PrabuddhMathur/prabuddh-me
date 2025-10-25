@@ -13,6 +13,3 @@ if [ -f "/var/secrets/db-ca-cert/db-ca-cert" ]; then
   echo "Setting permissions for db-ca-cert..."
   chmod 644 "/var/secrets/db-ca-cert/db-ca-cert"
 fi
-
-# Execute the main application command (your start.sh)
-exec "./start.sh"
