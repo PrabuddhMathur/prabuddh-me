@@ -8,6 +8,13 @@ log() {
 
 log "Starting entrypoint script..."
 
+# Check if GCP_PROJECT is set
+if [ -z "$GCP_PROJECT" ]; then
+    log "ERROR: GCP_PROJECT environment variable is not set"
+    exit 1
+fi
+log "Using GCP project: $GCP_PROJECT"
+
 # Use /tmp/certs directory (already created and owned by wagtail in Dockerfile)
 log "Using certificate directory at /tmp/certs..."
 
@@ -15,7 +22,7 @@ log "Using certificate directory at /tmp/certs..."
 log "Downloading SSL certificates from Google Cloud Secret Manager..."
 
 log "Downloading client certificate..."
-if gcloud secrets versions access latest --secret=db-client-cert > /tmp/certs/client.crt; then
+if gcloud secrets versions access latest --secret=db-client-cert --project=$GCP_PROJECT > /tmp/certs/client.crt; then
     log "Client certificate downloaded successfully"
 else
     log "ERROR: Failed to download client certificate"
@@ -23,7 +30,7 @@ else
 fi
 
 log "Downloading client key..."
-if gcloud secrets versions access latest --secret=db-client-key > /tmp/certs/client.key; then
+if gcloud secrets versions access latest --secret=db-client-key --project=$GCP_PROJECT > /tmp/certs/client.key; then
     log "Client key downloaded successfully"
 else
     log "ERROR: Failed to download client key"
@@ -31,7 +38,7 @@ else
 fi
 
 log "Downloading server CA certificate..."
-if gcloud secrets versions access latest --secret=db-server-ca > /tmp/certs/ca.crt; then
+if gcloud secrets versions access latest --secret=db-server-ca --project=$GCP_PROJECT > /tmp/certs/ca.crt; then
     log "Server CA certificate downloaded successfully"
 else
     log "ERROR: Failed to download server CA certificate"
