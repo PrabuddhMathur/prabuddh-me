@@ -58,4 +58,4 @@ EXPOSE 8080
 
 # Runtime command: Use startup script
 
-ENTRYPOINT ["./entrypoint.sh"]
+CMD ["./start.sh"]
