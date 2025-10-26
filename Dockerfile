@@ -1,12 +1,12 @@
-FROM python:3.12-slim-bookworm          # Base OS with Python
+FROM python:3.12-slim-bookworm          
 
 # Creates 'wagtail' user (non-root for security)
 RUN useradd --create-home --shell /bin/bash wagtail
 
-WORKDIR /app                            # All commands run from here
+WORKDIR /app                            
 
-ENV PYTHONUNBUFFERED=1                  # Real-time logs
-ENV PORT=8080                           # Cloud Run default port
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
 
 # Installs: gcc, PostgreSQL dev libs, image processing libs
 RUN apt-get install build-essential libpq-dev libjpeg62-turbo-dev
@@ -25,8 +25,8 @@ RUN mkdir -p /tmp/certs && chown wagtail:wagtail /tmp/certs
 COPY entrypoint.sh start.sh ./
 RUN chmod +x ./entrypoint.sh ./start.sh
 
-USER wagtail                            # Switch to non-root user
+USER wagtail                          
 
-EXPOSE 8080                             # Port for HTTP traffic
+EXPOSE 8080                             
 
-ENTRYPOINT ["./entrypoint.sh"]          # First script to run
+ENTRYPOINT ["./entrypoint.sh"]
