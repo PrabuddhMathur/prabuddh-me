@@ -1,31 +1,60 @@
 #!/bin/bash
-set -e                                  # Exit if any command fails
+set -e
 
-echo "Starting mTLS setup..."
+# Enable logging with timestamps
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ENTRYPOINT: $1"
+}
 
-# Create writable directory for certificates
-mkdir -p /tmp/certs
-chmod 700 /tmp/certs                    # Only owner can read/write/execute
+log "Starting entrypoint script..."
 
-# Copy certificates from read-only mounts to writable location
-# Source: /var/secrets/* (mounted by Cloud Run from Secret Manager)
-# Destination: /tmp/certs/* (writable filesystem)
+# Use /tmp/certs directory (already created and owned by wagtail in Dockerfile)
+log "Using certificate directory at /tmp/certs..."
 
-cp /var/secrets/db-client-key/db-client-key /tmp/certs/client.key
-chmod 600 /tmp/certs/client.key         # Only owner can read/write
+# Download SSL certificates from Google Cloud Secret Manager
+log "Downloading SSL certificates from Google Cloud Secret Manager..."
 
-cp /var/secrets/db-client-cert/db-client-cert /tmp/certs/client.crt
-chmod 644 /tmp/certs/client.crt         # Owner: read/write, Others: read
+log "Downloading client certificate..."
+if gcloud secrets versions access latest --secret=db-client-cert > /tmp/certs/client.crt; then
+    log "Client certificate downloaded successfully"
+else
+    log "ERROR: Failed to download client certificate"
+    exit 1
+fi
 
-cp /var/secrets/db-ca-cert/db-ca-cert /tmp/certs/ca.crt
-chmod 644 /tmp/certs/ca.crt
+log "Downloading client key..."
+if gcloud secrets versions access latest --secret=db-client-key > /tmp/certs/client.key; then
+    log "Client key downloaded successfully"
+else
+    log "ERROR: Failed to download client key"
+    exit 1
+fi
 
-# Set environment variables for Django to use
-export DB_SSLKEY=/tmp/certs/client.key
+log "Downloading server CA certificate..."
+if gcloud secrets versions access latest --secret=db-server-ca > /tmp/certs/ca.crt; then
+    log "Server CA certificate downloaded successfully"
+else
+    log "ERROR: Failed to download server CA certificate"
+    exit 1
+fi
+
+# Set proper permissions for certificate files
+log "Setting secure permissions for certificate files..."
+chmod 600 /tmp/certs/client.key
+chmod 644 /tmp/certs/client.crt /tmp/certs/ca.crt
+log "Certificate permissions set successfully"
+
+# Export paths for Django
+log "Setting SSL certificate environment variables..."
 export DB_SSLCERT=/tmp/certs/client.crt
+export DB_SSLKEY=/tmp/certs/client.key
 export DB_SSLROOTCERT=/tmp/certs/ca.crt
+log "Environment variables set:"
+log "  DB_SSLCERT=${DB_SSLCERT}"
+log "  DB_SSLKEY=${DB_SSLKEY}"
+log "  DB_SSLROOTCERT=${DB_SSLROOTCERT}"
 
-echo "Certificates ready. Starting Django..."
+log "SSL certificates ready. Handing off to start.sh..."
 
 # Execute start.sh (replaces this process)
 exec ./start.sh
