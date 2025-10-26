@@ -51,7 +51,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="" \
     GCLOUD_PROJECT=""
 
 # Copy Google Cloud SDK from the official image
-COPY --from=gcloud /google-cloud-sdk /google-cloud-sdk
+COPY --from=gcloud /usr/lib/google-cloud-sdk /google-cloud-sdk
 
 # Install system dependencies
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
