@@ -20,8 +20,17 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libjpeg62-turbo-dev \
     zlib1g-dev \
     libwebp-dev \
+    curl \
+    gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
+# Install Google Cloud SDK for wagtail user
+USER wagtail
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH="/home/wagtail/google-cloud-sdk/bin:${PATH}"
+
+# Switch back to root for remaining setup
+USER root
 
 
 # Installs: Django, Wagtail, psycopg2, gunicorn, etc.
@@ -35,21 +44,17 @@ COPY --chown=wagtail:wagtail . .
 # Creates /tmp/certs directory (writable by wagtail user)
 RUN mkdir -p /tmp/certs && chown wagtail:wagtail /tmp/certs
 
-# Makes scripts executable
-RUN chmod +x ./entrypoint.sh ./start.sh
+# Makes scripts executable and ensure wagtail owns gcloud
+RUN chmod +x ./entrypoint.sh ./start.sh && \
+    chown -R wagtail:wagtail /home/wagtail/google-cloud-sdk
 
 # Switch to non-root user
-
 USER wagtail
 
 
 # Health check for Cloud Run
-
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-
     CMD python -c "import requests; requests.get('http://localhost:8080/', timeout=5)" || exit 1
-
-
 
 # Expose port 8080 (Cloud Run default)
 
@@ -57,5 +62,4 @@ EXPOSE 8080
 
 
 # Runtime command: Use startup script
-
-CMD ["./start.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
