@@ -47,4 +47,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 EXPOSE 8080
 
 # Runtime command
-CMD ["./entrypoint.sh"]
+CMD ["./start.sh"]
