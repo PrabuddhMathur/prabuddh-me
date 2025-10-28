@@ -16,7 +16,6 @@ fi
 # --- Prepare writable temp directory for certs ---
 echo "[ENTRYPOINT] Ensuring /tmp/certs exists..."
 mkdir -p /tmp/certs
-chmod 700 /tmp/certs  # restrict permissions
 
 log "Fetching secrets via Secret Manager API (Python)..."
 
