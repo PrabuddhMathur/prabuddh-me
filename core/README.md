@@ -443,6 +443,40 @@ python manage.py validate_templates
 - ✅ Added class methods for common queries (`get_recent_posts`, etc.)
 - ✅ Database optimization with strategic indexes
 - ✅ Complete SEO meta template with OG and Twitter Cards
+- ✅ Implemented Reddit-style spoiler text feature for Draftail editor
+
+## Wagtail Custom Features
+
+### Spoiler Text (Draftail Inline Style)
+
+A Reddit-style spoiler text feature integrated into the Wagtail Draftail editor.
+
+**Features:**
+- Blurred text in editor and frontend
+- Click-to-reveal functionality
+- Keyboard accessible (Tab + Enter/Space)
+- Revealed state persists until page refresh
+- Dark mode support
+- ARIA attributes for screen readers
+
+**Usage in Wagtail Admin:**
+1. Select text in the Draftail editor
+2. Click the 👁 (eye) icon in the toolbar
+3. Text becomes blurred as a spoiler
+4. On the published page, click the spoiler to reveal
+
+**Technical Implementation:**
+- **File:** [`core/wagtail_hooks.py`](core/wagtail_hooks.py:1) - Registers the Draftail feature
+- **CSS:** [`core/static/core/css/spoiler.css`](core/static/core/css/spoiler.css:1) - Styling for blur effect
+- **JavaScript:** [`core/static/core/js/spoiler.js`](core/static/core/js/spoiler.js:1) - Click-to-reveal functionality
+- **Template:** [`core/templates/core/blocks/rich_text_block.html`](core/templates/core/blocks/rich_text_block.html:1) - Loads assets
+- **Database Format:** `<span class="spoiler" data-spoiler="true">content</span>`
+
+**Accessibility:**
+- Keyboard navigation supported (Tab to focus, Enter/Space to reveal)
+- ARIA labels for screen readers
+- Focus indicators for keyboard users
+- Progressive enhancement (works without JavaScript, just no reveal interaction)
 
 ## Future Enhancements
 

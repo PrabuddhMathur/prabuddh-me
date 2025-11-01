@@ -52,7 +52,8 @@ class BaseRichTextBlock(blocks.StructBlock):
     """Reusable rich text block with alignment options."""
     text = RichTextBlock(
         required=True,
-        help_text="Rich text content with formatting options"
+        help_text="Rich text content with formatting options",
+        features=['bold', 'italic', 'link', 'ol', 'ul', 'h2', 'h3', 'h4', 'spoiler']
     )
     alignment = blocks.ChoiceBlock(
         choices=[
