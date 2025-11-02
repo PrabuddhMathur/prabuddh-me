@@ -1,8 +1,8 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
 <!-- Navigation Header -->
-<nav class="bg-base-100 border-b border-base-200 px-6 lg:px-12 py-4 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50{% endif %}">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+<nav class="bg-base-100 border-b border-base-200 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50{% endif %}">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
         <!-- Logo / Site Title -->
         <a href="/" class="text-lg font-semibold tracking-tight hover:text-base-content/70 transition-colors">
             {% if settings.core.HeaderSettings.show_logo and settings.core.HeaderSettings.logo %}
@@ -22,7 +22,7 @@
         </div>
         
         <!-- Right Side Actions -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
             <!-- Search Bar -->
             {% if settings.core.HeaderSettings.show_search %}
             <form action="/search/" method="get" class="hidden md:block">
@@ -32,7 +32,7 @@
             
             <!-- Theme Toggle Button -->
             {% if settings.core.HeaderSettings.show_theme_toggle %}
-            <button id="theme-toggle" class="p-2 hover:bg-base-200 rounded-lg transition-colors" aria-label="Toggle theme">
+            <button id="theme-toggle" class="p-2 hover:bg-base-200 rounded-lg transition-colors flex items-center justify-center" aria-label="Toggle theme">
                 <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
@@ -45,7 +45,7 @@
             <!-- Mobile Menu Button -->
             <div class="lg:hidden">
                 <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="p-2 hover:bg-base-200 rounded-lg transition-colors" aria-label="Menu">
+                    <div tabindex="0" role="button" class="p-2 hover:bg-base-200 rounded-lg transition-colors flex items-center justify-center" aria-label="Menu">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>

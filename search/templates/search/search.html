@@ -4,14 +4,14 @@
 {% block title %}Search{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-16 max-w-4xl">
+<div class="max-w-4xl mx-auto px-6 lg:px-12 py-12">
     <h1 class="text-4xl font-bold mb-8">Search</h1>
 
     <form action="{% url 'search' %}" method="get" class="mb-8">
         <div class="flex gap-2">
             <input type="text" name="query"{% if search_query %} value="{{ search_query }}"{% endif %} 
                    class="input input-bordered flex-1" placeholder="Enter search query...">
-            <input type="submit" value="Search" class="btn btn-primary">
+            <button type="submit" class="px-6 py-2 border border-base-300 hover:bg-base-200 transition-colors">Search</button>
         </div>
     </form>
 

@@ -2,11 +2,12 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from wagtail.models import Page
 from wagtail.fields import StreamField
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, TabbedInterface, ObjectList
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail import blocks
 from wagtail.blocks import RichTextBlock, CharBlock, URLBlock, BooleanBlock
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.search import index
 
 
 # =====================================================
@@ -1187,3 +1188,86 @@ class AuthorSettings(BaseSiteSetting):
                 'icon': 'email'
             })
         return links
+
+
+# =====================================================
+# Static Page Model (for About, Contact, Terms, etc.)
+# =====================================================
+
+class StaticPage(BasePage):
+    """
+    Flexible static page model for content like About, Contact, Terms, Privacy, etc.
+    Uses StreamField for maximum flexibility in content layout.
+    Production-grade with validation and search indexing.
+    """
+    
+    # Page Introduction
+    intro = models.TextField(
+        blank=True,
+        max_length=500,
+        help_text="Optional introduction text (500 characters max)"
+    )
+    
+    # Main Content (StreamField with all available blocks)
+    body = StreamField([
+        ('heading', BaseHeadingBlock()),
+        ('text', BaseRichTextBlock()),
+        ('image', BaseImageBlock()),
+        ('quote', BaseQuoteBlock()),
+        ('button', BaseButtonBlock()),
+        ('spacer', BaseSpacerBlock()),
+        ('hero', BaseHeroBlock()),
+        ('cta', BaseCallToActionBlock()),
+        ('author_bio', BaseAuthorBioBlock()),
+    ], 
+    blank=True,
+    use_json_field=True,
+    help_text="Main page content using flexible blocks"
+    )
+    
+    # Display Settings
+    show_last_updated = models.BooleanField(
+        default=False,
+        help_text="Display last updated date at the bottom of the page"
+    )
+    
+    # Search configuration
+    search_fields = BasePage.search_fields + [
+        index.SearchField('intro'),
+        index.SearchField('body'),
+    ]
+    
+    # Content panels for the editor
+    content_panels = BasePage.content_panels + [
+        FieldPanel('intro'),
+        FieldPanel('body'),
+        FieldPanel('show_last_updated'),
+    ]
+    
+    # SEO panels from BasePage
+    promote_panels = BasePage.seo_panels
+    
+    # Combine into tabbed interface
+    edit_handler = TabbedInterface([
+        ObjectList(content_panels, heading='Content'),
+        ObjectList(promote_panels, heading='SEO & Promotion'),
+        ObjectList(BasePage.settings_panels, heading='Settings'),
+    ])
+    
+    class Meta:
+        verbose_name = "Static Page"
+        verbose_name_plural = "Static Pages"
+    
+    def __str__(self):
+        """String representation of the page."""
+        return self.title
+    
+    def get_context(self, request, *args, **kwargs):
+        """Add custom context to the template."""
+        context = super().get_context(request, *args, **kwargs)
+        
+        # Add last modified date if needed
+        if self.show_last_updated:
+            context['last_updated'] = self.last_published_at or self.latest_revision_created_at
+        
+        return context

@@ -68,6 +68,28 @@ class HomePage(BasePage):
         help_text="Call-to-action button link"
     )
     
+    # Hero text positioning
+    hero_text_horizontal = models.CharField(
+        max_length=20,
+        choices=[
+            ('left', 'Left'),
+            ('center', 'Center'),
+            ('right', 'Right'),
+        ],
+        default='left',
+        help_text="Horizontal position of hero text"
+    )
+    hero_text_vertical = models.CharField(
+        max_length=20,
+        choices=[
+            ('top', 'Top'),
+            ('center', 'Center'),
+            ('bottom', 'Bottom'),
+        ],
+        default='center',
+        help_text="Vertical position of hero text"
+    )
+    
     # Main Content StreamField - Uses blocks from core
     body = StreamField(
         [
@@ -145,6 +167,8 @@ class HomePage(BasePage):
             FieldPanel('hero_image'),
             FieldPanel('hero_cta_text'),
             FieldPanel('hero_cta_link'),
+            FieldPanel('hero_text_horizontal'),
+            FieldPanel('hero_text_vertical'),
         ], heading="Hero Section"),
         
         FieldPanel('body'),
@@ -301,9 +325,3 @@ class HomePage(BasePage):
             raise ValidationError({
                 'hero_cta_text': 'CTA button text cannot be empty or only whitespace. Use meaningful text for screen reader users.'
             })
-        
-        # Validate social media URLs format
-        if self.email_address:
-            # Basic email validation is handled by EmailField
-            pass
-

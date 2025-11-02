@@ -2,18 +2,19 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
-<article class="max-w-4xl mx-auto px-6 lg:px-12 py-12">
-    {# Breadcrumb Navigation #}
-    <nav class="text-sm mb-8 text-base-content/60">
-        <a href="/" class="hover:text-base-content">Home</a>
-        <span class="mx-2">/</span>
-        <a href="/blog/" class="hover:text-base-content">Blog</a>
-        <span class="mx-2">/</span>
-        <span>{{ page.title }}</span>
-    </nav>
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+    <article class="max-w-4xl mx-auto">
+        {# Breadcrumb Navigation #}
+        <nav class="text-sm mb-8 text-base-content/60">
+            <a href="/" class="hover:text-base-content">Home</a>
+            <span class="mx-2">/</span>
+            <a href="/blog/" class="hover:text-base-content">Blog</a>
+            <span class="mx-2">/</span>
+            <span class="text-base-content font-medium">{{ page.title }}</span>
+        </nav>
 
-    {# Article Header #}
-    <header class="mb-12">
+        {# Article Header #}
+        <header class="mb-12">
         <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">{{ page.title }}</h1>
         
         {# Post Meta Information #}
@@ -44,12 +45,21 @@
 
         {# Tags #}
         {% if page.tags.all %}
-        <div class="flex flex-wrap gap-2 mb-8">
-            {% for tag in page.tags.all %}
-            <a href="{% url 'blog_tag_archive' tag.slug %}" class="text-sm px-3 py-1 border border-base-300 hover:border-base-content hover:text-base-content transition-colors">
-                {{ tag }}
-            </a>
-            {% endfor %}
+        <div class="mb-8">
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span class="text-sm font-medium text-base-content/60">Tags:</span>
+                </div>
+                {% for tag in page.tags.all %}
+                <a href="{% url 'blog_tag_archive' tag.slug %}" class="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 bg-base-200 hover:bg-base-300 border border-base-300 hover:border-base-content rounded-md transition-colors">
+                    <span>#</span>
+                    <span>{{ tag }}</span>
+                </a>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
@@ -57,7 +67,7 @@
         {% if page.featured_image %}
         <figure class="mb-8">
             {% image page.featured_image width-1200 as featured_img %}
-            <button onclick="featured_image_modal.showModal()" class="block cursor-pointer group relative w-full overflow-hidden">
+            <button onclick="featured_image_modal.showModal()" class="block cursor-pointer group relative w-full overflow-hidden rounded-lg">
                 <img src="{{ featured_img.url }}" alt="{{ page.featured_image.title }}" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity">
             </button>
             {% if page.featured_image_caption %}
@@ -69,13 +79,13 @@
         
         {# Image Modal #}
         <dialog id="featured_image_modal" class="modal">
-            <div class="modal-box max-w-7xl w-11/12 p-0 bg-base-100">
+            <div class="modal-box max-w-4xl w-11/12 p-4 bg-transparent border-0 shadow-none group">
                 <form method="dialog">
-                    <button class="absolute right-4 top-4 z-10 p-2 bg-base-100/80 hover:bg-base-100 rounded-lg">✕</button>
+                    <button class="absolute right-4 top-4 z-10 p-2 bg-base-100/80 hover:bg-base-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                 </form>
-                <img src="{{ featured_img.url }}" alt="{{ page.featured_image.title }}" class="w-full h-auto">
+                <img src="{{ featured_img.url }}" alt="{{ page.featured_image.title }}" class="w-full h-auto rounded-lg">
                 {% if page.featured_image_caption %}
-                <div class="p-6 text-center text-sm text-base-content/60">
+                <div class="p-6 text-center text-sm text-base-content/60 bg-base-100 rounded-b-lg mt-1">
                     {{ page.featured_image_caption }}
                 </div>
                 {% endif %}
@@ -193,6 +203,6 @@
             </div>
             {% endif %}
         </aside>
-    </div>
-</article>
+    </article>
+</div>
 {% endblock %}

@@ -3,57 +3,16 @@
 <!-- Footer -->
 <footer class="border-t border-base-200 bg-base-100 mt-24">
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-            
-            <!-- Column 1: Author Info (if enabled) -->
-            {% if settings.core.AuthorSettings.show_author_in_footer and settings.core.AuthorSettings.author_name %}
-            <div>
-                <h2 class="text-sm font-semibold text-base-content uppercase tracking-wider mb-4">About</h2>
-                <div class="flex flex-col gap-3">
-                    {% if settings.core.AuthorSettings.author_image %}
-                        {% load wagtailimages_tags %}
-                        {% image settings.core.AuthorSettings.author_image fill-48x48 as author_footer_img %}
-                        <div class="avatar">
-                            <div class="w-12 h-12 rounded-full">
-                                <img src="{{ author_footer_img.url }}" alt="{{ settings.core.AuthorSettings.author_name }}">
-                            </div>
-                        </div>
-                    {% endif %}
-                    <p class="font-medium text-base-content">{{ settings.core.AuthorSettings.author_name }}</p>
-                    {% if settings.core.AuthorSettings.author_title %}
-                    <p class="text-sm text-base-content/60">{{ settings.core.AuthorSettings.author_title }}</p>
-                    {% endif %}
-                    {% if settings.core.AuthorSettings.author_bio_short %}
-                    <p class="text-sm text-base-content/70 mt-2 leading-relaxed">{{ settings.core.AuthorSettings.author_bio_short }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            {% elif settings.core.FooterSettings.footer_description %}
-            <div>
-                <h2 class="text-sm font-semibold text-base-content uppercase tracking-wider mb-4">{{ settings.core.FooterSettings.footer_col1_title|default:"About" }}</h2>
-                <p class="text-sm text-base-content/70 leading-relaxed">
-                    {{ settings.core.FooterSettings.footer_description }}
-                </p>
-            </div>
+        <!-- Main Content - Centered -->
+        <div class="max-w-2xl mx-auto text-center mb-12">
+            <!-- Author Name -->
+            {% if settings.core.AuthorSettings.author_name %}
+            <h2 class="text-lg font-semibold text-base-content mb-6">{{ settings.core.AuthorSettings.author_name }}</h2>
             {% endif %}
             
-            <!-- Column 2: Quick Links -->
-            <div>
-                <h2 class="text-sm font-semibold text-base-content uppercase tracking-wider mb-4">Quick Links</h2>
-                {% if settings.core.FooterSettings.get_footer_links %}
-                <nav class="flex flex-col gap-3">
-                    {% for link in settings.core.FooterSettings.get_footer_links %}
-                    <a href="{{ link.url }}" class="text-sm text-base-content/70 hover:text-base-content transition-colors">{{ link.text }}</a>
-                    {% endfor %}
-                </nav>
-                {% endif %}
-            </div>
-            
-            <!-- Column 3: Connect With Me -->
+            <!-- Social Links - Centered -->
             {% if settings.core.AuthorSettings.get_social_links %}
-            <div>
-                <h2 class="text-sm font-semibold text-base-content uppercase tracking-wider mb-4">Connect</h2>
-                <div class="flex gap-3">
+            <div class="flex gap-3 justify-center mb-8">
                     {% for social in settings.core.AuthorSettings.get_social_links %}
                     <a href="{{ social.url }}" class="p-2 hover:bg-base-200 rounded-lg transition-colors" aria-label="{{ social.name }}" {% if 'http' in social.url %}target="_blank" rel="noopener noreferrer"{% endif %}>
                         {% if social.icon == 'twitter' %}
@@ -84,11 +43,8 @@
                     </a>
                     {% endfor %}
                 </div>
-            </div>
             {% elif settings.core.FooterSettings.show_social_links and settings.core.FooterSettings.get_social_links %}
-            <div>
-                <h2 class="text-sm font-semibold text-base-content uppercase tracking-wider mb-4">Connect</h2>
-                <div class="flex gap-3">
+            <div class="flex gap-3 justify-center mb-8">
                     {% for social in settings.core.FooterSettings.get_social_links %}
                     <a href="{{ social.url }}" class="p-2 hover:bg-base-200 rounded-lg transition-colors" aria-label="{{ social.name }}" {% if 'http' in social.url %}target="_blank" rel="noopener noreferrer"{% endif %}>
                         {% if social.icon == 'twitter' %}
@@ -111,13 +67,20 @@
                     </a>
                     {% endfor %}
                 </div>
-            </div>
             {% endif %}
             
+            <!-- Quick Links - Inline Centered -->
+            {% if settings.core.FooterSettings.get_footer_links %}
+            <nav class="flex flex-wrap gap-6 justify-center text-sm">
+                {% for link in settings.core.FooterSettings.get_footer_links %}
+                <a href="{{ link.url }}" class="text-base-content/60 hover:text-base-content transition-colors">{{ link.text }}</a>
+                {% endfor %}
+            </nav>
+            {% endif %}
         </div>
         
         <!-- Copyright Bar -->
-        <div class="border-t border-base-200 mt-12 pt-8 text-center">
+        <div class="border-t border-base-200 pt-8 text-center">
             <p class="text-sm text-base-content/60">
                 {% if settings.core.FooterSettings.show_year %}
                 © {% now "Y" %} 

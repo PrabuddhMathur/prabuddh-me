@@ -1,47 +1,48 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
-<article class="card bg-base-200 shadow-lg hover:shadow-xl transition-all duration-300 mb-4 cursor-pointer group" onclick="window.location='{{ post.get_date_url }}'">
-    <div class="card-body">
-        <div class="flex gap-4">
-            {% if post.featured_image %}
-            <figure class="flex-shrink-0">
-                {% image post.featured_image fill-200x150 as post_img %}
-                <img src="{{ post_img.url }}" alt="{{ post.featured_image.title }}" class="w-32 h-24 object-cover rounded-lg">
-            </figure>
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<article class="group cursor-pointer flex flex-col sm:flex-row gap-4 sm:gap-6 py-4 sm:py-6 border-b border-base-200 hover:border-base-300 transition-colors" onclick="window.location='{{ post.get_date_url }}'">
+    {% if post.featured_image %}
+    <div class="w-full sm:w-40 flex-shrink-0 overflow-hidden rounded-lg">
+        {% image post.featured_image fill-300x200 as post_img %}
+        <img src="{{ post_img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-48 sm:h-32 object-cover group-hover:opacity-90 transition-opacity">
+    </div>
+    {% endif %}
+    
+    <div class="flex-1 min-w-0">
+        {% if post.featured %}
+        <div class="inline-block text-xs font-semibold uppercase tracking-wider text-base-content/60 mb-2">Featured</div>
+        {% endif %}
+        
+        <h2 class="text-lg sm:text-xl font-bold mb-2 group-hover:text-base-content/70 transition-colors leading-snug">
+            {{ post.title }}
+        </h2>
+        
+        <p class="text-sm sm:text-base text-base-content/60 mb-3 leading-relaxed">{{ post.intro|truncatewords:30 }}</p>
+        
+        {# Post Meta #}
+        <div class="flex flex-wrap gap-2 sm:gap-3 items-center text-xs sm:text-sm text-base-content/50 mb-2 sm:mb-3">
+            <span class="hidden sm:inline">{{ settings.core.AuthorSettings.author_name }}</span>
+            <span class="hidden sm:inline">•</span>
+            <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"M j, Y" }}</time>
+            {% if post.estimated_reading_time %}
+            <span>•</span>
+            <span>{{ post.estimated_reading_time }} min</span>
             {% endif %}
-            <div class="flex-1">
-                {% if post.featured %}
-                <div class="badge badge-accent mb-2 font-sans">Featured</div>
-                {% endif %}
-                <h3 class="card-title text-2xl mb-2 group-hover:text-primary transition-colors">
-                    {{ post.title }}
-                </h3>
-                <p class="text-base-content/70 mb-4">{{ post.intro }}</p>
-                
-                {# Post Meta #}
-                <div class="flex flex-wrap gap-3 items-center text-sm text-base-content/60 font-sans">
-                    <span>{{ settings.core.AuthorSettings.author_name }}</span>
-                    <span>•</span>
-                    <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"F j, Y" }}</time>
-                    {% if post.estimated_reading_time %}
-                    <span>•</span>
-                    <span>{{ post.estimated_reading_time }} min read</span>
-                    {% endif %}
-                </div>
-                
-                {# Tags #}
-                {% if post.tags.all %}
-                <div class="flex flex-wrap gap-2 mt-3">
-                    {% for tag in post.tags.all %}
-                    <a href="{% url 'blog_tag_archive' tag.slug %}" 
-                       class="badge badge-sm badge-outline hover:badge-primary transition-colors z-10 relative font-sans"
-                       onclick="event.stopPropagation()">
-                        {{ tag }}
-                    </a>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
         </div>
+        
+        {# Tags #}
+        {% if post.tags.all %}
+        <div class="flex flex-wrap gap-1.5 sm:gap-2">
+            {% for tag in post.tags.all|slice:":3" %}
+            <a href="{% url 'blog_tag_archive' tag.slug %}" 
+               class="text-xs px-2 py-0.5 sm:py-1 border border-base-300 hover:border-base-content hover:text-base-content transition-colors relative z-10"
+               onclick="event.stopPropagation()">
+                {{ tag }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </article>

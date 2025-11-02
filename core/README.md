@@ -37,6 +37,28 @@ class BlogPage(BasePage):
     pass
 ```
 
+#### `StaticPage` (Page Model)
+A flexible, reusable page model for static content pages like About, Contact, Terms, Privacy, etc. Provides:
+- Intro field for page introduction
+- StreamField with all available blocks for maximum flexibility
+- Optional "last updated" date display
+- Full SEO support from `BasePage`
+- Search indexing
+- Tabbed admin interface
+
+**Usage:**
+1. Create pages in Wagtail admin: Pages → Add Child Page → Static Page
+2. Set the page title and slug (e.g., "About" with slug "about")
+3. Add content using StreamField blocks
+4. Publish and access at `/about/`, `/contact/`, etc.
+
+**Example use cases:**
+- `/about` - About page with author bio
+- `/contact` - Contact information with form or email
+- `/terms` - Terms of Service
+- `/privacy` - Privacy Policy
+- Any other static content page
+
 ### 2. Reusable StreamField Blocks
 
 All blocks are production-ready with comprehensive configuration options:
