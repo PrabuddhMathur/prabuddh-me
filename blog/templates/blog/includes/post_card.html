@@ -20,11 +20,7 @@
         
         {# Post Meta #}
         <div class="flex flex-wrap gap-2 items-center text-sm text-base-content/60 mt-4">
-            <a href="{% url 'blog_author_archive' post.author|slugify %}" 
-               class="hover:text-primary transition-colors z-10 relative"
-               onclick="event.stopPropagation()">
-                {{ post.author }}
-            </a>
+            <span>{{ settings.core.AuthorSettings.author_name }}</span>
             <span>•</span>
             <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"M j, Y" }}</time>
             {% if post.estimated_reading_time %}

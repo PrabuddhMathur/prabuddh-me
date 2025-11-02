@@ -44,48 +44,11 @@ def blog_listing(request):
 
 def blog_author_archive(request, author_slug):
     """
-    View function for displaying all posts by a specific author.
+    Redirect to blog listing since there's only one author.
+    Kept for backwards compatibility with old URLs.
     """
-    from django.utils.text import slugify
-    
-    # Get author name from slug
-    author_name = author_slug.replace('-', ' ').title()
-    
-    # Get all published blog posts by this author
-    posts = BlogPage.objects.live().public().filter(
-        author__iexact=author_name
-    ).order_by('-date')
-    
-    # If no posts found, try without case sensitivity
-    if not posts.exists():
-        # Try to find any post with similar author name
-        sample_post = BlogPage.objects.live().public().filter(
-            author__icontains=author_slug.replace('-', ' ')
-        ).first()
-        if sample_post:
-            author_name = sample_post.author
-            posts = BlogPage.objects.live().public().filter(
-                author=author_name
-            ).order_by('-date')
-    
-    # Paginate results
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page', 1)
-    posts_page = paginator.get_page(page_number)
-    
-    # SEO metadata
-    seo_meta = {
-        'title': f'Posts by {author_name}',
-        'description': f'All blog posts written by {author_name}',
-    }
-    
-    return render(request, 'blog/blog_archive.html', {
-        'seo_meta': seo_meta,
-        'posts': posts_page,
-        'paginator': paginator,
-        'archive_type': 'author',
-        'author_name': author_name,
-    })
+    from django.shortcuts import redirect
+    return redirect('blog_listing')
 
 
 def blog_tag_archive(request, tag_slug):

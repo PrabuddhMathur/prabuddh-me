@@ -478,6 +478,150 @@ A Reddit-style spoiler text feature integrated into the Wagtail Draftail editor.
 - Focus indicators for keyboard users
 - Progressive enhancement (works without JavaScript, just no reveal interaction)
 
+### Citation Feature
+
+Wikipedia-style inline citations with automatic references section generation.
+
+#### Overview
+
+The citation feature allows content editors to add numbered citations to blog posts that link to a references section automatically generated at the bottom of the page. Citations appear as superscript numbers (e.g., [1], [2]) and scroll to their corresponding reference when clicked.
+
+#### Usage in Wagtail Admin
+
+1. Click the 📖 (book) button in the Draftail editor toolbar
+2. Enter citation number (auto-suggested based on existing citations)
+3. Enter citation text/description (required)
+4. Optionally enter a URL (can be cancelled/skipped)
+5. Citation appears as blue superscript number in editor
+
+#### Frontend Behavior
+
+**Citation Display:**
+- Citations appear as blue superscript links: [1]
+- Clicking scrolls smoothly to the reference section
+- References section auto-generates at page bottom
+- Each reference has a ↑ back arrow to return to citation
+- Yellow highlight animation on scroll target
+
+**Keyboard Accessibility:**
+- Tab to focus citations and back arrows
+- Enter or Space to activate
+- Screen reader support via ARIA labels
+
+#### Technical Implementation
+
+**Backend (Python):**
+- [`core/wagtail_hooks.py`](wagtail_hooks.py) (lines 76-167):
+  - `CitationEntityElementHandler`: Custom handler for HTML-to-ContentState conversion
+  - `citation_entity_decorator`: ContentState-to-HTML conversion
+  - `register_citation_feature`: Wagtail hook registration
+  - Entity type: `'CITATION'`
+  - Storage format: `<a class="citation" data-ref="{number}" data-text="{text}" data-url="{url}" href="#ref-{number}"><sup>[{number}]</sup></a>`
+
+**Editor Plugin (JavaScript):**
+- [`core/static/core/js/citation_plugin.js`](static/core/js/citation_plugin.js):
+  - `CitationSource`: React component for creating citations via prompts
+  - `Citation`: Decorator component for displaying citations in editor
+  - Auto-increment citation numbers
+  - Immutable entity type
+
+**Frontend Behavior (JavaScript):**
+- [`core/static/core/js/citation.js`](static/core/js/citation.js):
+  - Click-to-scroll for citations
+  - Back-to-citation navigation
+  - Highlight animations
+  - Keyboard support
+  - MutationObserver for dynamic content
+
+**Styling (CSS):**
+- [`core/static/core/css/citation.css`](static/core/css/citation.css):
+  - Wikipedia-style blue citations (#0066cc)
+  - Superscript positioning
+  - References list styling
+  - Yellow highlight animation
+  - Dark mode support
+
+**Template Integration:**
+- [`core/templates/core/blocks/rich_text_block.html`](templates/core/blocks/rich_text_block.html):
+  - Loads citation.css and citation.js
+- [`blog/templates/blog/blog_page.html`](../../blog/templates/blog/blog_page.html):
+  - Auto-extracts citations using template tag
+  - Displays references section if citations exist
+
+**Citation Extraction:**
+- [`core/templatetags/citation_tags.py`](templatetags/citation_tags.py):
+  - `extract_citations` template tag
+  - Parses StreamField HTML for citation elements
+  - Returns sorted list of unique citations
+  - Uses BeautifulSoup4 for reliable parsing
+
+#### Data Structure
+
+**Entity Data (in editor):**
+```javascript
+{
+  number: '1',        // Citation number
+  text: 'Description', // Citation text/description  
+  url: 'https://...'   // Optional URL
+}
+```
+
+**HTML Storage:**
+```html
+<a class="citation" 
+   data-ref="1" 
+   data-text="Source description"
+   data-url="https://example.com"
+   href="#ref-1">
+  <sup>[1]</sup>
+</a>
+```
+
+**References Section:**
+```html
+<section id="references" class="references-section">
+  <h2>References</h2>
+  <ol class="references-list">
+    <li id="ref-1">
+      <a href="#cite-1" class="back-to-citation">↑</a>
+      Source description
+      <a href="https://example.com">Link</a>
+    </li>
+  </ol>
+</section>
+```
+
+#### Dependencies
+
+- **beautifulsoup4** (>=4.12.0): HTML parsing for citation extraction
+- Added to requirements.txt
+
+#### Features Enabled In
+
+The citation feature is enabled in:
+- `BaseRichTextBlock` in [`core/models.py`](models.py) (line 56)
+- Available in all blog post rich text fields
+
+#### Important Notes
+
+1. **Bidirectional Conversion**: The custom `CitationEntityElementHandler` ensures citations retain their data when loading from database
+2. **Auto-numbering**: JavaScript plugin suggests next citation number based on existing citations
+3. **No Separate Model**: Citations are stored inline in rich text HTML
+4. **Template Tag**: `{% load citation_tags %}` and `{% extract_citations page.body as citations %}` in templates
+5. **File Paths**: EntityFeature loads `citation_plugin.js` automatically in Wagtail admin; frontend loads `citation.js` separately
+
+#### Testing
+
+To test the citation feature:
+1. Create/edit a blog post in Wagtail admin
+2. Add citations using the 📖 button
+3. Save and publish the page
+4. View on frontend and test:
+   - Citation links scroll to references
+   - Back arrows return to citations
+   - Keyboard navigation works
+   - Dark mode displays correctly
+
 ## Future Enhancements
 
 - [ ] Add more StreamField blocks (video, gallery, accordion, tabs)

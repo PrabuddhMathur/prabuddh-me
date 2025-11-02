@@ -1024,3 +1024,166 @@ class FooterSettings(BaseSiteSetting):
                 'icon': 'email'
             })
         return links
+
+
+# =====================================================
+# Author Settings (Singleton for Site Author)
+# =====================================================
+
+@register_setting
+class AuthorSettings(BaseSiteSetting):
+    """
+    Centralized author information for the site.
+    This is a singleton model accessible throughout the site.
+    Use this for consistent author information across blog posts, footers, etc.
+    """
+    
+    # Author Identity
+    author_name = models.CharField(
+        max_length=100,
+        default="Prabuddh Mathur",
+        help_text="Your name as it appears on the site"
+    )
+    
+    author_title = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Your professional title or tagline (e.g., 'Software Engineer & Writer')"
+    )
+    
+    author_bio = models.TextField(
+        blank=True,
+        help_text="Your biography for display on blog posts and author pages"
+    )
+    
+    author_bio_short = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Short bio for sidebars and cards (200 characters max)"
+    )
+    
+    # Author Image
+    author_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text="Profile photo"
+    )
+    
+    # Contact & Social Links
+    email_address = models.EmailField(
+        blank=True,
+        help_text="Contact email address"
+    )
+    
+    website_url = models.URLField(
+        blank=True,
+        help_text="Personal website URL"
+    )
+    
+    twitter_url = models.URLField(
+        blank=True,
+        help_text="Twitter/X profile URL"
+    )
+    
+    linkedin_url = models.URLField(
+        blank=True,
+        help_text="LinkedIn profile URL"
+    )
+    
+    github_url = models.URLField(
+        blank=True,
+        help_text="GitHub profile URL"
+    )
+    
+    mastodon_url = models.URLField(
+        blank=True,
+        help_text="Mastodon profile URL"
+    )
+    
+    # Display Options
+    show_author_in_footer = models.BooleanField(
+        default=True,
+        help_text="Display author information in the footer"
+    )
+    
+    show_author_on_blog_posts = models.BooleanField(
+        default=True,
+        help_text="Display author bio at the end of blog posts"
+    )
+    
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('author_name'),
+            FieldPanel('author_title'),
+            FieldPanel('author_image'),
+        ], heading="Author Identity"),
+        
+        MultiFieldPanel([
+            FieldPanel('author_bio'),
+            FieldPanel('author_bio_short'),
+        ], heading="Biography"),
+        
+        MultiFieldPanel([
+            FieldPanel('email_address'),
+            FieldPanel('website_url'),
+            FieldPanel('twitter_url'),
+            FieldPanel('linkedin_url'),
+            FieldPanel('github_url'),
+            FieldPanel('mastodon_url'),
+        ], heading="Contact & Social Links"),
+        
+        MultiFieldPanel([
+            FieldPanel('show_author_in_footer'),
+            FieldPanel('show_author_on_blog_posts'),
+        ], heading="Display Options"),
+    ]
+    
+    class Meta:
+        verbose_name = 'Author Settings'
+    
+    def __str__(self):
+        return f"Author: {self.author_name}"
+    
+    def get_social_links(self):
+        """Return social links as a list for template iteration."""
+        links = []
+        if self.website_url:
+            links.append({
+                'name': 'Website',
+                'url': self.website_url,
+                'icon': 'globe'
+            })
+        if self.twitter_url:
+            links.append({
+                'name': 'Twitter',
+                'url': self.twitter_url,
+                'icon': 'twitter'
+            })
+        if self.linkedin_url:
+            links.append({
+                'name': 'LinkedIn',
+                'url': self.linkedin_url,
+                'icon': 'linkedin'
+            })
+        if self.github_url:
+            links.append({
+                'name': 'GitHub',
+                'url': self.github_url,
+                'icon': 'github'
+            })
+        if self.mastodon_url:
+            links.append({
+                'name': 'Mastodon',
+                'url': self.mastodon_url,
+                'icon': 'mastodon'
+            })
+        if self.email_address:
+            links.append({
+                'name': 'Email',
+                'url': f'mailto:{self.email_address}',
+                'icon': 'email'
+            })
+        return links

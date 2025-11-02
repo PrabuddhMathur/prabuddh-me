@@ -30,7 +30,13 @@ class HomePage(BasePage):
     Production-grade Wagtail homepage with extensive StreamField usage.
     Designed for a personal blog with flexible content blocks.
     Extends BasePage to inherit SEO fields.
+    
+    This page can only be created once under the site root.
     """
+    
+    # Wagtail page configuration - singleton homepage
+    max_count = 1  # Only one instance can be created
+    parent_page_types = ['wagtailcore.Page']  # Can only exist under root
     
     # Hero Section Fields
     hero_title = models.CharField(
@@ -60,47 +66,6 @@ class HomePage(BasePage):
     hero_cta_link = models.URLField(
         blank=True,
         help_text="Call-to-action button link"
-    )
-    
-    # Author Information
-    author_name = models.CharField(
-        max_length=100,
-        default="Prabuddh Mathur",
-        help_text="Author's name"
-    )
-    author_bio = RichTextField(
-        blank=True,
-        help_text="Author biography for sidebar display"
-    )
-    author_image = models.ForeignKey(
-        'wagtailimages.Image',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        help_text="Author profile photo"
-    )
-    
-    # Social Media Links
-    website_url = models.URLField(
-        blank=True,
-        help_text="Personal website URL"
-    )
-    twitter_url = models.URLField(
-        blank=True,
-        help_text="Twitter profile URL"
-    )
-    linkedin_url = models.URLField(
-        blank=True,
-        help_text="LinkedIn profile URL"
-    )
-    github_url = models.URLField(
-        blank=True,
-        help_text="GitHub profile URL"
-    )
-    email_address = models.EmailField(
-        blank=True,
-        help_text="Contact email address"
     )
     
     # Main Content StreamField - Uses blocks from core
@@ -183,20 +148,6 @@ class HomePage(BasePage):
         ], heading="Hero Section"),
         
         FieldPanel('body'),
-        
-        MultiFieldPanel([
-            FieldPanel('author_name'),
-            FieldPanel('author_bio'),
-            FieldPanel('author_image'),
-        ], heading="Author Information"),
-        
-        MultiFieldPanel([
-            FieldPanel('website_url'),
-            FieldPanel('twitter_url'),
-            FieldPanel('linkedin_url'),
-            FieldPanel('github_url'),
-            FieldPanel('email_address'),
-        ], heading="Social Media Links"),
     ]
     
     # Inherit SEO panels from BasePage
@@ -292,31 +243,7 @@ class HomePage(BasePage):
             context['recent_posts'] = []
             context['featured_posts'] = []
         
-        # Add social links for easy template access
-        context['social_links'] = {
-            'website': self.website_url,
-            'twitter': self.twitter_url,
-            'linkedin': self.linkedin_url,
-            'github': self.github_url,
-            'email': self.email_address,
-        }
-        
         return context
-    
-    def get_social_links_list(self):
-        """Return social links as a list of tuples for template iteration."""
-        links = []
-        if self.website_url:
-            links.append(('website', 'Website', self.website_url, 'fa-globe'))
-        if self.twitter_url:
-            links.append(('twitter', 'Twitter', self.twitter_url, 'fa-twitter'))
-        if self.linkedin_url:
-            links.append(('linkedin', 'LinkedIn', self.linkedin_url, 'fa-linkedin'))
-        if self.github_url:
-            links.append(('github', 'GitHub', self.github_url, 'fa-github'))
-        if self.email_address:
-            links.append(('email', 'Email', f'mailto:{self.email_address}', 'fa-envelope'))
-        return links
     
     def __str__(self):
         return self.title
