@@ -1,62 +1,62 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
 <!-- Navigation Header -->
-<nav class="navbar bg-base-100 shadow-lg px-4 lg:px-8 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50{% endif %}">
-    <div class="navbar-start">
-        <!-- Mobile Menu Dropdown -->
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden" aria-label="Menu">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
-                </svg>
-            </div>
-            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                {% for link in settings.core.HeaderSettings.get_navigation_links %}
-                <li><a href="{{ link.url }}" class="{% if request.path == link.url %}active{% endif %}">{{ link.text }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-        
+<nav class="bg-base-100 border-b border-base-200 px-6 lg:px-12 py-4 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50{% endif %}">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo / Site Title -->
-        <a href="/" class="btn btn-ghost text-xl normal-case">
+        <a href="/" class="text-lg font-semibold tracking-tight hover:text-base-content/70 transition-colors">
             {% if settings.core.HeaderSettings.show_logo and settings.core.HeaderSettings.logo %}
-                {% image settings.core.HeaderSettings.logo fill-40x40 class="inline-block" %}
+                {% image settings.core.HeaderSettings.logo fill-32x32 class="inline-block" %}
             {% else %}
                 {{ settings.core.HeaderSettings.site_title }}
             {% endif %}
         </a>
-    </div>
-    
-    <!-- Desktop Navigation Links -->
-    <div class="navbar-center hidden lg:flex">
-        <ul class="menu menu-horizontal px-1">
-            {% for link in settings.core.HeaderSettings.get_navigation_links %}
-            <li><a href="{{ link.url }}" class="{% if request.path == link.url %}text-primary{% endif %}">{{ link.text }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-    <!-- Right Side Actions -->
-    <div class="navbar-end gap-2">
-        <!-- Search Bar -->
-        {% if settings.core.HeaderSettings.show_search %}
-        <div class="form-control">
-            <form action="/search/" method="get" class="flex">
-                <input type="text" name="q" placeholder="Search" class="input input-bordered input-sm w-24 md:w-auto" aria-label="Search" />
-            </form>
-        </div>
-        {% endif %}
         
-        <!-- Theme Toggle Button -->
-        {% if settings.core.HeaderSettings.show_theme_toggle %}
-        <button id="theme-toggle" class="btn btn-ghost btn-circle" aria-label="Toggle theme">
-            <svg id="theme-icon-light" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-            </svg>
-            <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-            </svg>
-        </button>
-        {% endif %}
+        <!-- Desktop Navigation Links -->
+        <div class="hidden lg:flex items-center gap-8">
+            {% for link in settings.core.HeaderSettings.get_navigation_links %}
+            <a href="{{ link.url }}" class="text-sm font-medium hover:text-base-content/70 transition-colors {% if request.path == link.url %}text-base-content border-b-2 border-base-content pb-1{% else %}text-base-content/60{% endif %}">
+                {{ link.text }}
+            </a>
+            {% endfor %}
+        </div>
+        
+        <!-- Right Side Actions -->
+        <div class="flex items-center gap-4">
+            <!-- Search Bar -->
+            {% if settings.core.HeaderSettings.show_search %}
+            <form action="/search/" method="get" class="hidden md:block">
+                <input type="text" name="q" placeholder="Search..." class="input input-sm input-bordered w-40 focus:w-56 transition-all" aria-label="Search" />
+            </form>
+            {% endif %}
+            
+            <!-- Theme Toggle Button -->
+            {% if settings.core.HeaderSettings.show_theme_toggle %}
+            <button id="theme-toggle" class="p-2 hover:bg-base-200 rounded-lg transition-colors" aria-label="Toggle theme">
+                <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+            {% endif %}
+            
+            <!-- Mobile Menu Button -->
+            <div class="lg:hidden">
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="p-2 hover:bg-base-200 rounded-lg transition-colors" aria-label="Menu">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </div>
+                    <ul tabindex="0" class="menu dropdown-content mt-3 z-[1] p-2 bg-base-100 border border-base-200 rounded-lg w-52">
+                        {% for link in settings.core.HeaderSettings.get_navigation_links %}
+                        <li><a href="{{ link.url }}" class="{% if request.path == link.url %}font-semibold{% endif %}">{{ link.text }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>

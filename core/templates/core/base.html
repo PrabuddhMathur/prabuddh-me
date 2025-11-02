@@ -5,6 +5,11 @@
 <head>
     {% include "core/includes/seo_meta.html" %}
     
+    <!-- Google Fonts: Hedvig Letters Family -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz,wght@12..24,400;12..24,500;12..24,700&family=Hedvig+Letters+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <!-- Theme initialization script (must run before body renders to prevent flash) -->
     <script>
         // Initialize theme from localStorage before page renders
@@ -21,8 +26,14 @@
     
     {# Custom CSS #}
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        body {
+            font-family: "Hedvig Letters Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+    </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-base-100">
     {% wagtailuserbar %}
     
     {# Header #}
@@ -30,7 +41,7 @@
         {% include "core/includes/header.html" %}
     {% endblock %}
     
-    {# Main Content - Add top padding when navbar is sticky to prevent content from being hidden behind it #}
+    {# Main Content #}
     <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>

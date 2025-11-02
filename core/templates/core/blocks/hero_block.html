@@ -1,19 +1,19 @@
 {% load wagtailimages_tags %}
 
-<section class="hero 
+<section class="relative
     {% if value.height == 'small' %}min-h-72
     {% elif value.height == 'medium' %}min-h-96
     {% elif value.height == 'large' %}min-h-screen-75
     {% elif value.height == 'full' %}min-h-screen
     {% endif %}
     
-    {% if value.background_image %}relative{% else %}bg-gradient-to-r from-primary to-secondary{% endif %}
+    {% if not value.background_image %}bg-base-100{% endif %}
     
-    my-8 rounded-lg overflow-hidden
+    my-12 flex items-center
 ">
     {% if value.background_image %}
         {% image value.background_image original as bg_image %}
-        <div class="hero-overlay {% if value.background_overlay %}bg-opacity-60{% else %}bg-opacity-0{% endif %}"></div>
+        <div class="absolute inset-0 {% if value.background_overlay %}bg-base-100/40{% else %}bg-base-100/0{% endif %}"></div>
         <style>
             .hero { 
                 background-image: url('{{ bg_image.url }}'); 
@@ -24,30 +24,30 @@
         </style>
     {% endif %}
     
-    <div class="hero-content text-center 
-        {% if value.text_color == 'white' %}text-white
-        {% elif value.text_color == 'black' %}text-black
-        {% elif value.text_color == 'primary' %}text-primary
-        {% endif %}
-    ">
-        <div class="max-w-md lg:max-w-2xl">
-            <h1 class="mb-5 text-3xl md:text-5xl font-bold leading-tight">
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-12 w-full">
+        <div class="max-w-2xl
+            {% if value.text_color == 'white' %}text-white
+            {% elif value.text_color == 'black' %}text-black
+            {% else %}text-base-content
+            {% endif %}
+        ">
+            <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-6">
                 {{ value.title }}
             </h1>
             
             {% if value.subtitle %}
-                <p class="mb-5 text-lg md:text-xl leading-relaxed opacity-90">
+                <p class="text-lg md:text-xl leading-relaxed mb-8 opacity-90">
                     {{ value.subtitle }}
                 </p>
             {% endif %}
             
             {% if value.cta_text and value.cta_link %}
-                <a href="{{ value.cta_link }}" class="btn 
-                    {% if value.cta_style == 'primary' %}btn-primary
-                    {% elif value.cta_style == 'secondary' %}btn-secondary
-                    {% elif value.cta_style == 'outline' %}btn-outline
+                <a href="{{ value.cta_link }}" class="inline-block px-6 py-3 
+                    {% if value.cta_style == 'primary' %}bg-base-content text-base-100 hover:bg-base-content/90
+                    {% elif value.cta_style == 'secondary' %}border-2 border-base-content hover:bg-base-content hover:text-base-100
+                    {% elif value.cta_style == 'outline' %}border border-base-content hover:bg-base-content hover:text-base-100
                     {% endif %}
-                    btn-lg shadow-lg hover:shadow-xl transition-all duration-300
+                    transition-colors font-medium
                 ">
                     {{ value.cta_text }}
                 </a>

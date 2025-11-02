@@ -11,3 +11,25 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+/**
+  * Custom theme configuration for Hedvig Letters font family
+  */
+@theme {
+  /* Font families */
+  --font-family-serif: "Hedvig Letters Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-family-sans: "Hedvig Letters Sans", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Font weights for Hedvig Letters */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  
+  /* Custom warm background for light mode */
+  --color-warm-white: oklch(99% 0.005 85);
+}
+
+/* Light mode warm background */
+[data-theme="light"] body {
+  background-color: var(--color-warm-white);
+}
