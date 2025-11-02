@@ -194,10 +194,12 @@ class HomePage(BasePage):
             # Get recent posts
             if self.show_recent_posts:
                 try:
+                    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
                     recent_posts = (
                         BlogPage.objects
                         .live()
                         .public()
+                        .select_related('owner')
                         .order_by('-first_published_at')[:self.number_of_recent_posts]
                     )
                     context['recent_posts'] = recent_posts
@@ -209,11 +211,13 @@ class HomePage(BasePage):
             # Get featured posts (assuming there's a featured field on BlogPage)
             if self.show_featured_posts:
                 try:
+                    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
                     featured_posts = (
                         BlogPage.objects
                         .live()
                         .public()
-                        .filter(featured=True)[:self.number_of_featured_posts]
+                        .filter(featured=True)
+                        .select_related('owner')[:self.number_of_featured_posts]
                     )
                     context['featured_posts'] = featured_posts
                     logger.debug(f"Loaded {featured_posts.count()} featured posts for homepage")
@@ -221,10 +225,12 @@ class HomePage(BasePage):
                     # Fallback to recent posts if no featured field exists
                     logger.info(f"Featured field not available, using recent posts: {e}")
                     try:
+                        # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
                         featured_posts = (
                             BlogPage.objects
                             .live()
                             .public()
+                            .select_related('owner')
                             .order_by('-first_published_at')[:self.number_of_featured_posts]
                         )
                         context['featured_posts'] = featured_posts

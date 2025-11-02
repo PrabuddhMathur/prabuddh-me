@@ -16,7 +16,8 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # =====================================================
 # Core Django Configuration
 # =====================================================
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-key-change-in-production")
+# SECRET_KEY is required and must be set in environment variables - no default for security
+SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
@@ -141,8 +142,6 @@ MEDIA_URL = "/media/"
 GS_BUCKET_NAME = config("GS_BUCKET_NAME", default=None)
 
 if GS_BUCKET_NAME:
-    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-    STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
     GS_DEFAULT_ACL = None
     GS_FILE_OVERWRITE = False
 

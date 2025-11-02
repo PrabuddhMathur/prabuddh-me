@@ -20,7 +20,8 @@ def blog_listing(request):
         request.session['blog_view_mode'] = view_mode
     
     # Get all published blog posts
-    posts = BlogPage.objects.live().public().order_by('-date')
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
+    posts = BlogPage.objects.live().public().select_related('owner').order_by('-date')
     
     # Paginate results
     posts_per_page = 12 if 'grid' in view_mode else 10
@@ -59,9 +60,10 @@ def blog_tag_archive(request, tag_slug):
     tag = get_object_or_404(Tag, slug=tag_slug)
     
     # Get all published blog posts with this tag
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         tags__slug=tag_slug
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)
@@ -105,9 +107,10 @@ def blog_year_archive(request, year):
     View function for displaying blog posts from a specific year.
     """
     # Get all published blog posts for the year
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)  # 10 posts per page
@@ -136,10 +139,11 @@ def blog_month_archive(request, year, month):
     from datetime import date
     
     # Get all published blog posts for the month
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year,
         date__month=month
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)  # 10 posts per page
@@ -174,11 +178,12 @@ def blog_day_archive(request, year, month, day):
     from datetime import date
     
     # Get all published blog posts for the day
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year,
         date__month=month,
         date__day=day
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)  # 10 posts per page
