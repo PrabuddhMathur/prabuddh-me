@@ -1,12 +1,12 @@
 <blockquote class="my-8 
-    {% if value.style == 'default' %}border-l-4 border-primary pl-6 py-4
+    {% if value.style == 'default' %}border-l-4 border-base-content pl-6 py-4
     {% elif value.style == 'large' %}text-center py-8 px-6
-    {% elif value.style == 'bordered' %}border-2 border-base-300 rounded-lg p-6
-    {% elif value.style == 'accent' %}bg-gradient-to-r from-accent/10 to-primary/10 border-l-4 border-accent rounded-r-lg p-6
+    {% elif value.style == 'bordered' %}border-2 border-base-200 p-6
+    {% elif value.style == 'accent' %}bg-base-200 border-l-4 border-base-content p-6
     {% endif %}
 ">
     {% if value.style == 'large' %}
-        <svg class="w-8 h-8 mx-auto mb-4 text-primary/50" fill="currentColor" viewBox="0 0 24 24">
+        <svg class="w-8 h-8 mx-auto mb-4 text-base-content/30" fill="currentColor" viewBox="0 0 24 24">
             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
         </svg>
         
@@ -20,7 +20,7 @@
             {% endif %}
             font-serif leading-relaxed text-base-content mb-4
         ">
-            {% if value.style != 'accent' %}"{% endif %}{{ value.quote }}{% if value.style != 'accent' %}"{% endif %}
+            "{{ value.quote }}"
         </p>
     {% endif %}
     
@@ -36,18 +36,6 @@
         </footer>
     {% endif %}
 </blockquote>
-
-{% if value.style == 'accent' %}
-<style>
-    blockquote::before {
-        content: '"';
-        font-size: 4rem;
-        line-height: 1;
-        font-family: Georgia, serif;
-        color: hsl(var(--ac) / 0.3);
-        position: absolute;
-        margin-top: -1rem;
-        margin-left: -2rem;
     }
 </style>
 {% endif %}

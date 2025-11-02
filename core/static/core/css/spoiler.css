@@ -1,0 +1,100 @@
+/**
+ * Spoiler Text - Tailwind-style animation
+ */
+
+@layer components {
+    /* Editor styling */
+    .Draftail-Editor .DraftEditor-editorContainer span[data-spoiler] {
+        @apply cursor-text;
+    }
+
+    /* Hidden spoiler - matches Tailwind classes */
+    .spoiler {
+        display: inline;
+        cursor: pointer;
+        user-select: text;
+        
+        /* Inherit typography from parent */
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        letter-spacing: inherit;
+        
+        /* Fix vertical alignment with baseline text */
+        vertical-align: baseline;
+        
+        /* Remove browser button styling (role="button" override) */
+        border: none;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        
+        /* Ensure consistent box model */
+        box-sizing: border-box;
+        
+        /* Tailwind neutral-200 */
+        background-color: #e5e5e5;
+        
+        /* text-transparent */
+        color: transparent;
+        
+        /* Rounded corners for visual appeal */
+        border-radius: 0.375rem;
+        
+        /* Small padding to look better with rounded corners */
+        padding: 0.125rem 0.25rem;
+        
+        /* No transition animation */
+        transition: none;
+    }
+
+    /* Hover state - neutral-300 */
+    .spoiler:hover {
+        background-color: #d4d4d4;
+    }
+
+    /* Revealed state - matches toggled classes */
+    .spoiler.revealed {
+        /* Inherit text color from parent - CRITICAL FIX */
+        color: inherit !important;
+        
+        /* bg-transparent - use !important to override */
+        background-color: transparent !important;
+        
+        /* Remove visual separation to blend with regular text */
+        padding: 0;
+        border-radius: 0;
+        
+        /* Allow text selection */
+        user-select: text;
+        cursor: pointer;
+    }
+
+    /* Hover state for revealed spoilers - keep transparent */
+    .spoiler.revealed:hover {
+        background-color: transparent !important;
+    }
+
+    /* Remove focus outline to prevent visible borders */
+    .spoiler:focus {
+        outline: none !important;
+    }
+
+    /* Dark mode - use Tailwind's dark neutral palette */
+    .dark .spoiler,
+    [data-theme="dark"] .spoiler {
+        background-color: #525252; /* neutral-600 */
+    }
+
+    .dark .spoiler:hover,
+    [data-theme="dark"] .spoiler:hover {
+        background-color: #737373; /* neutral-500 */
+    }
+
+    .dark .spoiler.revealed,
+    [data-theme="dark"] .spoiler.revealed {
+        color: inherit !important;
+    }
+}

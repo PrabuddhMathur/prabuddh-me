@@ -60,22 +60,10 @@ class BlogPage(BasePage):
     Production-grade with validation, logging, and search indexing.
     """
     
-    # Author Information
-    author = models.CharField(
-        max_length=100,
-        default="Prabuddh Mathur",
-        help_text="Post author name",
-        db_index=True,
-    )
-    
-    author_bio = RichTextField(
-        blank=True,
-        help_text="Author biography (optional, overrides global author bio)"
-    )
-    
     # Post Metadata
     date = models.DateField(
         "Post date",
+        default=timezone.now,
         help_text="Publication date for the blog post",
         db_index=True,
     )
@@ -127,11 +115,6 @@ class BlogPage(BasePage):
         db_index=True,
     )
     
-    show_author_bio = models.BooleanField(
-        default=True,
-        help_text="Display author biography at the end of post"
-    )
-    
     show_related_posts = models.BooleanField(
         default=True,
         help_text="Display related posts based on tags"
@@ -147,7 +130,6 @@ class BlogPage(BasePage):
     search_fields = BasePage.search_fields + [
         index.SearchField('intro'),
         index.SearchField('body'),
-        index.SearchField('author'),
         index.FilterField('date'),
         index.FilterField('featured'),
     ]
@@ -155,7 +137,6 @@ class BlogPage(BasePage):
     # Content panels
     content_panels = Page.content_panels + [
         MultiFieldPanel([
-            FieldPanel('author'),
             FieldPanel('date'),
         ], heading="Post Metadata"),
         
@@ -168,17 +149,12 @@ class BlogPage(BasePage):
         
         FieldPanel('body'),
         FieldPanel('tags'),
-        
-        MultiFieldPanel([
-            FieldPanel('author_bio'),
-        ], heading="Author Information"),
     ]
     
     # Settings panels
     settings_panels = Page.settings_panels + [
         MultiFieldPanel([
             FieldPanel('featured'),
-            FieldPanel('show_author_bio'),
             FieldPanel('show_related_posts'),
         ], heading="Display Options"),
     ]
@@ -266,12 +242,6 @@ class BlogPage(BasePage):
             logger.debug(f"Cached {limit} featured blog posts")
         
         return posts
-    
-    def get_author_url(self):
-        """Get the URL for this post's author archive."""
-        from django.utils.text import slugify
-        from django.urls import reverse
-        return reverse('blog_author_archive', args=[slugify(self.author)])
     
     def get_date_url(self):
         """Get the date-based URL for this post: /YYYY/MM/DD/slug/"""
@@ -421,13 +391,6 @@ class BlogPage(BasePage):
             errors['date'] = ValidationError(
                 'Post date cannot be in the future.',
                 code='future_date'
-            )
-        
-        # Validate author name is not empty
-        if not self.author or not self.author.strip():
-            errors['author'] = ValidationError(
-                'Author name is required.',
-                code='author_required'
             )
         
         # Validate featured image has alt text if provided

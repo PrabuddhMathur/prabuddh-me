@@ -5,23 +5,23 @@
 
 {% block title %}{{ page.title }}{% if page.hero_subtitle %} - {{ page.hero_subtitle }}{% endif %}{% endblock %}
 {% block content %}
-<div class="min-h-screen -mt-16">
+<div class="min-h-screen">
     <!-- Hero Section -->
     {% if page.hero_title or page.hero_image %}
-    <section class="hero min-h-96 pt-16 {% if page.hero_image %}relative bg-cover bg-center{% else %}bg-gradient-to-r from-primary to-secondary{% endif %}" {% if page.hero_image %}{% image page.hero_image fill-1920x600 as hero_img %}style="background-image: url('{{ hero_img.url }}');"{% endif %}>
+    <section class="relative min-h-[60vh] flex {% if page.hero_text_vertical == 'top' %}items-start{% elif page.hero_text_vertical == 'bottom' %}items-end{% else %}items-center{% endif %} {% if page.hero_image %}bg-cover bg-center{% else %}bg-base-100{% endif %}" {% if page.hero_image %}{% image page.hero_image fill-1920x600 as hero_img %}style="background-image: url('{{ hero_img.url }}');"{% endif %}>
         {% if page.hero_image %}
-            <div class="hero-overlay bg-opacity-60"></div>
+            <div class="absolute inset-0 bg-base-100/20"></div>
         {% endif %}
-        <div class="hero-content text-center text-neutral-content">
-            <div class="max-w-md">
+        <div class="relative max-w-7xl mx-auto px-8 sm:px-6 lg:px-12 {% if page.hero_text_vertical == 'top' %}pt-20 pb-8{% elif page.hero_text_vertical == 'bottom' %}pt-8 pb-20{% else %}py-20{% endif %} w-full {% if page.hero_text_horizontal == 'center' %}flex justify-center{% elif page.hero_text_horizontal == 'right' %}flex justify-end{% endif %}">
+            <div class="max-w-2xl break-words {% if page.hero_text_horizontal == 'center' %}text-center{% elif page.hero_text_horizontal == 'right' %}text-right{% endif %} {% if page.hero_text_horizontal != 'right' %}pr-6 sm:pr-4{% endif %}">
                 {% if page.hero_title %}
-                    <h1 class="mb-5 text-5xl font-bold">{{ page.hero_title }}</h1>
+                    <h1 class="text-5xl md:text-6xl font-bold text-base-content mb-6 leading-tight break-words overflow-wrap-anywhere hyphens-auto tracking-wide">{{ page.hero_title }}</h1>
                 {% endif %}
                 {% if page.hero_subtitle %}
-                    <p class="mb-5 text-xl">{{ page.hero_subtitle }}</p>
+                    <p class="text-xl md:text-2xl text-base-content/70 mb-8 leading-relaxed break-words overflow-wrap-anywhere hyphens-auto tracking-wide">{{ page.hero_subtitle }}</p>
                 {% endif %}
                 {% if page.hero_cta_text and page.hero_cta_link %}
-                    <a href="{{ page.hero_cta_link }}" class="btn btn-primary btn-lg">{{ page.hero_cta_text }}</a>
+                    <a href="{{ page.hero_cta_link }}" class="inline-block px-6 py-3 bg-base-content text-base-100 hover:bg-base-content/90 transition-colors font-medium">{{ page.hero_cta_text }}</a>
                 {% endif %}
             </div>
         </div>
@@ -29,48 +29,48 @@
     {% endif %}
 
     <!-- Main Content Layout -->
-    <div class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Main Content Column -->
-            <div class="lg:col-span-2">
-                <!-- StreamField Content -->
-                {% if page.body %}
-                <div class="space-y-8">
-                    {{ page.body }}
-                </div>
-                {% endif %}
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                
+                <!-- Main Content Column -->
+                <div class="lg:col-span-2">
+                    <!-- StreamField Content -->
+                    {% if page.body %}
+                    <div class="space-y-12">
+                        {{ page.body }}
+                    </div>
+                    {% endif %}
 
                 <!-- Featured Posts Section -->
                 {% if page.show_featured_posts and featured_posts %}
-                <section class="mt-12">
-                    <div class="flex items-center mb-6">
+                <section class="mt-16">
+                    <div class="mb-8">
                         <h2 class="text-3xl font-bold text-base-content">{{ page.featured_posts_title }}</h2>
-                        <div class="flex-1 h-px bg-base-300 ml-4"></div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {% for post in featured_posts %}
-                        <article class="card bg-base-100 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300">
+                        <article class="group border border-base-200 hover:border-base-300 rounded-lg overflow-hidden shadow-sm transition-colors">
                             {% if post.hero_image %}
-                                {% image post.hero_image fill-400x200 class="w-full h-48 object-cover" %}
+                            <a href="{% pageurl post %}" class="block overflow-hidden">
+                                {% image post.hero_image fill-400x200 class="w-full h-48 object-cover group-hover:opacity-90 transition-opacity" %}
+                            </a>
                             {% endif %}
-                            <div class="card-body">
-                                <h3 class="card-title">
-                                    <a href="{% pageurl post %}" class="link link-hover">{{ post.title }}</a>
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold mb-2">
+                                    <a href="{% pageurl post %}" class="hover:text-base-content/70 transition-colors">{{ post.title }}</a>
                                 </h3>
                                 {% if post.excerpt %}
-                                <p class="text-base-content/70">{{ post.excerpt|truncatewords:20 }}</p>
+                                <p class="text-base-content/60 mb-3 leading-relaxed">{{ post.excerpt|truncatewords:20 }}</p>
                                 {% endif %}
-                                <div class="card-actions justify-between items-center mt-4">
-                                    <div class="flex items-center space-x-2 text-sm text-base-content/60">
-                                        {% if post.first_published_at %}
-                                        <time datetime="{{ post.first_published_at|date:'c' }}">
-                                            {{ post.first_published_at|date:"M d, Y" }}
-                                        </time>
-                                        {% endif %}
-                                    </div>
-                                    <a href="{% pageurl post %}" class="btn btn-primary btn-sm">Read More</a>
+                                <div class="flex items-center text-sm text-base-content/50">
+                                    {% if post.first_published_at %}
+                                    <time datetime="{{ post.first_published_at|date:'c' }}">
+                                        {{ post.first_published_at|date:"M d, Y" }}
+                                    </time>
+                                    {% endif %}
                                 </div>
+                            </div>
                             </div>
                         </article>
                         {% endfor %}
@@ -80,42 +80,38 @@
 
                 <!-- Recent Posts Section -->
                 {% if page.show_recent_posts and recent_posts %}
-                <section class="mt-12">
-                    <div class="flex items-center mb-6">
+                <section class="mt-16">
+                    <div class="mb-8">
                         <h2 class="text-3xl font-bold text-base-content">{{ page.recent_posts_title }}</h2>
-                        <div class="flex-1 h-px bg-base-300 ml-4"></div>
                     </div>
                     <div class="space-y-4">
                         {% for post in recent_posts %}
-                        <article class="card card-side bg-base-100 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group" onclick="window.location='{{ post.get_date_url }}'">
+                        <article class="group flex gap-6 p-4 border border-base-200 rounded-lg shadow-sm hover:border-base-300 cursor-pointer transition-colors" onclick="window.location='{{ post.get_date_url }}'">
                             {% if post.hero_image %}
-                            <figure class="w-32 flex-shrink-0">
-                                {% image post.hero_image fill-128x128 class="w-full h-full object-cover" %}
-                            </figure>
+                            <div class="flex-shrink-0 overflow-hidden rounded-lg">
+                                {% image post.hero_image fill-128x128 class="w-24 h-24 object-cover group-hover:opacity-90 transition-opacity" %}
+                            </div>
                             {% endif %}
-                            <div class="card-body p-4">
-                                <h3 class="card-title text-lg">
-                                    <span class="group-hover:text-primary transition-colors">{{ post.title }}</span>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold mb-2 group-hover:text-base-content/70 transition-colors">
+                                    {{ post.title }}
                                 </h3>
                                 {% if post.excerpt %}
-                                <p class="text-sm text-base-content/70">{{ post.excerpt|truncatewords:15 }}</p>
+                                <p class="text-sm text-base-content/60 mb-2 leading-relaxed">{{ post.excerpt|truncatewords:15 }}</p>
                                 {% endif %}
-                                <div class="card-actions justify-between items-center">
-                                    <div class="text-xs text-base-content/60">
-                                        {% if post.first_published_at %}
-                                        <time datetime="{{ post.first_published_at|date:'c' }}">
-                                            {{ post.first_published_at|date:"M d, Y" }}
-                                        </time>
-                                        {% endif %}
-                                    </div>
-                                    <a href="{{ post.get_date_url }}" class="btn btn-outline btn-xs" onclick="event.stopPropagation()">Read</a>
+                                <div class="flex items-center text-sm text-base-content/50">
+                                    {% if post.first_published_at %}
+                                    <time datetime="{{ post.first_published_at|date:'c' }}">
+                                        {{ post.first_published_at|date:"M d, Y" }}
+                                    </time>
+                                    {% endif %}
                                 </div>
                             </div>
                         </article>
                         {% endfor %}
                     </div>
                     <div class="text-center mt-8">
-                        <a href="/blog/" class="btn btn-primary">View All Posts</a>
+                        <a href="/blog/" class="inline-block px-6 py-3 border border-base-content hover:bg-base-content hover:text-base-100 transition-colors font-medium">View All Posts</a>
                     </div>
                 </section>
                 {% endif %}
@@ -123,62 +119,65 @@
 
             <!-- Sidebar -->
             <div class="lg:col-span-1">
-                <div class="sticky top-8 space-y-6">
+                <div class="sticky top-24 space-y-8">
                     
                     <!-- Author Bio Card -->
-                    {% if page.show_author_sidebar %}
-                    <div class="card card-side bg-base-100 shadow-xl">
-                        {% if page.author_image %}
-                        <figure class="w-32 flex-shrink-0">
-                            {% image page.author_image fill-128x160 class="w-full h-full object-cover" %}
-                        </figure>
+                    {% if page.show_author_sidebar and settings.core.AuthorSettings.author_name %}
+                    <div class="border border-base-300 rounded-xl p-8 shadow-sm bg-base-100/50 backdrop-blur-sm">
+                        {% if settings.core.AuthorSettings.author_image %}
+                        <div class="mb-6 flex justify-center">
+                            {% image settings.core.AuthorSettings.author_image fill-160x160 class="w-32 h-32 rounded-full object-cover ring-2 ring-base-300 shadow-sm" %}
+                        </div>
                         {% endif %}
                         
-                        <div class="card-body p-4">
-                            <h3 class="card-title text-lg">{{ page.author_name }}</h3>
+                        <div class="text-center">
+                            <h3 class="text-2xl font-bold mb-2 text-base-content">{{ settings.core.AuthorSettings.author_name }}</h3>
+                            {% if settings.core.AuthorSettings.author_title %}
+                            <p class="text-sm font-medium text-base-content/70 mb-4 tracking-wide uppercase">{{ settings.core.AuthorSettings.author_title }}</p>
+                            {% endif %}
                             
-                            {% if page.author_bio %}
-                            <div class="text-base-content/70 text-xs leading-relaxed">
-                                {{ page.author_bio|richtext }}
+                            {% if settings.core.AuthorSettings.author_bio_short %}
+                            <div class="border-t border-base-300 pt-4 mt-4">
+                                <p class="text-sm text-base-content/80 leading-relaxed">{{ settings.core.AuthorSettings.author_bio_short }}</p>
                             </div>
                             {% endif %}
                             
                             <!-- Social Links -->
-                            {% if social_links %}
-                            <div class="card-actions justify-start mt-2">
-                                <div class="flex space-x-1">
-                                    {% for link_key, link_url in social_links.items %}
-                                        {% if link_url %}
-                                        <a href="{% if link_key == 'email' %}mailto:{{ link_url }}{% else %}{{ link_url }}{% endif %}" 
-                                           class="btn btn-circle btn-sm btn-ghost hover:btn-primary" 
-                                           target="_blank" 
-                                           rel="noopener noreferrer"
-                                           title="{{ link_key|title }}">
-                                            {% if link_key == 'twitter' %}
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                                                </svg>
-                                            {% elif link_key == 'github' %}
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                                                </svg>
-                                            {% elif link_key == 'linkedin' %}
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                                                </svg>
-                                            {% elif link_key == 'email' %}
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                                </svg>
-                                            {% elif link_key == 'website' %}
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
-                                                </svg>
-                                            {% endif %}
-                                        </a>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
+                            {% if settings.core.AuthorSettings.get_social_links %}
+                            <div class="flex gap-3 justify-center mt-6 pt-6 border-t border-base-300">
+                                {% for link in settings.core.AuthorSettings.get_social_links %}
+                                <a href="{{ link.url }}" 
+                                   class="p-2.5 hover:bg-base-300 rounded-lg transition-all hover:scale-105 border border-base-200" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   title="{{ link.name }}">
+                                    {% if link.icon == 'twitter' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                    </svg>
+                                    {% elif link.icon == 'github' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                    </svg>
+                                    {% elif link.icon == 'linkedin' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                    </svg>
+                                    {% elif link.icon == 'email' %}
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    {% elif link.icon == 'globe' %}
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                    </svg>
+                                    {% elif link.icon == 'mastodon' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M23.268 5.313c-.35-2.578-2.617-4.61-5.304-5.004C17.51.242 15.792 0 11.813 0h-.03c-3.98 0-4.835.242-5.288.309C3.882.692 1.496 2.518.917 5.127.64 6.412.61 7.837.661 9.143c.074 1.874.088 3.745.26 5.611.118 1.24.325 2.47.62 3.68.55 2.237 2.777 4.098 4.96 4.857 2.336.792 4.849.923 7.256.38.265-.061.527-.132.786-.213.585-.184 1.27-.39 1.774-.753a.057.057 0 0 0 .023-.043v-1.809a.052.052 0 0 0-.02-.041.053.053 0 0 0-.046-.01 20.282 20.282 0 0 1-4.709.545c-2.73 0-3.463-1.284-3.674-1.818a5.593 5.593 0 0 1-.319-1.433.053.053 0 0 1 .066-.054c1.517.363 3.072.546 4.632.546.376 0 .75 0 1.125-.01 1.57-.044 3.224-.124 4.768-.422.038-.008.077-.015.11-.024 2.435-.464 4.753-1.92 4.989-5.604.008-.145.03-1.52.03-1.67.002-.512.167-3.63-.024-5.545zm-3.748 9.195h-2.561V8.29c0-1.309-.55-1.976-1.67-1.976-1.23 0-1.846.79-1.846 2.35v3.403h-2.546V8.663c0-1.56-.617-2.35-1.848-2.35-1.112 0-1.668.668-1.67 1.977v6.218H4.822V8.102c0-1.31.337-2.35 1.011-3.12.696-.77 1.608-1.164 2.74-1.164 1.311 0 2.302.5 2.962 1.498l.638 1.06.638-1.06c.66-.999 1.65-1.498 2.96-1.498 1.13 0 2.043.395 2.74 1.164.675.77 1.012 1.81 1.012 3.12z"/>
+                                    </svg>
+                                    {% endif %}
+                                </a>
+                                {% endfor %}
                             </div>
                             {% endif %}
                         </div>
@@ -218,5 +217,3 @@
     </div>
 </div>
 {% endblock %}
-
-

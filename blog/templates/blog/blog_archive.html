@@ -4,32 +4,34 @@
 {% block title %}{{ seo_meta.title }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
     {# Archive Header #}
-    <div class="mb-12">
-        <nav class="text-sm breadcrumbs mb-6">
-            <ul>
-                <li><a href="/" class="hover:text-primary">Home</a></li>
-                {% if archive_type == 'author' or archive_type == 'tag' %}
-                    <li><a href="/blog/" class="hover:text-primary">Blog</a></li>
-                    {% if archive_type == 'author' %}
-                    <li class="text-base-content/60">{{ author_name }}</li>
-                    {% elif archive_type == 'tag' %}
-                    <li class="text-base-content/60">{{ tag.name }}</li>
-                    {% endif %}
-                {% else %}
-                    <li><a href="/{{ year }}/" class="hover:text-primary">{{ year }}</a></li>
-                    {% if month %}
-                    <li><a href="/{{ year }}/{{ month|stringformat:"02d" }}/" class="hover:text-primary">{{ month_name }}</a></li>
-                    {% endif %}
-                    {% if day %}
-                    <li class="text-base-content/60">{{ day }}</li>
-                    {% endif %}
+    <div class="mb-16 max-w-4xl mx-auto">
+        <nav class="text-sm mb-4 text-base-content/60">
+            <a href="/" class="hover:text-base-content">Home</a>
+            <span class="mx-2">/</span>
+            {% if archive_type == 'author' or archive_type == 'tag' %}
+                <a href="/blog/" class="hover:text-base-content">Blog</a>
+                <span class="mx-2">/</span>
+                {% if archive_type == 'author' %}
+                <span class="text-base-content font-medium">{{ author_name }}</span>
+                {% elif archive_type == 'tag' %}
+                <span class="text-base-content font-medium">{{ tag.name }}</span>
                 {% endif %}
-            </ul>
+            {% else %}
+                <a href="/{{ year }}/" class="hover:text-base-content">{{ year }}</a>
+                {% if month %}
+                <span class="mx-2">/</span>
+                <a href="/{{ year }}/{{ month|stringformat:"02d" }}/" class="hover:text-base-content">{{ month_name }}</a>
+                {% endif %}
+                {% if day %}
+                <span class="mx-2">/</span>
+                <span class="text-base-content font-medium">{{ day }}</span>
+                {% endif %}
+            {% endif %}
         </nav>
         
-        <h1 class="text-4xl md:text-5xl font-bold text-primary mb-4">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
             {% if archive_type == 'author' %}
                 Posts by {{ author_name }}
             {% elif archive_type == 'tag' %}
@@ -43,13 +45,13 @@
             {% endif %}
         </h1>
         {% if archive_type == 'author' or archive_type == 'tag' %}
-        <p class="text-base-content/70">{{ paginator.count }} post{{ paginator.count|pluralize }}</p>
+        <p class="text-base-content/60">{{ paginator.count }} post{{ paginator.count|pluralize }}</p>
         {% endif %}
     </div>
 
     {# Blog Posts #}
     {% if posts %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {% for post in posts %}
             {% include "blog/includes/post_card.html" with post=post %}
             {% endfor %}
@@ -57,32 +59,32 @@
 
         {# Pagination #}
         {% if posts.has_other_pages %}
-        <div class="flex justify-center mt-12">
-            <div class="btn-group">
+        <div class="max-w-4xl mx-auto flex justify-center mt-12">
+            <div class="flex gap-2">
                 {% if posts.has_previous %}
-                <a href="?page={{ posts.previous_page_number }}" class="btn btn-outline">
-                    « Previous
+                <a href="?page={{ posts.previous_page_number }}" class="px-4 py-2 border border-base-300 hover:bg-base-200 transition-colors">
+                    ← Previous
                 </a>
                 {% endif %}
                 
-                <button class="btn btn-outline">
+                <span class="px-4 py-2 border border-base-300 bg-base-200">
                     Page {{ posts.number }} of {{ paginator.num_pages }}
-                </button>
+                </span>
                 
                 {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}" class="btn btn-outline">
-                    Next »
+                <a href="?page={{ posts.next_page_number }}" class="px-4 py-2 border border-base-300 hover:bg-base-200 transition-colors">
+                    Next →
                 </a>
                 {% endif %}
             </div>
         </div>
         {% endif %}
     {% else %}
-        <div class="alert alert-info">
+        <div class="max-w-4xl mx-auto alert alert-info">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span>No blog posts found for this date.</span>
+            <span>No blog posts found.</span>
         </div>
     {% endif %}
 </div>

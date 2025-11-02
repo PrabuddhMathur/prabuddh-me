@@ -20,7 +20,8 @@ def blog_listing(request):
         request.session['blog_view_mode'] = view_mode
     
     # Get all published blog posts
-    posts = BlogPage.objects.live().public().order_by('-date')
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
+    posts = BlogPage.objects.live().public().select_related('owner').order_by('-date')
     
     # Paginate results
     posts_per_page = 12 if 'grid' in view_mode else 10
@@ -44,48 +45,11 @@ def blog_listing(request):
 
 def blog_author_archive(request, author_slug):
     """
-    View function for displaying all posts by a specific author.
+    Redirect to blog listing since there's only one author.
+    Kept for backwards compatibility with old URLs.
     """
-    from django.utils.text import slugify
-    
-    # Get author name from slug
-    author_name = author_slug.replace('-', ' ').title()
-    
-    # Get all published blog posts by this author
-    posts = BlogPage.objects.live().public().filter(
-        author__iexact=author_name
-    ).order_by('-date')
-    
-    # If no posts found, try without case sensitivity
-    if not posts.exists():
-        # Try to find any post with similar author name
-        sample_post = BlogPage.objects.live().public().filter(
-            author__icontains=author_slug.replace('-', ' ')
-        ).first()
-        if sample_post:
-            author_name = sample_post.author
-            posts = BlogPage.objects.live().public().filter(
-                author=author_name
-            ).order_by('-date')
-    
-    # Paginate results
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page', 1)
-    posts_page = paginator.get_page(page_number)
-    
-    # SEO metadata
-    seo_meta = {
-        'title': f'Posts by {author_name}',
-        'description': f'All blog posts written by {author_name}',
-    }
-    
-    return render(request, 'blog/blog_archive.html', {
-        'seo_meta': seo_meta,
-        'posts': posts_page,
-        'paginator': paginator,
-        'archive_type': 'author',
-        'author_name': author_name,
-    })
+    from django.shortcuts import redirect
+    return redirect('blog_listing')
 
 
 def blog_tag_archive(request, tag_slug):
@@ -96,9 +60,10 @@ def blog_tag_archive(request, tag_slug):
     tag = get_object_or_404(Tag, slug=tag_slug)
     
     # Get all published blog posts with this tag
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         tags__slug=tag_slug
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)
@@ -142,9 +107,10 @@ def blog_year_archive(request, year):
     View function for displaying blog posts from a specific year.
     """
     # Get all published blog posts for the year
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)  # 10 posts per page
@@ -173,10 +139,11 @@ def blog_month_archive(request, year, month):
     from datetime import date
     
     # Get all published blog posts for the month
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year,
         date__month=month
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)  # 10 posts per page
@@ -211,11 +178,12 @@ def blog_day_archive(request, year, month, day):
     from datetime import date
     
     # Get all published blog posts for the day
+    # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year,
         date__month=month,
         date__day=day
-    ).order_by('-date')
+    ).select_related('owner').order_by('-date')
     
     # Paginate results
     paginator = Paginator(posts, 10)  # 10 posts per page

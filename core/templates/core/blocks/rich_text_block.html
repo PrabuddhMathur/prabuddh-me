@@ -1,4 +1,7 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags static %}
+
+{# Load spoiler feature assets #}
+<link rel="stylesheet" href="{% static 'core/css/spoiler.css' %}">
 
 {# Base Rich Text Block Template #}
 <div class="prose max-w-none
@@ -9,3 +12,6 @@
 ">
     {{ value.text|richtext }}
 </div>
+
+{# Load spoiler JavaScript with defer for better performance #}
+<script src="{% static 'core/js/spoiler.js' %}" defer></script>

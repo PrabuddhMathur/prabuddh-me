@@ -28,6 +28,7 @@ You are an experienced Django/Wagtail developer. I am creating a personal blog u
 - **Do not add JavaScript.**
 - Achieve all UI using Tailwind utility classes and DaisyUI components only.
 - Use DaisyUI (https://daisyui.com/components/) as the component library.
+- Make new designs mobile ready
 
 ---
 

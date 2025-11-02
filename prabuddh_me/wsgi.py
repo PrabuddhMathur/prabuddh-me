@@ -11,6 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prabuddh_me.settings.dev")
+# Default to production settings for security - override with DJANGO_SETTINGS_MODULE env var if needed
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prabuddh_me.settings.production")
 
 application = get_wsgi_application()

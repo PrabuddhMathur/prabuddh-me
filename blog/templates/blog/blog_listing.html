@@ -4,111 +4,113 @@
 {% block title %}{{ seo_meta.title }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
     {# Header with View Controls #}
-    <div class="mb-12">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <div>
-                <nav class="text-sm breadcrumbs mb-4">
-                    <ul>
-                        <li><a href="/" class="hover:text-primary">Home</a></li>
-                        <li class="text-base-content/60">Blog</li>
-                    </ul>
-                </nav>
-                <h1 class="text-4xl md:text-5xl font-bold text-primary">All Blog Posts</h1>
-                <p class="text-base-content/70 mt-2">Browse {{ paginator.count }} posts</p>
-            </div>
+    <div class="mb-8 max-w-4xl mx-auto">
+        <nav class="text-sm mb-4 text-base-content/60">
+            <a href="/" class="hover:text-base-content">Home</a>
+            <span class="mx-2">/</span>
+            <span class="text-base-content font-medium">Blog</span>
+        </nav>
+        
+        <div class="flex justify-between items-start mb-2">
+            <h1 class="text-4xl md:text-5xl font-bold">All Blog Posts</h1>
             
-            {# View Mode Toggle #}
-            <div class="flex gap-2">
-                <div class="join">
-                    <a href="?view=grid-2{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                       class="btn btn-sm join-item {% if view_mode == 'grid-2' %}btn-primary{% else %}btn-outline{% endif %}"
-                       title="2 Column Grid">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                    </a>
-                    <a href="?view=grid-3{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                       class="btn btn-sm join-item {% if view_mode == 'grid-3' %}btn-primary{% else %}btn-outline{% endif %}"
-                       title="3 Column Grid">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                        </svg>
-                    </a>
-                    <a href="?view=masonry{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                       class="btn btn-sm join-item {% if view_mode == 'masonry' %}btn-primary{% else %}btn-outline{% endif %}"
-                       title="Masonry Grid">
+            {# View Mode Dropdown #}
+            <div class="relative">
+                <button id="view-dropdown-toggle" class="flex items-center gap-2 px-3 py-2 text-sm border border-base-200 rounded-lg hover:bg-base-200 transition-colors" aria-label="Change view mode">
+                    <svg id="current-view-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z" />
+                    </svg>
+                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                <div id="view-dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-base-100 border border-base-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                    <button data-view="masonry" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z" />
                         </svg>
-                    </a>
-                    <a href="?view=list{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                       class="btn btn-sm join-item {% if view_mode == 'list' %}btn-primary{% else %}btn-outline{% endif %}"
-                       title="List View">
+                        <span>Masonry</span>
+                    </button>
+                    <button data-view="grid-2" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        <span>2 Columns</span>
+                    </button>
+                    <button data-view="grid-3" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                        </svg>
+                        <span>3 Columns</span>
+                    </button>
+                    <button data-view="list" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                    </a>
+                        <span>List</span>
+                    </button>
                 </div>
             </div>
         </div>
+        
+        <p class="text-base-content/60">{{ paginator.count }} posts</p>
     </div>
 
-    {# Blog Posts #}
+    {# Blog Posts - All views in one container, toggled with JavaScript #}
     {% if posts %}
-        {# Grid View (2 columns) #}
-        {% if view_mode == 'grid-2' %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        {# Grid View (2 columns) - Mobile: 1 column, Tablet+: 2 columns #}
+        <div id="view-grid-2" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-12" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_card.html" with post=post %}
             {% endfor %}
         </div>
         
-        {# Grid View (3 columns) #}
-        {% elif view_mode == 'grid-3' %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {# Grid View (3 columns) - Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns #}
+        <div id="view-grid-3" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_card.html" with post=post %}
             {% endfor %}
         </div>
         
-        {# Masonry Grid #}
-        {% elif view_mode == 'masonry' %}
-        <div class="columns-1 md:columns-2 lg:columns-3 gap-6 mb-12">
-            {% for post in posts %}
-            <div class="break-inside-avoid mb-6">
-                {% include "blog/includes/post_card.html" with post=post %}
-            </div>
-            {% endfor %}
-        </div>
-        
-        {# List View #}
-        {% else %}
-        <div class="space-y-6 mb-12">
+        {# List View - Compact spacing on mobile #}
+        <div id="view-list" class="view-container max-w-4xl mx-auto space-y-4 sm:space-y-6 mb-12" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_list_item.html" with post=post %}
             {% endfor %}
         </div>
-        {% endif %}
+        
+        {# Masonry Grid - Default View - Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns #}
+        <div id="view-masonry" class="view-container max-w-4xl mx-auto columns-1 sm:columns-2 lg:columns-3 gap-6 sm:gap-8 mb-12">
+            {% for post in posts %}
+            <div class="break-inside-avoid mb-6 sm:mb-8">
+                {% include "blog/includes/post_card.html" with post=post %}
+            </div>
+            {% endfor %}
+        </div>
 
-        {# Pagination #}
+        {# Pagination - Mobile optimized #}
         {% if posts.has_other_pages %}
-        <div class="flex justify-center mt-12">
-            <div class="btn-group">
+        <div class="max-w-4xl mx-auto flex justify-center mt-12">
+            <div class="flex gap-1 sm:gap-2">
                 {% if posts.has_previous %}
-                <a href="?page={{ posts.previous_page_number }}{% if view_mode != 'grid-2' %}&view={{ view_mode }}{% endif %}" class="btn btn-outline">
-                    « Previous
+                <a href="?page={{ posts.previous_page_number }}{% if view_mode and view_mode != 'masonry' %}&view={{ view_mode }}{% endif %}" class="px-3 sm:px-4 py-2 border border-base-300 hover:bg-base-200 transition-colors text-sm">
+                    <span class="hidden sm:inline">← Previous</span>
+                    <span class="sm:hidden">←</span>
                 </a>
                 {% endif %}
                 
-                <button class="btn btn-outline">
-                    Page {{ posts.number }} of {{ paginator.num_pages }}
-                </button>
+                <span class="px-3 sm:px-4 py-2 border border-base-300 bg-base-200 text-sm">
+                    <span class="hidden sm:inline">Page {{ posts.number }} of {{ paginator.num_pages }}</span>
+                    <span class="sm:hidden">{{ posts.number }}/{{ paginator.num_pages }}</span>
+                </span>
                 
                 {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}{% if view_mode != 'grid-2' %}&view={{ view_mode }}{% endif %}" class="btn btn-outline">
-                    Next »
+                <a href="?page={{ posts.next_page_number }}{% if view_mode and view_mode != 'masonry' %}&view={{ view_mode }}{% endif %}" class="px-3 sm:px-4 py-2 border border-base-300 hover:bg-base-200 transition-colors text-sm">
+                    <span class="hidden sm:inline">Next →</span>
+                    <span class="sm:hidden">→</span>
                 </a>
                 {% endif %}
             </div>
@@ -123,4 +125,94 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+    // View mode switching with dropdown menu
+    (function() {
+        const STORAGE_KEY = 'blog-view-mode';
+        const DEFAULT_VIEW = 'masonry';
+        
+        const dropdownToggle = document.getElementById('view-dropdown-toggle');
+        const dropdownMenu = document.getElementById('view-dropdown-menu');
+        const currentViewIcon = document.getElementById('current-view-icon');
+        
+        // Get saved view or default
+        const savedView = localStorage.getItem(STORAGE_KEY) || DEFAULT_VIEW;
+        
+        // Toggle dropdown menu
+        dropdownToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            dropdownMenu.classList.add('hidden');
+        });
+        
+        // Prevent dropdown from closing when clicking inside
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Update icon to match current view
+        function updateCurrentIcon(viewName) {
+            const selectedOption = document.querySelector(`.view-option[data-view="${viewName}"]`);
+            if (selectedOption) {
+                const iconSvg = selectedOption.querySelector('svg');
+                if (iconSvg) {
+                    currentViewIcon.innerHTML = iconSvg.innerHTML;
+                    currentViewIcon.setAttribute('viewBox', iconSvg.getAttribute('viewBox'));
+                }
+            }
+        }
+        
+        // Initialize view on page load
+        function initView() {
+            switchView(savedView, false);
+        }
+        
+        // Switch between views
+        function switchView(viewName, saveToStorage = true) {
+            // Hide all views
+            document.querySelectorAll('.view-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            // Show selected view
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) {
+                // Set appropriate display based on view type
+                if (viewName === 'masonry') {
+                    targetView.style.display = 'block';
+                } else if (viewName.startsWith('grid')) {
+                    targetView.style.display = 'grid';
+                } else {
+                    targetView.style.display = 'block';
+                }
+            }
+            
+            // Update current icon
+            updateCurrentIcon(viewName);
+            
+            // Close dropdown
+            dropdownMenu.classList.add('hidden');
+            
+            // Save preference
+            if (saveToStorage) {
+                localStorage.setItem(STORAGE_KEY, viewName);
+            }
+        }
+        
+        // Add click handlers to view options
+        document.querySelectorAll('.view-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchView(this.dataset.view);
+            });
+        });
+        
+        // Initialize on page load
+        initView();
+    })();
+</script>
 {% endblock %}

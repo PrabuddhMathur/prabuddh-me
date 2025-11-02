@@ -2,11 +2,12 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from wagtail.models import Page
 from wagtail.fields import StreamField
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, TabbedInterface, ObjectList
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail import blocks
 from wagtail.blocks import RichTextBlock, CharBlock, URLBlock, BooleanBlock
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.search import index
 
 
 # =====================================================
@@ -52,7 +53,8 @@ class BaseRichTextBlock(blocks.StructBlock):
     """Reusable rich text block with alignment options."""
     text = RichTextBlock(
         required=True,
-        help_text="Rich text content with formatting options"
+        help_text="Rich text content with formatting options",
+        features=['bold', 'italic', 'link', 'ol', 'ul', 'h2', 'h3', 'h4', 'spoiler']
     )
     alignment = blocks.ChoiceBlock(
         choices=[
@@ -1023,3 +1025,249 @@ class FooterSettings(BaseSiteSetting):
                 'icon': 'email'
             })
         return links
+
+
+# =====================================================
+# Author Settings (Singleton for Site Author)
+# =====================================================
+
+@register_setting
+class AuthorSettings(BaseSiteSetting):
+    """
+    Centralized author information for the site.
+    This is a singleton model accessible throughout the site.
+    Use this for consistent author information across blog posts, footers, etc.
+    """
+    
+    # Author Identity
+    author_name = models.CharField(
+        max_length=100,
+        default="Prabuddh Mathur",
+        help_text="Your name as it appears on the site"
+    )
+    
+    author_title = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Your professional title or tagline (e.g., 'Software Engineer & Writer')"
+    )
+    
+    author_bio = models.TextField(
+        blank=True,
+        help_text="Your biography for display on blog posts and author pages"
+    )
+    
+    author_bio_short = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Short bio for sidebars and cards (200 characters max)"
+    )
+    
+    # Author Image
+    author_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text="Profile photo"
+    )
+    
+    # Contact & Social Links
+    email_address = models.EmailField(
+        blank=True,
+        help_text="Contact email address"
+    )
+    
+    website_url = models.URLField(
+        blank=True,
+        help_text="Personal website URL"
+    )
+    
+    twitter_url = models.URLField(
+        blank=True,
+        help_text="Twitter/X profile URL"
+    )
+    
+    linkedin_url = models.URLField(
+        blank=True,
+        help_text="LinkedIn profile URL"
+    )
+    
+    github_url = models.URLField(
+        blank=True,
+        help_text="GitHub profile URL"
+    )
+    
+    mastodon_url = models.URLField(
+        blank=True,
+        help_text="Mastodon profile URL"
+    )
+    
+    # Display Options
+    show_author_in_footer = models.BooleanField(
+        default=True,
+        help_text="Display author information in the footer"
+    )
+    
+    show_author_on_blog_posts = models.BooleanField(
+        default=True,
+        help_text="Display author bio at the end of blog posts"
+    )
+    
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('author_name'),
+            FieldPanel('author_title'),
+            FieldPanel('author_image'),
+        ], heading="Author Identity"),
+        
+        MultiFieldPanel([
+            FieldPanel('author_bio'),
+            FieldPanel('author_bio_short'),
+        ], heading="Biography"),
+        
+        MultiFieldPanel([
+            FieldPanel('email_address'),
+            FieldPanel('website_url'),
+            FieldPanel('twitter_url'),
+            FieldPanel('linkedin_url'),
+            FieldPanel('github_url'),
+            FieldPanel('mastodon_url'),
+        ], heading="Contact & Social Links"),
+        
+        MultiFieldPanel([
+            FieldPanel('show_author_in_footer'),
+            FieldPanel('show_author_on_blog_posts'),
+        ], heading="Display Options"),
+    ]
+    
+    class Meta:
+        verbose_name = 'Author Settings'
+    
+    def __str__(self):
+        return f"Author: {self.author_name}"
+    
+    def get_social_links(self):
+        """Return social links as a list for template iteration."""
+        links = []
+        if self.website_url:
+            links.append({
+                'name': 'Website',
+                'url': self.website_url,
+                'icon': 'globe'
+            })
+        if self.twitter_url:
+            links.append({
+                'name': 'Twitter',
+                'url': self.twitter_url,
+                'icon': 'twitter'
+            })
+        if self.linkedin_url:
+            links.append({
+                'name': 'LinkedIn',
+                'url': self.linkedin_url,
+                'icon': 'linkedin'
+            })
+        if self.github_url:
+            links.append({
+                'name': 'GitHub',
+                'url': self.github_url,
+                'icon': 'github'
+            })
+        if self.mastodon_url:
+            links.append({
+                'name': 'Mastodon',
+                'url': self.mastodon_url,
+                'icon': 'mastodon'
+            })
+        if self.email_address:
+            links.append({
+                'name': 'Email',
+                'url': f'mailto:{self.email_address}',
+                'icon': 'email'
+            })
+        return links
+
+
+# =====================================================
+# Static Page Model (for About, Contact, Terms, etc.)
+# =====================================================
+
+class StaticPage(BasePage):
+    """
+    Flexible static page model for content like About, Contact, Terms, Privacy, etc.
+    Uses StreamField for maximum flexibility in content layout.
+    Production-grade with validation and search indexing.
+    """
+    
+    # Page Introduction
+    intro = models.TextField(
+        blank=True,
+        max_length=500,
+        help_text="Optional introduction text (500 characters max)"
+    )
+    
+    # Main Content (StreamField with all available blocks)
+    body = StreamField([
+        ('heading', BaseHeadingBlock()),
+        ('text', BaseRichTextBlock()),
+        ('image', BaseImageBlock()),
+        ('quote', BaseQuoteBlock()),
+        ('button', BaseButtonBlock()),
+        ('spacer', BaseSpacerBlock()),
+        ('hero', BaseHeroBlock()),
+        ('cta', BaseCallToActionBlock()),
+        ('author_bio', BaseAuthorBioBlock()),
+    ], 
+    blank=True,
+    use_json_field=True,
+    help_text="Main page content using flexible blocks"
+    )
+    
+    # Display Settings
+    show_last_updated = models.BooleanField(
+        default=False,
+        help_text="Display last updated date at the bottom of the page"
+    )
+    
+    # Search configuration
+    search_fields = BasePage.search_fields + [
+        index.SearchField('intro'),
+        index.SearchField('body'),
+    ]
+    
+    # Content panels for the editor
+    content_panels = BasePage.content_panels + [
+        FieldPanel('intro'),
+        FieldPanel('body'),
+        FieldPanel('show_last_updated'),
+    ]
+    
+    # SEO panels from BasePage
+    promote_panels = BasePage.seo_panels
+    
+    # Combine into tabbed interface
+    edit_handler = TabbedInterface([
+        ObjectList(content_panels, heading='Content'),
+        ObjectList(promote_panels, heading='SEO & Promotion'),
+        ObjectList(BasePage.settings_panels, heading='Settings'),
+    ])
+    
+    class Meta:
+        verbose_name = "Static Page"
+        verbose_name_plural = "Static Pages"
+    
+    def __str__(self):
+        """String representation of the page."""
+        return self.title
+    
+    def get_context(self, request, *args, **kwargs):
+        """Add custom context to the template."""
+        context = super().get_context(request, *args, **kwargs)
+        
+        # Add last modified date if needed
+        if self.show_last_updated:
+            context['last_updated'] = self.last_published_at or self.latest_revision_created_at
+        
+        return context

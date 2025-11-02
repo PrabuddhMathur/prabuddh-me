@@ -22,10 +22,10 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Disable HSTS temporarily (re-enable once fully stable)
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
+# HSTS Configuration (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # =====================================================
 # ✅ Cookie / Session / CSRF Configuration
@@ -35,7 +35,7 @@ SESSION_COOKIE_DOMAIN = ".prabuddh.in"
 SESSION_COOKIE_PATH = "/"
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 CSRF_USE_SESSIONS = True  # store CSRF inside the session
 CSRF_COOKIE_NAME = "csrftoken"
@@ -43,7 +43,7 @@ CSRF_COOKIE_DOMAIN = ".prabuddh.in"
 CSRF_COOKIE_PATH = "/"
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "Lax"
 
 USE_X_FORWARDED_HOST = True
 

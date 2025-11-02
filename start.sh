@@ -171,10 +171,17 @@ fi
 
 # ===== Gunicorn Server Startup =====
 echo "Starting Gunicorn server..."
+# For a single vCPU (1000m) a good default is 3 workers (2*1+1) and 2 threads.
+WORKERS=${GUNICORN_WORKERS:-3}
+THREADS=${GUNICORN_THREADS:-2}
+
+echo "Starting Gunicorn with $WORKERS workers, $THREADS threads per worker (assumes 1 vCPU)"
+
 exec gunicorn prabuddh_me.wsgi:application \
-    --bind 0.0.0.0:$PORT \
-    --workers 2 \
+    --bind 0.0.0.0:${PORT:-8000} \
+    --workers "$WORKERS" \
     --worker-class gthread \
+    --threads "$THREADS" \
     --worker-connections 1000 \
     --timeout 300 \
     --max-requests 1000 \
