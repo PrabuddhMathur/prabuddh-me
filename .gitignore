@@ -221,6 +221,7 @@ prabuddh_me/settings/local.py
 
 # Static and media files in development
 /static/
+/staticfiles/
 /media/
 /documentation/
 # Cloud SQL Proxy

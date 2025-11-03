@@ -129,8 +129,10 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
+# Project-level static files (prabuddh_me/static/)
 STATICFILES_DIRS = [os.path.join(PROJECT_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# Collected static files go to a separate directory
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
