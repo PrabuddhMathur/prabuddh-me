@@ -4,124 +4,94 @@
 {% block title %}{{ seo_meta.title }}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
-    {# Header with View Controls #}
-    <div class="mb-8 max-w-4xl mx-auto">
-        <nav class="text-sm mb-4 text-base-content/60">
-            <a href="/" class="hover:text-base-content">Home</a>
-            <span class="mx-2">/</span>
-            <span class="text-base-content font-medium">Blog</span>
-        </nav>
-        
-        <div class="flex justify-between items-start mb-2">
-            <h1 class="text-4xl md:text-5xl font-bold">All Blog Posts</h1>
+{# Breadcrumbs #}
+<nav class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4" aria-label="Breadcrumb">
+    <div class="max-w-4xl mx-auto">
+        <ol class="flex items-center gap-2 text-sm text-base-content/60">
+            <li><a href="/" class="hover:text-base-content transition-colors">Home</a></li>
+            <li><span class="text-base-content/40">/</span></li>
+            <li class="text-base-content font-medium">Blog</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-8 lg:py-12">
+    {# Hero Section with Header and View Controls #}
+    <div class="mb-12 max-w-4xl mx-auto">
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold text-base-content mb-2">All Blog Posts</h1>
+                <p class="text-lg text-base-content/60">{{ paginator.count }} post{{ paginator.count|pluralize }}</p>
+            </div>
             
-            {# View Mode Dropdown #}
-            <div class="relative">
-                <button id="view-dropdown-toggle" class="flex items-center gap-2 px-3 py-2 text-sm border border-base-200 rounded-lg hover:bg-base-200 transition-colors" aria-label="Change view mode">
-                    <svg id="current-view-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {# Enhanced View Mode Dropdown #}
+            <div class="relative flex-shrink-0">
+                <button id="view-dropdown-toggle" 
+                        class="btn btn-outline gap-2" 
+                        aria-label="Change view mode">
+                    <svg id="current-view-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z" />
                     </svg>
-                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="hidden sm:inline">View</span>
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 
-                <div id="view-dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-base-100 border border-base-200 rounded-lg shadow-lg z-10 overflow-hidden">
-                    <button data-view="masonry" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div id="view-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-base-100 border border-base-content/20 rounded-lg shadow-2xl z-50 overflow-hidden">
+                    <button data-view="masonry" class="view-option w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-base-200 transition-colors text-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z" />
                         </svg>
-                        <span>Masonry</span>
+                        <span>Masonry Grid</span>
                     </button>
-                    <button data-view="grid-2" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        <span>2 Columns</span>
-                    </button>
-                    <button data-view="grid-3" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                        </svg>
-                        <span>3 Columns</span>
-                    </button>
-                    <button data-view="list" class="view-option w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-base-200 transition-colors text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button data-view="list" class="view-option w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-base-200 transition-colors text-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                        <span>List</span>
+                        <span>List View</span>
                     </button>
                 </div>
             </div>
         </div>
-        
-        <p class="text-base-content/60">{{ paginator.count }} posts</p>
     </div>
 
-    {# Blog Posts - All views in one container, toggled with JavaScript #}
+    {# Blog Posts - Masonry and List views, toggled with JavaScript #}
     {% if posts %}
-        {# Grid View (2 columns) - Mobile: 1 column, Tablet+: 2 columns #}
-        <div id="view-grid-2" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 mb-12" style="display: none;">
-            {% for post in posts %}
-            {% include "blog/includes/post_card.html" with post=post %}
-            {% endfor %}
-        </div>
-        
-        {# Grid View (3 columns) - Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns #}
-        <div id="view-grid-3" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 mb-12" style="display: none;">
-            {% for post in posts %}
-            {% include "blog/includes/post_card.html" with post=post %}
-            {% endfor %}
-        </div>
-        
-        {# List View - Compact spacing on mobile #}
-        <div id="view-list" class="view-container max-w-4xl mx-auto mb-12" style="display: none;">
+        {# List View #}
+        <div id="view-list" class="view-container max-w-4xl mx-auto mb-12 space-y-6" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_list_item.html" with post=post %}
             {% endfor %}
         </div>
         
         {# Masonry Grid - Default View - Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns #}
-        <div id="view-masonry" class="view-container max-w-4xl mx-auto columns-1 sm:columns-2 lg:columns-3 gap-8 sm:gap-10 mb-12">
+        <div id="view-masonry" class="view-container max-w-4xl mx-auto columns-1 md:columns-2 lg:columns-3 gap-6 mb-12">
             {% for post in posts %}
-            <div class="break-inside-avoid mb-8 sm:mb-10">
+            <div class="break-inside-avoid mb-6">
                 {% include "blog/includes/post_card.html" with post=post %}
             </div>
             {% endfor %}
         </div>
 
-        {# Pagination - Mobile optimized #}
-        {% if posts.has_other_pages %}
-        <div class="max-w-4xl mx-auto flex justify-center mt-12">
-            <div class="flex gap-1 sm:gap-2">
-                {% if posts.has_previous %}
-                <a href="?page={{ posts.previous_page_number }}{% if view_mode and view_mode != 'masonry' %}&view={{ view_mode }}{% endif %}" class="px-3 sm:px-4 py-2 border border-base-300 hover:bg-base-200 transition-colors text-sm">
-                    <span class="hidden sm:inline">← Previous</span>
-                    <span class="sm:hidden">←</span>
-                </a>
-                {% endif %}
-                
-                <span class="px-3 sm:px-4 py-2 border border-base-300 bg-base-200 text-sm">
-                    <span class="hidden sm:inline">Page {{ posts.number }} of {{ paginator.num_pages }}</span>
-                    <span class="sm:hidden">{{ posts.number }}/{{ paginator.num_pages }}</span>
-                </span>
-                
-                {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}{% if view_mode and view_mode != 'masonry' %}&view={{ view_mode }}{% endif %}" class="px-3 sm:px-4 py-2 border border-base-300 hover:bg-base-200 transition-colors text-sm">
-                    <span class="hidden sm:inline">Next →</span>
-                    <span class="sm:hidden">→</span>
-                </a>
-                {% endif %}
-            </div>
+        {# Enhanced Pagination #}
+        <div class="max-w-4xl mx-auto">
+            {% include "core/components/pagination.html" with page=posts paginator=paginator %}
         </div>
-        {% endif %}
     {% else %}
-        <div class="alert alert-info">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span>No blog posts found.</span>
+        {# Enhanced Empty State #}
+        <div class="max-w-4xl mx-auto text-center py-16 px-6">
+            <div class="text-6xl mb-6">📝</div>
+            <h3 class="text-2xl font-bold mb-3 text-base-content">No posts yet</h3>
+            <p class="text-base-content/70 mb-8 max-w-md mx-auto">
+                Check back soon for new content!
+            </p>
+            <a href="/" class="btn btn-primary gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Home
+            </a>
         </div>
     {% endif %}
 </div>
@@ -182,14 +152,7 @@
             // Show selected view
             const targetView = document.getElementById(`view-${viewName}`);
             if (targetView) {
-                // Set appropriate display based on view type
-                if (viewName === 'masonry') {
-                    targetView.style.display = 'block';
-                } else if (viewName.startsWith('grid')) {
-                    targetView.style.display = 'grid';
-                } else {
-                    targetView.style.display = 'block';
-                }
+                targetView.style.display = 'block';
             }
             
             // Update current icon

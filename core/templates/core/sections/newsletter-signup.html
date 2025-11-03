@@ -1,0 +1,28 @@
+{% comment %}
+Newsletter Signup Section Component
+Usage: {% include "core/sections/newsletter-signup.html" %}
+
+DaisyUI Components Used:
+  - card: Container with gradient background
+  - form-control: Form wrapper
+  - input: Email input field
+  - btn: Subscribe button
+
+Mobile-responsive and theme-aware
+{% endcomment %}
+
+<div class="card bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10">
+  <div class="card-body text-center items-center">
+    <h3 class="text-2xl font-bold mb-2">Stay Updated</h3>
+    <p class="text-base-content/70 mb-4">Get new posts delivered to your inbox</p>
+    <form class="form-control gap-4" method="post" action="#">
+      <input type="email"
+             name="email"
+             placeholder="your@email.com"
+             class="input input-bordered w-full mb-4"
+             required
+             aria-label="Email address">
+      <button type="submit" class="btn btn-primary">Subscribe</button>
+    </form>
+  </div>
+</div>

@@ -27,18 +27,14 @@
         /* Remove browser button styling (role="button" override) */
         border: none;
         outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
+
         
         /* Ensure consistent box model */
         box-sizing: border-box;
         
-        /* Tailwind neutral-200 */
-        background-color: #e5e5e5;
-        
-        /* text-transparent */
-        color: transparent;
+        /* Default - use theme's neutral color for background */
+        background-color: var(--spoiler-bg-color);
+        color: var(--spoiler-color);
         
         /* Rounded corners for visual appeal */
         border-radius: 0.375rem;
@@ -50,18 +46,14 @@
         transition: none;
     }
 
-    /* Hover state - neutral-300 */
-    .spoiler:hover {
-        background-color: #d4d4d4;
-    }
 
     /* Revealed state - matches toggled classes */
     .spoiler.revealed {
         /* Inherit text color from parent - CRITICAL FIX */
-        color: inherit !important;
+        color: inherit ;
         
-        /* bg-transparent - use !important to override */
-        background-color: transparent !important;
+        /* bg-transparent - use  to override */
+        background-color: transparent ;
         
         /* Remove visual separation to blend with regular text */
         padding: 0;
@@ -74,27 +66,11 @@
 
     /* Hover state for revealed spoilers - keep transparent */
     .spoiler.revealed:hover {
-        background-color: transparent !important;
+        background-color: transparent ;
     }
 
     /* Remove focus outline to prevent visible borders */
     .spoiler:focus {
-        outline: none !important;
-    }
-
-    /* Dark mode - use Tailwind's dark neutral palette */
-    .dark .spoiler,
-    [data-theme="dark"] .spoiler {
-        background-color: #525252; /* neutral-600 */
-    }
-
-    .dark .spoiler:hover,
-    [data-theme="dark"] .spoiler:hover {
-        background-color: #737373; /* neutral-500 */
-    }
-
-    .dark .spoiler.revealed,
-    [data-theme="dark"] .spoiler.revealed {
-        color: inherit !important;
+        outline: none ;
     }
 }

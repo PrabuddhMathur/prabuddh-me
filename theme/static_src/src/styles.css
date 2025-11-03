@@ -1,35 +1,50 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-
-@plugin "daisyui";
-
-/**
-  * A catch-all path to Django template files, JavaScript, and Python files
-  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
-  *
-  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
-  * the scope of this path.
-  */
+@plugin "daisyui"{
+  themes: light, dim;
+};
+/* Paths Tailwind should scan for class names */
 @source "../../../**/*.{html,py,js}";
 
-/**
-  * Custom theme configuration for Hedvig Letters font family
-  */
+/* -------------------------------------------------------
+   Global design tokens and typography
+------------------------------------------------------- */
 @theme {
   /* Font families */
   --font-family-serif: "Hedvig Letters Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-family-sans: "Hedvig Letters Sans", ui-sans-serif, system-ui, sans-serif;
-  
-  /* Font weights for Hedvig Letters */
+
+  /* Font weights */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 700;
-  
-  /* Custom warm background for light mode */
-  --color-warm-white: oklch(99% 0.005 85);
 }
 
-/* Light mode warm background */
-[data-theme="light"] body {
-  background-color: var(--color-warm-white);
+/* -------------------------------------------------------
+   Theme-based styling overrides
+------------------------------------------------------- */
+
+/* Dim mode: DaisyUI color overrides - warm white text */
+[data-theme="dim"] {
+  --color-base-content: oklch(98% 0.01 60);
+  --color-primary-content: oklch(0% 0 0);
+  --color-secondary-content: oklch(97% 0.02 65);
+  --color-accent-content: oklch(97% 0.018 70);
+  --color-neutral-content: oklch(96% 0.012 58);
+  --color-info-content: oklch(97% 0.015 62);
+  --color-success-content: oklch(98% 0.012 68);
+  --color-warning-content: oklch(96% 0.02 55);
+  --color-error-content: oklch(97% 0.016 52);
+  --color-primary: oklch(98% 0.01 60);
+  /* Spoiler colors - light warm white tones */
+  --spoiler-bg-color: oklch(95% 0.015 60);
+  --spoiler-color: oklch(95% 0.015 60);
+}
+
+[data-theme="light"] {
+  /* Spoiler colors - light gray tones */
+  --color-primary: oklch(0% 0 0);
+
+  --spoiler-bg-color: oklch(83.987% 0.00616 240.304);
+  --spoiler-color: oklch(83.987% 0.00616 240.304);
 }

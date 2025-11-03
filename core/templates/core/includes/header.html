@@ -1,7 +1,7 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
 <!-- Navigation Header -->
-<nav class="bg-base-100 border-b border-base-200 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50{% endif %}">
+<nav id="main-navbar" class="bg-base-100 border-b border-base-200 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50 transition-transform duration-300{% endif %}">
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
         <!-- Logo / Site Title -->
         <a href="/" class="text-lg font-semibold tracking-tight hover:text-base-content/70 transition-colors">
@@ -15,7 +15,7 @@
         <!-- Desktop Navigation Links -->
         <div class="hidden lg:flex items-center gap-8">
             {% for link in settings.core.HeaderSettings.get_navigation_links %}
-            <a href="{{ link.url }}" class="text-sm font-medium hover:text-base-content/70 transition-colors {% if request.path == link.url %}text-base-content border-b-2 border-base-content pb-1{% else %}text-base-content/60{% endif %}">
+            <a href="{{ link.url }}" class="text-sm font-medium hover:text-base-content transition-colors {% if request.path == link.url %}text-base-content border-b-2 border-base-content pb-1{% else %}text-base-content/90{% endif %}">
                 {{ link.text }}
             </a>
             {% endfor %}
@@ -32,31 +32,52 @@
             
             <!-- Theme Toggle Button -->
             {% if settings.core.HeaderSettings.show_theme_toggle %}
-            <button id="theme-toggle" class="p-2 hover:bg-base-200 rounded-lg transition-colors flex items-center justify-center" aria-label="Toggle theme">
-                <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-                <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
-            </button>
+            {% include "core/components/theme-toggle-button.html" %}
             {% endif %}
             
             <!-- Mobile Menu Button -->
             <div class="lg:hidden">
-                <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="p-2 hover:bg-base-200 rounded-lg transition-colors flex items-center justify-center" aria-label="Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </div>
-                    <ul tabindex="0" class="menu dropdown-content mt-3 z-[1] p-2 bg-base-100 border border-base-200 rounded-lg w-52">
-                        {% for link in settings.core.HeaderSettings.get_navigation_links %}
-                        <li><a href="{{ link.url }}" class="{% if request.path == link.url %}font-semibold{% endif %}">{{ link.text }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                {% include "core/components/mobile-menu.html" with nav_links=settings.core.HeaderSettings.get_navigation_links %}
             </div>
         </div>
     </div>
 </nav>
+
+{% if settings.core.HeaderSettings.header_style == 'sticky' %}
+<script>
+    // Hide/show navbar on scroll
+    (function() {
+        const navbar = document.getElementById('main-navbar');
+        if (!navbar) return;
+        
+        let lastScrollTop = 0;
+        let isScrolling = false;
+        
+        window.addEventListener('scroll', function() {
+            if (!isScrolling) {
+                window.requestAnimationFrame(function() {
+                    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    // Don't hide navbar at the very top of the page
+                    if (currentScroll <= 100) {
+                        navbar.style.transform = 'translateY(0)';
+                    } 
+                    // Scrolling down - hide navbar
+                    else if (currentScroll > lastScrollTop && currentScroll > 100) {
+                        navbar.style.transform = 'translateY(-100%)';
+                    } 
+                    // Scrolling up - show navbar
+                    else if (currentScroll < lastScrollTop) {
+                        navbar.style.transform = 'translateY(0)';
+                    }
+                    
+                    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+                    isScrolling = false;
+                });
+                
+                isScrolling = true;
+            }
+        }, { passive: true });
+    })();
+</script>
+{% endif %}

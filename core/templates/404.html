@@ -4,12 +4,39 @@
 {% block title %}Page Not Found{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-6 lg:px-12 py-16">
+<div class="max-w-4xl mx-auto px-6 lg:px-12 py-16 md:py-24">
     <div class="text-center">
-        <h1 class="text-6xl font-bold mb-4">404</h1>
-        <h2 class="text-3xl font-semibold mb-6">Page Not Found</h2>
-        <p class="text-lg text-base-content/70 mb-8">Sorry, the page you are looking for could not be found.</p>
-        <a href="/" class="px-6 py-3 border border-base-300 hover:bg-base-200 transition-colors inline-block">Go to Home</a>
+        {# Enhanced error icon #}
+        <div class="text-8xl mb-6">🔍</div>
+        
+        {# Error code with better styling #}
+        <div class="text-6xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            404
+        </div>
+        
+        {# Error title #}
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-base-content">Page Not Found</h1>
+        
+        {# Helpful message #}
+        <p class="text-lg text-base-content/70 mb-8 max-w-md mx-auto leading-relaxed">
+            The page you're looking for doesn't exist or has been moved. Let's get you back on track!
+        </p>
+        
+        {# CTA buttons #}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="/" class="btn btn-primary gap-2 min-h-[44px]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Go to Home
+            </a>
+            <a href="/blog/" class="btn btn-outline gap-2 min-h-[44px]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                Browse Blog
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

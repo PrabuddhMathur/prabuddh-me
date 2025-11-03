@@ -126,6 +126,20 @@ class BlogPage(BasePage):
         help_text="Estimated reading time in minutes (auto-calculated on save)"
     )
     
+    # Typography settings
+    line_height = models.CharField(
+        max_length=20,
+        default='relaxed',
+        choices=[
+            ('normal', 'Normal (1.5)'),
+            ('comfortable', 'Comfortable (1.55)'),
+            ('relaxed', 'Relaxed (1.625)'),
+            ('spacious', 'Spacious (1.8)'),
+            ('loose', 'Loose (2.0)'),
+        ],
+        help_text="Line height for blog post content"
+    )
+    
     # Search index configuration
     search_fields = BasePage.search_fields + [
         index.SearchField('intro'),
@@ -157,6 +171,9 @@ class BlogPage(BasePage):
             FieldPanel('featured'),
             FieldPanel('show_related_posts'),
         ], heading="Display Options"),
+        MultiFieldPanel([
+            FieldPanel('line_height'),
+        ], heading="Typography"),
     ]
     
     # SEO panels from BasePage
@@ -284,7 +301,8 @@ class BlogPage(BasePage):
                             word_count += len(value.split())
             
             # Calculate reading time (200 words per minute, minimum 1 minute)
-            self.estimated_reading_time = max(1, word_count // 200)
+            # Use round() for more accurate calculation: round(words/200) instead of words//200
+            self.estimated_reading_time = max(1, round(word_count / 200))
             
             logger.info(f"Saving BlogPage: {self.title} (Reading time: {self.estimated_reading_time} min)")
             

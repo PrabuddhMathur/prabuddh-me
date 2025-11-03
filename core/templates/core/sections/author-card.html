@@ -1,0 +1,66 @@
+{% comment %}
+Author Card Section Component
+Usage: {% include "core/sections/author-card.html" %}
+
+Parameters:
+  - author_image: URL to author image (optional, uses default if not provided)
+  - author_name: Author name (optional, pulls from settings if not provided)
+  - author_title: Author title/role (optional)
+  - author_bio: Author bio text (optional, pulls from settings if not provided)
+  - social_links: Social links queryset (optional, pulls from settings if not provided)
+
+DaisyUI Components Used:
+  - card: Container with base-200 background
+  - avatar: Author photo with ring effect
+  - Integrates social-links component
+
+Mobile-responsive with centered layout
+{% endcomment %}
+
+{% load static %}
+
+<div class="card bg-base-200">
+  <div class="card-body items-center text-center">
+    <!-- Author Avatar -->
+    {% if author_image or settings.core.AuthorSettings.author_image %}
+    <div class="avatar">
+      <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+        <img src="{% if author_image %}{{ author_image }}{% else %}{{ settings.core.AuthorSettings.author_image.url }}{% endif %}" 
+             alt="{% if author_name %}{{ author_name }}{% else %}{{ settings.core.AuthorSettings.author_name }}{% endif %}">
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Author Name -->
+    <h3 class="card-title text-xl mt-4">
+      {% if author_name %}
+        {{ author_name }}
+      {% else %}
+        {{ settings.core.AuthorSettings.author_name }}
+      {% endif %}
+    </h3>
+    
+    <!-- Author Title/Role -->
+    {% if author_title %}
+    <p class="text-sm text-base-content/70">{{ author_title }}</p>
+    {% endif %}
+    
+    <!-- Author Bio -->
+    {% if author_bio %}
+    <p class="text-base-content/80 leading-relaxed mt-2">{{ author_bio }}</p>
+    {% elif settings.core.AuthorSettings.author_bio %}
+    <p class="text-base-content/80 leading-relaxed mt-2">{{ settings.core.AuthorSettings.author_bio|truncatewords:30 }}</p>
+    {% endif %}
+    
+    <!-- Social Links -->
+    {% if social_links %}
+    <div class="mt-4">
+      {% include "core/components/social-links.html" with links=social_links size="md" %}
+    </div>
+    {% elif settings.core.AuthorSettings.get_social_links %}
+    <div class="mt-4">
+      {% include "core/components/social-links.html" with links=settings.core.AuthorSettings.get_social_links size="md" %}
+    </div>
+    {% endif %}
+  </div>
+</div>

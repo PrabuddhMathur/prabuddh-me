@@ -1,0 +1,22 @@
+/**
+ * Mobile Header Hide-on-Scroll Styles
+ * Provides smooth transitions for header visibility on mobile devices
+ */
+
+/* Ensure header is positioned for transforms */
+nav {
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform;
+}
+
+/* Hidden state - translate header up by its height */
+nav.header-hidden {
+    transform: translateY(-100%);
+}
+
+/* Ensure header stays visible on desktop (lg breakpoint and up) */
+@media (min-width: 1024px) {
+    nav.header-hidden {
+        transform: translateY(0);
+    }
+}

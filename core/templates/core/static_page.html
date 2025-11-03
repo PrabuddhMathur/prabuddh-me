@@ -5,10 +5,12 @@
 <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
     <article class="max-w-4xl mx-auto">
         {# Breadcrumb Navigation #}
-        <nav class="text-sm mb-8 text-base-content/60">
-            <a href="/" class="hover:text-base-content">Home</a>
-            <span class="mx-2">/</span>
-            <span class="text-base-content font-medium">{{ page.title }}</span>
+        <nav class="text-sm mb-8 text-base-content/60" aria-label="Breadcrumb">
+            <ol class="flex items-center gap-2">
+                <li><a href="/" class="hover:text-base-content transition-colors">Home</a></li>
+                <li><span class="text-base-content/40">/</span></li>
+                <li class="text-base-content font-medium">{{ page.title }}</li>
+            </ol>
         </nav>
 
         {# Page Header #}

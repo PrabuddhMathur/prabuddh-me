@@ -1,0 +1,35 @@
+{% comment %}
+Breadcrumb Navigation Component
+
+Usage: {% include "core/components/breadcrumb.html" with items=breadcrumb_items %}
+
+Parameters:
+  - items: List of breadcrumb items, each with 'text' and 'url' (url is None for current page)
+  
+Example items structure:
+  [
+    {'text': 'Home', 'url': '/'},
+    {'text': 'Blog', 'url': '/blog/'},
+    {'text': 'Current Page', 'url': None}
+  ]
+{% endcomment %}
+
+{% if items %}
+<nav class="text-sm mb-8 text-base-content/60" aria-label="Breadcrumb">
+    <ol class="flex items-center gap-2 flex-wrap">
+        {% for item in items %}
+        <li class="flex items-center gap-2">
+            {% if item.url %}
+            <a href="{{ item.url }}" class="hover:text-base-content transition-colors">{{ item.text }}</a>
+            {% else %}
+            <span class="text-base-content font-medium">{{ item.text }}</span>
+            {% endif %}
+            
+            {% if not forloop.last %}
+            <span class="text-base-content/40" aria-hidden="true">/</span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endif %}

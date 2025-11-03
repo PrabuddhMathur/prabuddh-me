@@ -174,7 +174,8 @@ core/templates/
 ├── 500.html                      # Custom 500 error page
 └── core/
     ├── base.html                 # Master template
-    ├── blocks/                   # Block templates
+    ├── static_page.html          # Static page template
+    ├── blocks/                   # StreamField block templates
     │   ├── author_bio_block.html
     │   ├── button_block.html
     │   ├── cta_block.html
@@ -185,30 +186,23 @@ core/templates/
     │   ├── recent_posts_block.html
     │   ├── rich_text_block.html
     │   └── spacer_block.html
-    └── includes/                 # Reusable partials
-        ├── footer.html
+    ├── components/               # Atomic reusable components
+    │   ├── breadcrumb.html
+    │   ├── button.html
+    │   ├── mobile-menu.html
+    │   ├── pagination.html
+    │   ├── post-meta.html
+    │   ├── post-tags.html
+    │   ├── social-links.html
+    │   └── theme-toggle-button.html
+    ├── sections/                 # Composed section components (NEW)
+    │   ├── author-card.html      # Author info with avatar and social links
+    │   ├── newsletter-signup.html # Newsletter subscription form
+    │   └── tag-cloud.html        # Popular tags display
+    └── includes/                 # Page-level includes
+        ├── footer.html           # Redesigned modern footer
         ├── header.html
         └── seo_meta.html
-```
-```
-core/templates/
-├── core/
-│   ├── base.html                 # Master template
-│   ├── blocks/                   # Block templates
-│   │   ├── author_bio_block.html
-│   │   ├── button_block.html
-│   │   ├── cta_block.html
-│   │   ├── heading_block.html
-│   │   ├── hero_block.html
-│   │   ├── image_block.html
-│   │   ├── quote_block.html
-│   │   ├── recent_posts_block.html
-│   │   ├── rich_text_block.html
-│   │   └── spacer_block.html
-│   └── includes/                 # Reusable partials
-│       ├── footer.html
-│       ├── header.html
-│       └── seo_meta.html
 ```
 
 **Creating a template that extends base:**
@@ -371,6 +365,133 @@ class YourPage(BasePage):
 6. **Test across all apps** that use core functionality
 7. **Run tests**: `python manage.py test core`
 
+### 5. Section Components (NEW)
+
+The new `sections/` directory contains composed components built from atomic elements. These are ready-to-use sections for common website patterns.
+
+#### Newsletter Signup Section
+**Location**: [`core/templates/core/sections/newsletter-signup.html`](core/templates/core/sections/newsletter-signup.html:1)
+
+A modern newsletter subscription form with gradient styling.
+
+**Features:**
+- Gradient background using DaisyUI's gradient utilities
+- Email input with validation
+- Subscribe button with primary styling
+- ARIA labels for accessibility
+- Mobile-responsive design
+
+**Usage:**
+```django
+{% include "core/sections/newsletter-signup.html" %}
+```
+
+**DaisyUI Components Used:**
+- `card` - Container
+- `form-control` - Form wrapper
+- `input input-bordered` - Email field
+- `btn btn-primary` - Submit button
+
+#### Tag Cloud Section
+**Location**: [`core/templates/core/sections/tag-cloud.html`](core/templates/core/sections/tag-cloud.html:1)
+
+Interactive tag display with hover effects for blog/content categorization.
+
+**Features:**
+- Badge-based tag display
+- Hover effects with color transitions
+- Optional "View all tags" link
+- Wrapping layout for responsive design
+- ARIA labels for screen readers
+
+**Usage:**
+```django
+{% include "core/sections/tag-cloud.html" with tags=tags %}
+{% include "core/sections/tag-cloud.html" with tags=tags show_all_link=False %}
+```
+
+**Parameters:**
+- `tags` - QuerySet or list of tag objects (required)
+- `show_all_link` - Boolean to show "View all tags" link (default: True)
+
+**DaisyUI Components Used:**
+- `card` - Container
+- `badge badge-lg badge-outline` - Tag badges
+- `link link-primary` - View all link
+
+#### Author Card Section
+**Location**: [`core/templates/core/sections/author-card.html`](core/templates/core/sections/author-card.html:1)
+
+Professional author profile card with avatar, bio, and social links.
+
+**Features:**
+- Avatar with ring effect
+- Author name and title
+- Bio text with truncation
+- Integrated social links component
+- Falls back to AuthorSettings if no parameters provided
+- Center-aligned layout
+
+**Usage:**
+```django
+{# Use with parameters #}
+{% include "core/sections/author-card.html" with author_name="John Doe" author_bio="..." %}
+
+{# Use with settings (automatic fallback) #}
+{% include "core/sections/author-card.html" %}
+```
+
+**Parameters (all optional):**
+- `author_image` - URL to author image
+- `author_name` - Author name (pulls from settings if not provided)
+- `author_title` - Author title/role
+- `author_bio` - Author bio text (pulls from settings if not provided)
+- `social_links` - Social links queryset (pulls from settings if not provided)
+
+**DaisyUI Components Used:**
+- `card` - Container
+- `avatar` - Photo display with ring
+- Includes `social-links.html` component
+
+### 6. Footer Redesign
+
+The footer has been completely redesigned to be more modern, informative, and engaging.
+
+**Location**: [`core/templates/core/includes/footer.html`](core/templates/core/includes/footer.html:1)
+
+#### New Features:
+
+**Modern 3-Column Layout:**
+1. **About Section** - Author info with truncated bio and "Learn more" link
+2. **Quick Links** - Configurable navigation links from FooterSettings
+3. **Newsletter Section** - Integrated newsletter signup component
+
+**Design Improvements:**
+- Gradient styling and better visual hierarchy
+- Responsive grid (1 column mobile → 2 columns tablet → 3 columns desktop)
+- Centered social links with large icons
+- Professional copyright bar
+- Proper spacing and dividers
+- Touch-friendly minimum heights (44px) for mobile
+
+**Responsive Behavior:**
+- **Mobile (< 768px)**: Single column, stacked sections
+- **Tablet (768px - 1024px)**: 2 columns
+- **Desktop (> 1024px)**: 3 equal columns
+
+**Accessibility:**
+- Semantic HTML with proper `<footer>` tag
+- ARIA labels on navigation
+- Keyboard-navigable form
+- Proper heading hierarchy
+- Focus states on interactive elements
+
+**Integration:**
+- Uses `AuthorSettings` for author info
+- Uses `FooterSettings` for links and configuration
+- Includes `newsletter-signup.html` section
+- Includes `social-links.html` component
+
 ## File Structure
 
 ```
@@ -378,23 +499,40 @@ core/
 ├── __init__.py
 ├── admin.py                  # Wagtail admin customizations
 ├── apps.py                   # App configuration
-├── models.py                 # Base models, blocks, and settings (970 lines)
+├── models.py                 # Base models, blocks, and settings
 ├── README.md                 # This documentation
 ├── tests.py                  # Unit tests
 ├── views.py                  # Views (if needed)
+├── rich_text_handlers.py     # Custom rich text handlers
+├── wagtail_hooks.py          # Wagtail customizations
 ├── migrations/               # Database migrations
 │   ├── __init__.py
 │   ├── 0001_initial.py
 │   ├── 0002_footersettings_headersettings.py
-│   └── 0003_alter_sitesettings_site_name.py
+│   ├── 0003_alter_sitesettings_site_name.py
+│   ├── 0004_authorsettings.py
+│   └── 0005_staticpage.py
+├── static/core/              # Static assets
+│   ├── css/
+│   │   ├── citation.css      # Citation styling
+│   │   └── spoiler.css       # Spoiler text styling
+│   └── js/
+│       ├── citation.js       # Citation functionality
+│       ├── citation_plugin.js # Citation editor plugin
+│       └── spoiler.js        # Spoiler reveal functionality
 ├── templates/
 │   ├── 404.html              # Custom 404 error page
 │   ├── 500.html              # Custom 500 error page
 │   └── core/
 │       ├── base.html         # Master template
+│       ├── static_page.html  # Static page template
 │       ├── blocks/           # All StreamField block templates
+│       ├── components/       # Atomic reusable components
+│       ├── sections/         # NEW: Composed section components
 │       └── includes/         # Header, footer, SEO meta
-└── __pycache__/
+└── templatetags/
+    ├── __init__.py
+    └── citation_tags.py      # Citation extraction tags
 ```
 
 ## Testing
@@ -445,6 +583,18 @@ python manage.py validate_templates
 - [Django Documentation](https://docs.djangoproject.com/)
 
 ## Changelog
+
+### Frontend Revamp (November 3, 2025)
+- ✅ Created new `sections/` directory for composed components
+- ✅ Added newsletter signup section component
+- ✅ Added tag cloud section component
+- ✅ Added author card section component
+- ✅ Redesigned footer with modern 3-column layout
+- ✅ Integrated newsletter signup into footer
+- ✅ Improved footer responsiveness (mobile → tablet → desktop)
+- ✅ Enhanced footer accessibility with ARIA labels and proper semantics
+- ✅ Added proper touch targets for mobile (44px minimum)
+- ✅ Implemented visual hierarchy with gradients and spacing
 
 ### Latest Changes (October 20, 2025)
 - ✅ Moved 404 and 500 error pages to core app templates
@@ -685,6 +835,6 @@ For questions or issues:
 
 ---
 
-**Maintainer**: Prabuddh Mathur  
-**Last Updated**: October 20, 2025  
-**Version**: 2.0 (Production-Ready Refactor)
+**Maintainer**: Prabuddh Mathur
+**Last Updated**: November 3, 2025
+**Version**: 2.1 (Frontend Revamp Complete)

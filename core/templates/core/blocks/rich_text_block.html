@@ -1,9 +1,7 @@
-{% load wagtailcore_tags static %}
-
-{# Load spoiler feature assets #}
-<link rel="stylesheet" href="{% static 'core/css/spoiler.css' %}">
+{% load wagtailcore_tags %}
 
 {# Base Rich Text Block Template #}
+{# Note: Spoiler CSS/JS are now loaded globally in base.html #}
 <div class="prose max-w-none
     {% if value.alignment == 'left' %}text-left{% endif %}
     {% if value.alignment == 'center' %}text-center{% endif %}
@@ -12,6 +10,3 @@
 ">
     {{ value.text|richtext }}
 </div>
-
-{# Load spoiler JavaScript with defer for better performance #}
-<script src="{% static 'core/js/spoiler.js' %}" defer></script>

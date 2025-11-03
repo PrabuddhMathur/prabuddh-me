@@ -1,0 +1,39 @@
+{% comment %}
+Loading skeleton for post list item component
+Usage: {% include "blog/includes/post_list_item_skeleton.html" %}
+Matches the structure of post_list_item.html for consistent loading states
+Responsive: stacks on mobile, horizontal on desktop
+{% endcomment %}
+
+<article class="card bg-base-100 shadow-md mb-6 flex-row flex-col md:flex-row overflow-hidden" aria-busy="true" aria-label="Loading post">
+    {# Image skeleton - responsive sizing #}
+    <figure class="md:w-64 w-full flex-shrink-0 overflow-hidden bg-base-300 aspect-video md:aspect-auto md:h-48">
+        <div class="skeleton h-full w-full"></div>
+    </figure>
+    
+    <div class="card-body p-6 gap-3">
+        {# Title skeleton - larger on desktop #}
+        <div class="skeleton h-7 md:h-8 w-4/5"></div>
+        
+        {# Meta skeleton - date and reading time #}
+        <div class="flex gap-2">
+            <div class="skeleton h-4 w-24"></div>
+            <div class="skeleton h-4 w-20"></div>
+        </div>
+        
+        {# Intro text skeleton - 2-3 lines responsive #}
+        <div class="space-y-2">
+            <div class="skeleton h-4 w-full"></div>
+            <div class="skeleton h-4 w-full"></div>
+            <div class="skeleton h-4 w-3/4 hidden md:block"></div>
+        </div>
+        
+        {# Tags skeleton #}
+        <div class="flex gap-2 mt-2">
+            <div class="skeleton h-6 w-16"></div>
+            <div class="skeleton h-6 w-20"></div>
+            <div class="skeleton h-6 w-18"></div>
+            <div class="skeleton h-6 w-16"></div>
+        </div>
+    </div>
+</article>

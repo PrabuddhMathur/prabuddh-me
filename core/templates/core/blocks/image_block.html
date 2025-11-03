@@ -2,22 +2,28 @@
 
 {# Base Image Block Template #}
 <figure class="
-    {% if value.alignment == 'left' %}text-left{% endif %}
-    {% if value.alignment == 'center' %}mx-auto text-center{% endif %}
-    {% if value.alignment == 'right' %}ml-auto text-right{% endif %}
+    mx-auto text-center
     {% if value.alignment == 'full' %}w-full{% else %}max-w-4xl{% endif %}
 ">
     {% image value.image fill-1200x800 as img %}
-    <img 
-        src="{{ img.url }}" 
-        alt="{{ value.alt_text|default:value.caption|default:'Image' }}"
-        class="{% if value.alignment == 'full' %}w-full{% else %}max-w-full h-auto{% endif %} rounded-lg shadow-lg"
-        width="{{ img.width }}"
-        height="{{ img.height }}"
-    />
+    {% image value.image width-2400 as full_img %}
+    <button 
+        class="block cursor-pointer group relative w-full bg-transparent border-0 p-0 blog-gallery-image"
+        data-full-url="{{ full_img.url }}"
+        data-caption="{{ value.caption|default:'' }}"
+        data-alt="{{ value.alt_text|default:value.caption|default:'Image' }}"
+        aria-label="View full size image">
+        <img 
+            src="{{ img.url }}" 
+            alt="{{ value.alt_text|default:value.caption|default:'Image' }}"
+            class="{% if value.alignment == 'full' %}w-full{% else %}max-w-full h-auto mx-auto{% endif %} rounded-lg"
+            width="{{ img.width }}"
+            height="{{ img.height }}"
+        />
+    </button>
     
     {% if value.caption %}
-        <figcaption class="mt-2 text-sm text-gray-600">
+        <figcaption class="mt-2 text-sm text-base-content/60">
             {{ value.caption }}
         </figcaption>
     {% endif %}

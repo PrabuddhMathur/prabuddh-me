@@ -1,0 +1,23 @@
+{% comment %}
+Button Component - Standardized button with variants
+
+Usage: {% include "core/components/button.html" with url="#" text="Click Me" size="md" %}
+
+Parameters:
+  - url: (required) Link destination
+  - text: (required) Button text
+  - size: xs|sm|md|lg (default: md)
+  - external: Boolean, if true adds target="_blank" and rel attributes (default: false)
+  - classes: Additional CSS classes (optional)
+{% endcomment %}
+
+<a href="{{ url }}" 
+   class="inline-block border border-base-content hover:bg-base-content hover:text-base-100 transition-colors font-medium
+          {% if size == 'xs' %}text-xs px-3 py-1.5
+          {% elif size == 'sm' %}text-sm px-4 py-2
+          {% elif size == 'lg' %}text-lg px-8 py-4
+          {% else %}px-6 py-3{% endif %}
+          {{ classes }}"
+   {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>
+    {{ text }}
+</a>

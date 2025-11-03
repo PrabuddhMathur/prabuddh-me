@@ -268,6 +268,192 @@ blog/#### Main Templates
 - Horizontal layout with thumbnail and content
 - Tag links for filtering
 
+## Templates Documentation
+
+All blog templates extend [`core/base.html`](../core/templates/core/base.html:1) for consistency.
+
+### Main Templates
+
+#### blog_page.html
+**Location**: [`blog/templates/blog/blog_page.html`](blog/templates/blog/blog_page.html:1)
+
+Individual blog post display with full content.
+
+**Features:**
+- Breadcrumb navigation
+- Post header with featured image
+- Post metadata (author, date, reading time)
+- Full StreamField content rendering
+- Author bio section (optional)
+- Post navigation (previous/next)
+- Related posts sidebar
+- Social sharing buttons
+- Responsive layout
+
+#### blog_index_page.html
+**Location**: [`blog/templates/blog/blog_index_page.html`](blog/templates/blog/blog_index_page.html:1)
+
+Main blog listing page with featured posts and filtering.
+
+**Features:**
+- Featured posts section at top
+- Multiple layout options (list/grid/masonry)
+- Tag filtering via sidebar
+- Pagination controls
+- Responsive grid layouts
+- Loading skeletons for better UX
+
+#### blog_listing.html
+**Location**: [`blog/templates/blog/blog_listing.html`](blog/templates/blog/blog_listing.html:1)
+
+Alternative blog listing with view mode switching.
+
+**Features:**
+- View mode toggle (list/grid/masonry)
+- Persistent view preference
+- Same filtering capabilities as index
+- Optimized for different content densities
+
+#### blog_archive.html
+**Location**: [`blog/templates/blog/blog_archive.html`](blog/templates/blog/blog_archive.html:1)
+
+Date-based archive view for posts.
+
+**Features:**
+- Date-filtered post display
+- Archive navigation
+- SEO-optimized meta tags
+
+### Include Templates
+
+#### post_card.html
+**Location**: [`blog/templates/blog/includes/post_card.html`](blog/templates/blog/includes/post_card.html:1)
+
+Reusable post card component for grid/masonry layouts.
+
+**Enhanced Features (Frontend Revamp):**
+- ✅ Enforced aspect-video ratio for images (16:9)
+- ✅ Smooth hover effects with shadow transitions
+- ✅ Featured badge with prominent styling
+- ✅ Image zoom effect on hover (scale-105)
+- ✅ Card lift animation (hover:-translate-y-1)
+- ✅ Improved visual hierarchy with better spacing
+- ✅ Enhanced typography with line clamping
+- ✅ Accessibility improvements (ARIA labels)
+- ✅ Touch-friendly design for mobile
+
+**DaisyUI Components:**
+- `card` with shadow-md and hover:shadow-xl
+- `badge badge-primary` for featured posts
+- Responsive image with aspect-video
+
+**Usage:**
+```django
+{% include "blog/includes/post_card.html" with post=post %}
+```
+
+#### post_list_item.html
+**Location**: [`blog/templates/blog/includes/post_list_item.html`](blog/templates/blog/includes/post_list_item.html:1)
+
+Compact horizontal layout for list views.
+
+**Enhanced Features (Frontend Revamp):**
+- ✅ Responsive layout (stacks on mobile, horizontal on desktop)
+- ✅ Better content truncation with line-clamp
+- ✅ Improved metadata display
+- ✅ Enhanced hover states with smooth transitions
+- ✅ Tag links with hover effects
+- ✅ Optimized mobile experience
+- ✅ Better visual separation between items
+- ✅ Accessibility enhancements
+
+**DaisyUI Components:**
+- `card card-side` for horizontal layout
+- Responsive breakpoints (md:flex-row)
+- Badge tags with hover effects
+
+**Usage:**
+```django
+{% include "blog/includes/post_list_item.html" with post=post %}
+```
+
+### Loading Skeleton Components (NEW - Frontend Revamp)
+
+Added loading skeletons for better perceived performance during content loading.
+
+#### post_card_skeleton.html
+**Location**: [`blog/templates/blog/includes/post_card_skeleton.html`](blog/templates/blog/includes/post_card_skeleton.html:1)
+
+Loading skeleton matching post_card.html structure.
+
+**Features:**
+- Matches card aspect ratios perfectly
+- Skeleton image placeholder with aspect-video
+- Title, meta, and content skeleton lines
+- Tag placeholder skeletons
+- ARIA busy state for accessibility
+- Smooth pulsing animations
+- Matches exact spacing of real cards
+
+**DaisyUI Components:**
+- `skeleton` utility class
+- `card` structure matching post_card
+- `aspect-video` for image skeleton
+
+**Usage:**
+```django
+{% include "blog/includes/post_card_skeleton.html" %}
+```
+
+**Use Case:**
+Display while posts are loading or during dynamic content updates to improve perceived performance.
+
+#### post_list_item_skeleton.html
+**Location**: [`blog/templates/blog/includes/post_list_item_skeleton.html`](blog/templates/blog/includes/post_list_item_skeleton.html:1)
+
+Loading skeleton matching post_list_item.html structure.
+
+**Features:**
+- Responsive skeleton (stacks on mobile, horizontal on desktop)
+- Matches list item proportions exactly
+- Image skeleton with proper sizing
+- Content skeleton with varying line widths
+- ARIA busy states for screen readers
+- Smooth loading animations
+- Mobile-optimized skeleton display
+
+**DaisyUI Components:**
+- `skeleton` utility class
+- `card card-side` responsive layout
+- Breakpoint-aware sizing (md:w-64, md:h-48)
+
+**Usage:**
+```django
+{% include "blog/includes/post_list_item_skeleton.html" %}
+```
+
+**Use Case:**
+Display in list view while content is loading to maintain layout stability and provide visual feedback.
+
+### Template File Structure
+
+```
+blog/templates/blog/
+├── blog_archive.html           # Date-based archive
+├── blog_index_page.html        # Main blog listing
+├── blog_listing.html           # Alternative listing
+├── blog_page.html              # Individual post
+├── blocks/                     # StreamField block templates
+└── includes/                   # Reusable components
+    ├── post_card.html          # Enhanced card component
+    ├── post_card_skeleton.html # NEW: Card loading skeleton
+    ├── post_list_item.html     # Enhanced list item
+    ├── post_list_item_skeleton.html # NEW: List item loading skeleton
+    ├── post_meta.html          # Post metadata
+    └── post_tags.html          # Tag display
+```
+
+
 ## Configuration
 
 ### Admin Interface
@@ -495,6 +681,18 @@ Potential additions:
 - Ensure image renditions are generated
 
 ## Changelog
+### Frontend Revamp (November 3, 2025)
+- ✅ Enhanced post_card.html with hover effects and animations
+- ✅ Enhanced post_list_item.html with responsive improvements
+- ✅ Created post_card_skeleton.html for loading states
+- ✅ Created post_list_item_skeleton.html for loading states
+- ✅ Improved image aspect ratios (enforced 16:9)
+- ✅ Added smooth transitions and hover effects
+- ✅ Enhanced mobile responsiveness and touch targets
+- ✅ Improved visual hierarchy and spacing
+- ✅ Added accessibility improvements (ARIA labels)
+- ✅ Optimized for perceived performance with skeletons
+
 
 ### Version 1.1.0 (October 2025)
 - ✅ Removed MockPage hack from all archive views
