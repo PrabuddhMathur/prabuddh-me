@@ -52,17 +52,17 @@
             {% if page.featured_image %}
             <figure class="mt-8 -mx-6 md:mx-0">
                 {% image page.featured_image width-1200 as featured_img %}
-                <button onclick="featured_image_modal.showModal()"
+                {% image page.featured_image width-2400 as featured_img_full %}
+                <button onclick="openFeaturedImage()"
                         class="block cursor-pointer group relative w-full overflow-hidden rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300"
+                        data-full-url="{{ featured_img_full.url }}"
+                        data-caption="{{ page.featured_image_caption|default:'' }}"
+                        data-alt="{{ page.featured_image.title }}"
                         aria-label="View full size image">
                     <img src="{{ featured_img.url }}"
                          alt="{{ page.featured_image.title }}"
                          class="w-full h-auto object-cover group-hover:opacity-95 transition-opacity">
-                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                        </svg>
-                    </div>
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                 </button>
                 {% if page.featured_image_caption %}
                 <figcaption class="text-sm text-center text-base-content/60 mt-4 italic">
@@ -70,26 +70,6 @@
                 </figcaption>
                 {% endif %}
             </figure>
-            
-            {# Image Modal #}
-            <dialog id="featured_image_modal" class="modal" aria-label="Featured image modal">
-                <div class="modal-box max-w-6xl w-11/12 p-4 bg-transparent border-0 shadow-none group">
-                    <form method="dialog">
-                        <button class="absolute right-4 top-4 z-10 btn btn-sm btn-circle bg-base-100/90 hover:bg-base-100 opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Close modal">✕</button>
-                    </form>
-                    <img src="{{ featured_img.url }}" 
-                         alt="{{ page.featured_image.title }}" 
-                         class="w-full h-auto rounded-lg shadow-2xl">
-                    {% if page.featured_image_caption %}
-                    <div class="p-6 text-center text-sm text-base-content/80 bg-base-100 rounded-b-lg mt-2">
-                        {{ page.featured_image_caption }}
-                    </div>
-                    {% endif %}
-                </div>
-                <form method="dialog" class="modal-backdrop">
-                    <button>close</button>
-                </form>
-            </dialog>
             {% endif %}
 
             {# Post Introduction with enhanced styling #}
@@ -119,7 +99,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
-                        Tagged with:
+                        Tags:
                     </span>
                     {% include "core/components/post-tags.html" with post=page show_inline=True %}
                 </div>
@@ -179,4 +159,233 @@
         {% endif %}
     </article>
 </div>
+
+{# Image Gallery Modal #}
+<dialog id="image_gallery_modal" class="modal" aria-label="Image gallery">
+    <div class="modal-box max-w-7xl w-11/12 p-0 bg-base-300 relative">
+        {# Close Button #}
+        <form method="dialog">
+            <button class="absolute right-4 top-4 z-50 btn btn-sm btn-circle bg-base-100/90 hover:bg-base-100 border-0 shadow-lg" aria-label="Close gallery">✕</button>
+        </form>
+        
+        {# Navigation Buttons #}
+        <button id="gallery_prev" 
+                class="absolute left-4 top-1/2 -translate-y-1/2 z-40 btn btn-circle btn-lg bg-base-100/90 hover:bg-base-100 border-0 shadow-lg"
+                aria-label="Previous image">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        
+        <button id="gallery_next" 
+                class="absolute right-4 top-1/2 -translate-y-1/2 z-40 btn btn-circle btn-lg bg-base-100/90 hover:bg-base-100 border-0 shadow-lg"
+                aria-label="Next image">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+        
+        {# Image Container #}
+        <div class="p-8">
+            <img id="gallery_image" 
+                 src="" 
+                 alt="" 
+                 class="w-full h-auto max-h-[70vh] object-contain rounded-lg shadow-2xl mx-auto">
+            
+            {# Image Caption #}
+            <div id="gallery_caption" class="mt-4 text-center text-sm text-base-content/80 hidden"></div>
+            
+            {# Image Counter #}
+            <div id="gallery_counter" class="mt-4 text-center text-sm text-base-content/60"></div>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<script>
+    // Image Gallery Functionality
+    let galleryImages = [];
+    let currentImageIndex = 0;
+    
+    // Initialize gallery on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        collectGalleryImages();
+        setupGalleryControls();
+        setupKeyboardNavigation();
+        setupImageClickHandlers();
+    });
+    
+    function collectGalleryImages() {
+        galleryImages = [];
+        
+        // Add featured image if present
+        const featuredImageButton = document.querySelector('[onclick="openFeaturedImage()"]');
+        if (featuredImageButton) {
+            galleryImages.push({
+                url: featuredImageButton.getAttribute('data-full-url'),
+                caption: featuredImageButton.getAttribute('data-caption'),
+                alt: featuredImageButton.getAttribute('data-alt')
+            });
+        }
+        
+        // Add all content images
+        const contentImages = document.querySelectorAll('.blog-gallery-image');
+        contentImages.forEach(img => {
+            galleryImages.push({
+                url: img.getAttribute('data-full-url'),
+                caption: img.getAttribute('data-caption'),
+                alt: img.getAttribute('data-alt')
+            });
+        });
+    }
+    
+    function setupImageClickHandlers() {
+        // Featured image handler
+        const featuredImageButton = document.querySelector('[onclick="openFeaturedImage()"]');
+        if (featuredImageButton) {
+            featuredImageButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                openFeaturedImage();
+            });
+        }
+        
+        // Content images handlers
+        const contentImages = document.querySelectorAll('.blog-gallery-image');
+        contentImages.forEach((img, index) => {
+            img.addEventListener('click', function(e) {
+                e.preventDefault();
+                openImageGallery(index);
+            });
+        });
+    }
+    
+    function openFeaturedImage() {
+        currentImageIndex = 0;
+        showImageInGallery();
+    }
+    
+    function openImageGallery(index) {
+        // Offset by 1 if featured image exists
+        const featuredImageButton = document.querySelector('[onclick="openFeaturedImage()"]');
+        const offset = featuredImageButton ? 1 : 0;
+        currentImageIndex = index + offset;
+        showImageInGallery();
+    }
+    
+    function showImageInGallery() {
+        if (galleryImages.length === 0) return;
+        
+        const modal = document.getElementById('image_gallery_modal');
+        const image = document.getElementById('gallery_image');
+        const caption = document.getElementById('gallery_caption');
+        const counter = document.getElementById('gallery_counter');
+        const prevBtn = document.getElementById('gallery_prev');
+        const nextBtn = document.getElementById('gallery_next');
+        
+        const currentImage = galleryImages[currentImageIndex];
+        
+        // Update image
+        image.src = currentImage.url;
+        image.alt = currentImage.alt;
+        
+        // Update caption
+        if (currentImage.caption) {
+            caption.textContent = currentImage.caption;
+            caption.classList.remove('hidden');
+        } else {
+            caption.classList.add('hidden');
+        }
+        
+        // Update counter
+        counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
+        
+        // Update button visibility
+        prevBtn.style.display = galleryImages.length > 1 ? 'flex' : 'none';
+        nextBtn.style.display = galleryImages.length > 1 ? 'flex' : 'none';
+        
+        // Show modal
+        modal.showModal();
+    }
+    
+    function setupGalleryControls() {
+        const prevBtn = document.getElementById('gallery_prev');
+        const nextBtn = document.getElementById('gallery_next');
+        
+        prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navigatePrevious();
+        });
+        
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navigateNext();
+        });
+    }
+    
+    function setupKeyboardNavigation() {
+        const modal = document.getElementById('image_gallery_modal');
+        
+        modal.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                navigatePrevious();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navigateNext();
+            }
+        });
+    }
+    
+    function navigatePrevious() {
+        if (galleryImages.length <= 1) return;
+        currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+        updateGalleryImage();
+    }
+    
+    function navigateNext() {
+        if (galleryImages.length <= 1) return;
+        currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+        updateGalleryImage();
+    }
+    
+    function updateGalleryImage() {
+        const image = document.getElementById('gallery_image');
+        const caption = document.getElementById('gallery_caption');
+        const counter = document.getElementById('gallery_counter');
+        
+        const currentImage = galleryImages[currentImageIndex];
+        
+        // Fade out
+        image.style.opacity = '0';
+        
+        setTimeout(() => {
+            // Update content
+            image.src = currentImage.url;
+            image.alt = currentImage.alt;
+            
+            if (currentImage.caption) {
+                caption.textContent = currentImage.caption;
+                caption.classList.remove('hidden');
+            } else {
+                caption.classList.add('hidden');
+            }
+            
+            counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
+            
+            // Fade in
+            image.style.opacity = '1';
+        }, 150);
+    }
+</script>
+
+<style>
+    #gallery_image {
+        transition: opacity 0.15s ease-in-out;
+    }
+</style>
+
 {% endblock %}
