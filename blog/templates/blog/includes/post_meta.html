@@ -1,0 +1,12 @@
+{% comment %}
+Post Meta Component - Date and Reading Time (Author removed as there's only one author)
+Usage: {% include "blog/includes/post_meta.html" with post=post %}
+{% endcomment %}
+
+<div class="flex flex-wrap gap-2 items-center text-xs sm:text-sm text-base-content/50">
+    <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"M j, Y" }}</time>
+    {% if post.estimated_reading_time %}
+    <span>•</span>
+    <span>{{ post.estimated_reading_time }} min read</span>
+    {% endif %}
+</div>

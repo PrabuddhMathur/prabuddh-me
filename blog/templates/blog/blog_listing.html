@@ -62,30 +62,30 @@
     {# Blog Posts - All views in one container, toggled with JavaScript #}
     {% if posts %}
         {# Grid View (2 columns) - Mobile: 1 column, Tablet+: 2 columns #}
-        <div id="view-grid-2" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-12" style="display: none;">
+        <div id="view-grid-2" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 mb-12" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_card.html" with post=post %}
             {% endfor %}
         </div>
         
         {# Grid View (3 columns) - Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns #}
-        <div id="view-grid-3" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12" style="display: none;">
+        <div id="view-grid-3" class="view-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 mb-12" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_card.html" with post=post %}
             {% endfor %}
         </div>
         
         {# List View - Compact spacing on mobile #}
-        <div id="view-list" class="view-container max-w-4xl mx-auto space-y-4 sm:space-y-6 mb-12" style="display: none;">
+        <div id="view-list" class="view-container max-w-4xl mx-auto mb-12" style="display: none;">
             {% for post in posts %}
             {% include "blog/includes/post_list_item.html" with post=post %}
             {% endfor %}
         </div>
         
         {# Masonry Grid - Default View - Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns #}
-        <div id="view-masonry" class="view-container max-w-4xl mx-auto columns-1 sm:columns-2 lg:columns-3 gap-6 sm:gap-8 mb-12">
+        <div id="view-masonry" class="view-container max-w-4xl mx-auto columns-1 sm:columns-2 lg:columns-3 gap-8 sm:gap-10 mb-12">
             {% for post in posts %}
-            <div class="break-inside-avoid mb-6 sm:mb-8">
+            <div class="break-inside-avoid mb-8 sm:mb-10">
                 {% include "blog/includes/post_card.html" with post=post %}
             </div>
             {% endfor %}

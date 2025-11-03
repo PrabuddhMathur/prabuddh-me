@@ -1,18 +1,13 @@
 {% load wagtailcore_tags %}
 
-{# Base Button Block Template - Using DaisyUI button styles #}
+{# Base Button Block Template - Consistent outline button style #}
 <a 
     href="{{ value.button_url }}" 
-    class="btn 
-        {% if value.button_style == 'primary' %}btn-primary{% endif %}
-        {% if value.button_style == 'secondary' %}btn-secondary{% endif %}
-        {% if value.button_style == 'accent' %}btn-accent{% endif %}
-        {% if value.button_style == 'ghost' %}btn-ghost{% endif %}
-        {% if value.button_style == 'link' %}btn-link{% endif %}
-        {% if value.button_size == 'xs' %}btn-xs{% endif %}
-        {% if value.button_size == 'sm' %}btn-sm{% endif %}
-        {% if value.button_size == 'md' %}btn-md{% endif %}
-        {% if value.button_size == 'lg' %}btn-lg{% endif %}
+    class="inline-block px-6 py-3 border border-base-content hover:bg-base-content hover:text-base-100 transition-colors font-medium
+        {% if value.button_size == 'xs' %}text-xs px-3 py-1.5{% endif %}
+        {% if value.button_size == 'sm' %}text-sm px-4 py-2{% endif %}
+        {% if value.button_size == 'md' %}{% endif %}
+        {% if value.button_size == 'lg' %}text-lg px-8 py-4{% endif %}
     "
     {% if value.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
 >

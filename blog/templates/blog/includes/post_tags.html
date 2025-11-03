@@ -1,0 +1,22 @@
+{% comment %}
+Post Tags Component
+Usage: {% include "blog/includes/post_tags.html" with post=post max_tags=3 %}
+Parameters:
+  - post: The blog post object
+  - max_tags: Maximum number of tags to display (default: 3)
+  - show_inline: If true, doesn't add margin (optional)
+{% endcomment %}
+
+{% if post.tags.all %}
+<div class="flex flex-wrap gap-1.5 sm:gap-2{% if not show_inline %} mb-3{% endif %}">
+    {% for tag in post.tags.all %}
+    {% if forloop.counter <= max_tags|default:3 %}
+    <a href="{% url 'blog_tag_archive' tag.slug %}" 
+       class="text-xs px-2 py-0.5 sm:py-1 border border-base-content/10 hover:border-base-content transition-colors relative z-10"
+       onclick="event.stopPropagation()">
+        {{ tag }}
+    </a>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
