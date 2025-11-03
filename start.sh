@@ -141,7 +141,8 @@ python manage.py migrate --noinput || {
 
 # ===== Static Files Collection =====
 echo "Collecting static files..."
-python manage.py collectstatic --noinput --clear --no-post-process || echo "Static files collection had warnings, but continuing..."
+# Note: Removed --clear flag to avoid clearing GCS bucket on every deploy
+python manage.py collectstatic --noinput || echo "Static files collection had warnings, but continuing..."
 
 # ===== Superuser Creation =====
 if [ -n "$SUPERUSER_NAME" ] && [ -n "$SUPERUSER_EMAIL" ] && [ -n "$SUPERUSER_PASSWORD" ]; then
