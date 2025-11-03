@@ -24,13 +24,8 @@
         </style>
     {% endif %}
     
-    <div class="relative max-w-7xl mx-auto px-6 lg:px-12 w-full">
-        <div class="max-w-2xl
-            {% if value.text_color == 'white' %}text-white
-            {% elif value.text_color == 'black' %}text-black
-            {% else %}text-base-content
-            {% endif %}
-        ">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full">
+        <div class="max-w-2xl text-base-content">
             <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-6">
                 {{ value.title }}
             </h1>

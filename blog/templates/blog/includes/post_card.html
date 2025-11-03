@@ -1,39 +1,40 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
-<article class="group cursor-pointer border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20 transition-colors rounded-lg overflow-hidden shadow-sm" onclick="window.location='{{ post.get_date_url }}'">
+<article class="relative card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+    <a href="{{ post.get_date_url }}" class="absolute inset-0" aria-label="Read {{ post.title }}"></a>
     {% if post.featured_image %}
-    <div class="overflow-hidden">
-        {% image post.featured_image fill-600x400 as post_img %}
-        <img src="{{ post_img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-48 sm:h-56 object-cover group-hover:opacity-90 transition-opacity">
-    </div>
+    <figure class="aspect-video overflow-hidden">
+        {% image post.featured_image fill-800x450 as post_img %}
+        <img src="{{ post_img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+    </figure>
     {% endif %}
-    <div class="p-5 sm:p-7">
+    
+    <div class="card-body p-6 space-y-4">
         {% if post.featured %}
-        <div class="inline-block text-xs font-semibold uppercase tracking-wider text-base-content/60 mb-3">Featured</div>
+        <div class="badge badge-primary badge-sm">Featured</div>
         {% endif %}
-        <h2 class="text-xl sm:text-2xl font-semibold mb-4 group-hover:text-base-content/70 transition-colors leading-snug">
+        
+        <h2 class="card-title text-xl font-semibold hover:text-primary transition-colors">
             {{ post.title }}
         </h2>
         
+        {# Post Meta using core component #}
+        {% include "core/components/post-meta.html" with post=post %}
+        
         {# Intro excerpt with read more - fallback to body text if intro is empty #}
         {% if post.intro %}
-        <p class="text-sm sm:text-base text-base-content/70 mb-5 leading-relaxed">
-            {{ post.intro|truncatewords:25 }}
-            <span class="text-base-content font-medium ml-1">Read more →</span>
+        <p class="text-base-content/80 line-clamp-3 leading-relaxed">
+            {{ post.intro }}
         </p>
         {% elif post.body %}
-        <p class="text-sm sm:text-base text-base-content/70 mb-5 leading-relaxed">
+        <p class="text-base-content/80 line-clamp-3 leading-relaxed">
             {{ post.body|striptags|truncatewords:25 }}
-            <span class="text-base-content font-medium ml-1">Read more →</span>
         </p>
         {% endif %}
         
-        {# Post Meta #}
-        {% include "blog/includes/post_meta.html" with post=post %}
-        
-        {# Tags #}
-        <div class="mt-4">
-            {% include "blog/includes/post_tags.html" with post=post max_tags=3 %}
-        </div>
+        {# Tags using core component #}
+        {% if post.tags.all %}
+            {% include "core/components/post-tags.html" with post=post max_tags=3 show_inline=True %}
+        {% endif %}
     </div>
 </article>

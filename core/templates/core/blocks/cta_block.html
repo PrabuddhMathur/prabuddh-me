@@ -32,12 +32,11 @@
                 {% elif value.text_alignment == 'right' %}text-right
                 {% endif %}
             ">
-                <a href="{{ value.button_link }}" 
+                <a href="{{ value.button_link }}"
                    class="inline-block px-6 py-3 border border-base-content hover:bg-base-content hover:text-base-100 transition-colors font-medium"
                    {% if value.button_link|slice:":4" == "http" %}target="_blank" rel="noopener noreferrer"{% endif %}
                 >
                     {{ value.button_text }}
-                </a>
                 </a>
             </div>
         </div>

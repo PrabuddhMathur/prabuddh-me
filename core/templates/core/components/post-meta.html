@@ -1,0 +1,29 @@
+{% comment %}
+Post Meta Component - Date and Reading Time Display
+
+Usage: {% include "core/components/post-meta.html" with post=post show_icons=False %}
+
+Parameters:
+  - post: The blog post object (required)
+  - show_icons: Boolean, if true shows icons next to info (default: False)
+  - classes: Additional CSS classes (optional)
+{% endcomment %}
+
+<div class="flex flex-wrap gap-2 items-center text-sm text-base-content/60 {{ classes }}">
+    {% if show_icons %}
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+    </svg>
+    {% endif %}
+    <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"M j, Y" }}</time>
+    
+    {% if post.estimated_reading_time %}
+    <span>•</span>
+    {% if show_icons %}
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    {% endif %}
+    <span>{{ post.estimated_reading_time }} min read</span>
+    {% endif %}
+</div>

@@ -2,5 +2,5 @@
 # Edit these commands to customize your Django and Tailwind dev setup.
 # Format: process_name: command_to_run
 
-django: DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py runserver 0.0.0.0:8000
+django: DJANGO_SETTINGS_MODULE=prabuddh_me.settings.dev python manage.py runserver 0.0.0.0:8001
 tailwind: python manage.py tailwind start

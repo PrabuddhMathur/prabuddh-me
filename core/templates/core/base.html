@@ -12,9 +12,10 @@
     
     <!-- Theme initialization script (must run before body renders to prevent flash) -->
     <script>
-        // Initialize theme from localStorage before page renders
+        // Initialize theme from localStorage or system preference before page renders
         (function() {
-            const theme = localStorage.getItem('theme') || 'light';
+            const theme = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dim' : 'light');
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
@@ -27,6 +28,9 @@
     {% else %}
         <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
     {% endif %}
+    
+    {# Spoiler feature CSS (used in rich text blocks) #}
+    <link rel="stylesheet" href="{% static 'core/css/spoiler.css' %}">
     
     {# Custom CSS #}
     {% block extra_css %}{% endblock %}
@@ -67,7 +71,7 @@
             
             // Function to update icon based on current theme
             function updateThemeIcon(theme) {
-                if (theme === 'dark') {
+                if (theme === 'dim') {
                     themeIconLight.classList.add('hidden');
                     themeIconDark.classList.remove('hidden');
                 } else {
@@ -84,7 +88,7 @@
             themeToggle.addEventListener('click', function() {
                 const html = document.documentElement;
                 const currentTheme = html.getAttribute('data-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                const newTheme = currentTheme === 'light' ? 'dim' : 'light';
                 
                 // Update theme
                 html.setAttribute('data-theme', newTheme);
@@ -93,6 +97,9 @@
             });
         })();
     </script>
+    
+    {# Spoiler feature JavaScript (used in rich text blocks) #}
+    <script src="{% static 'core/js/spoiler.js' %}" defer></script>
     
     {# Extra JavaScript #}
     {% block extra_js %}{% endblock %}

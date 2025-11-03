@@ -5,7 +5,7 @@
     <div class="text-center">
         {% if value.author_image %}
         <div class="mb-6 flex justify-center">
-            {% image value.author_image fill-96x96 class="w-24 h-24 rounded-full object-cover ring-2 ring-base-content/10 dark:ring-white/10 shadow-sm" %}
+            {% image value.author_image fill-96x96 class="w-24 h-24 rounded-full object-cover ring-2 ring-base-content/10 shadow-sm" %}
         </div>
         {% endif %}
         
@@ -16,10 +16,10 @@
         </div>
         
         {% if value.show_social_icons %}
-        <div class="flex gap-3 justify-center pt-6 border-t border-base-content/10 dark:border-white/10">
+        <div class="flex gap-3 justify-center pt-6 border-t border-base-content/10">
             {% if value.website_url %}
             <a href="{{ value.website_url }}" 
-               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20" 
+               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20"
                target="_blank" 
                rel="noopener noreferrer"
                title="Website">
@@ -31,7 +31,7 @@
             
             {% if value.twitter_url %}
             <a href="{{ value.twitter_url }}" 
-               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20" 
+               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20"
                target="_blank" 
                rel="noopener noreferrer"
                title="Twitter">
@@ -42,9 +42,8 @@
             {% endif %}
             
             {% if value.linkedin_url %}
-            {% if value.linkedin_url %}
-            <a href="{{ value.linkedin_url }}" 
-               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20" 
+            <a href="{{ value.linkedin_url }}"
+               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20"
                target="_blank" 
                rel="noopener noreferrer"
                title="LinkedIn">
@@ -56,7 +55,7 @@
             
             {% if value.github_url %}
             <a href="{{ value.github_url }}" 
-               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20" 
+               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20"
                target="_blank" 
                rel="noopener noreferrer"
                title="GitHub">
@@ -68,7 +67,7 @@
             
             {% if value.email %}
             <a href="mailto:{{ value.email }}" 
-               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20" 
+               class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20"
                title="Email">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>

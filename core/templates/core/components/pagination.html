@@ -1,0 +1,39 @@
+{% comment %}
+Pagination Component - Multi-page navigation
+
+Usage: {% include "core/components/pagination.html" with page=page_obj paginator=paginator %}
+
+Parameters:
+  - page: Page object with number, has_previous, has_next, previous_page_number, next_page_number
+  - paginator: Paginator object with num_pages
+  - classes: Additional CSS classes (optional)
+{% endcomment %}
+
+{% if page.has_other_pages %}
+<nav class="flex justify-center mt-12 {{ classes }}" aria-label="Pagination">
+    <div class="flex gap-2">
+        {% if page.has_previous %}
+        <a href="?page={{ page.previous_page_number }}" 
+           class="px-4 py-2 border border-base-content/10 hover:bg-base-200 hover:border-base-content/20 transition-colors rounded-lg"
+           aria-label="Previous page">
+            <span class="hidden sm:inline">← Previous</span>
+            <span class="sm:hidden">←</span>
+        </a>
+        {% endif %}
+        
+        <span class="px-4 py-2 border border-base-content/10 bg-base-200 rounded-lg font-medium">
+            <span class="hidden sm:inline">Page {{ page.number }} of {{ paginator.num_pages }}</span>
+            <span class="sm:hidden">{{ page.number }}/{{ paginator.num_pages }}</span>
+        </span>
+        
+        {% if page.has_next %}
+        <a href="?page={{ page.next_page_number }}" 
+           class="px-4 py-2 border border-base-content/10 hover:bg-base-200 hover:border-base-content/20 transition-colors rounded-lg"
+           aria-label="Next page">
+            <span class="hidden sm:inline">Next →</span>
+            <span class="sm:hidden">→</span>
+        </a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}

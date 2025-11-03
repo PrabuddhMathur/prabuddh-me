@@ -1,0 +1,21 @@
+{% comment %}
+Mobile Menu Component - Mobile navigation dropdown
+
+Usage: {% include "core/components/mobile-menu.html" with nav_links=nav_links %}
+
+Parameters:
+  - nav_links: List of navigation links with url and text attributes
+{% endcomment %}
+
+<div class="dropdown dropdown-end">
+    <div tabindex="0" role="button" class="p-2 hover:bg-base-200 rounded-lg transition-colors flex items-center justify-center" aria-label="Menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </div>
+    <ul tabindex="0" class="menu dropdown-content mt-3 z-[1] p-2 bg-base-100 border border-base-200 rounded-lg w-52 shadow-lg">
+        {% for link in nav_links %}
+        <li><a href="{{ link.url }}" class="{% if request.path == link.url %}font-semibold{% endif %}">{{ link.text }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

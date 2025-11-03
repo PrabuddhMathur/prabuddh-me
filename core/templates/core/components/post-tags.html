@@ -1,0 +1,32 @@
+{% comment %}
+Post Tags Component - Display post tags
+
+Usage: {% include "core/components/post-tags.html" with post=post max_tags=3 %}
+
+Parameters:
+  - post: The blog post object (required)
+  - max_tags: Maximum number of tags to display (default: 3)
+  - show_inline: If true, doesn't add margin (optional)
+  - show_label: If true, adds "Tags:" label (optional)
+  - classes: Additional CSS classes (optional)
+{% endcomment %}
+
+{% if post.tags.all %}
+<div class="flex flex-wrap gap-1.5 sm:gap-2 items-center{% if not show_inline %} mb-3{% endif %} {{ classes }}">
+    {% if show_label %}
+    <span class="text-xs sm:text-sm text-base-content/60 font-medium">Tags:</span>
+    {% endif %}
+    
+    {% for tag in post.tags.all %}
+    {% if forloop.counter <= max_tags|default:3 %}
+    <a href="{% url 'blog_tag_archive' tag.slug %}" 
+       class="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 sm:py-1 border border-base-content/10 hover:border-base-content transition-colors rounded-md relative z-10"
+       onclick="event.stopPropagation()"
+       aria-label="View posts tagged with {{ tag }}">
+        <span>#</span>
+        <span>{{ tag }}</span>
+    </a>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
