@@ -21,7 +21,7 @@
                     <p class="text-xl md:text-2xl text-base-content/70 mb-8 leading-relaxed break-words overflow-wrap-anywhere hyphens-auto tracking-wide">{{ page.hero_subtitle }}</p>
                 {% endif %}
                 {% if page.hero_cta_text and page.hero_cta_link %}
-                    <a href="{{ page.hero_cta_link }}" class="inline-block px-6 py-3 bg-base-content text-base-100 hover:bg-base-content/90 transition-colors font-medium">{{ page.hero_cta_text }}</a>
+                    <a href="{{ page.hero_cta_link }}" class="inline-block px-6 py-3 border border-base-content hover:bg-base-content hover:text-base-100 transition-colors font-medium">{{ page.hero_cta_text }}</a>
                 {% endif %}
             </div>
         </div>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {% for post in featured_posts %}
-                        <article class="group border border-base-200 hover:border-base-300 rounded-lg overflow-hidden shadow-sm transition-colors">
+                        <article class="group border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20 rounded-lg overflow-hidden shadow-sm transition-colors">
                             {% if post.hero_image %}
                             <a href="{% pageurl post %}" class="block overflow-hidden">
                                 {% image post.hero_image fill-400x200 class="w-full h-48 object-cover group-hover:opacity-90 transition-opacity" %}
@@ -86,7 +86,7 @@
                     </div>
                     <div class="space-y-4">
                         {% for post in recent_posts %}
-                        <article class="group flex gap-6 p-4 border border-base-200 rounded-lg shadow-sm hover:border-base-300 cursor-pointer transition-colors" onclick="window.location='{{ post.get_date_url }}'">
+                        <article class="group flex gap-6 p-4 border border-base-content/10 rounded-lg shadow-sm hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20 cursor-pointer transition-colors" onclick="window.location='{{ post.get_date_url }}'">
                             {% if post.hero_image %}
                             <div class="flex-shrink-0 overflow-hidden rounded-lg">
                                 {% image post.hero_image fill-128x128 class="w-24 h-24 object-cover group-hover:opacity-90 transition-opacity" %}
@@ -123,10 +123,10 @@
                     
                     <!-- Author Bio Card -->
                     {% if page.show_author_sidebar and settings.core.AuthorSettings.author_name %}
-                    <div class="border border-base-300 rounded-xl p-8 shadow-sm bg-base-100/50 backdrop-blur-sm">
+                    <div class="border-2 border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20 rounded-xl p-8 shadow-sm bg-base-100/50 backdrop-blur-sm transition-colors">
                         {% if settings.core.AuthorSettings.author_image %}
                         <div class="mb-6 flex justify-center">
-                            {% image settings.core.AuthorSettings.author_image fill-160x160 class="w-32 h-32 rounded-full object-cover ring-2 ring-base-300 shadow-sm" %}
+                            {% image settings.core.AuthorSettings.author_image fill-160x160 class="w-32 h-32 rounded-full object-cover ring-2 ring-base-content/10 dark:ring-white/10 shadow-sm" %}
                         </div>
                         {% endif %}
                         
@@ -137,17 +137,17 @@
                             {% endif %}
                             
                             {% if settings.core.AuthorSettings.author_bio_short %}
-                            <div class="border-t border-base-300 pt-4 mt-4">
+                            <div class="border-t border-base-content/10 dark:border-white/10 pt-4 mt-4">
                                 <p class="text-sm text-base-content/80 leading-relaxed">{{ settings.core.AuthorSettings.author_bio_short }}</p>
                             </div>
                             {% endif %}
                             
                             <!-- Social Links -->
                             {% if settings.core.AuthorSettings.get_social_links %}
-                            <div class="flex gap-3 justify-center mt-6 pt-6 border-t border-base-300">
+                            <div class="flex gap-3 justify-center mt-6 pt-6 border-t border-base-content/10 dark:border-white/10">
                                 {% for link in settings.core.AuthorSettings.get_social_links %}
                                 <a href="{{ link.url }}" 
-                                   class="p-2.5 hover:bg-base-300 rounded-lg transition-all hover:scale-105 border border-base-200" 
+                                   class="p-2.5 hover:bg-base-200 rounded-lg transition-all hover:scale-105 border border-base-content/10 hover:border-base-content/20 dark:border-white/10 dark:hover:border-white/20" 
                                    target="_blank" 
                                    rel="noopener noreferrer"
                                    title="{{ link.name }}">
