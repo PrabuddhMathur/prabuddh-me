@@ -1,0 +1,39 @@
+{% comment %}
+Tag Cloud Section Component
+Usage: {% include "core/sections/tag-cloud.html" with tags=tags %}
+
+Parameters:
+  - tags: QuerySet or list of tag objects (required)
+  - show_all_link: Boolean to show "View all tags" link (default: True)
+
+DaisyUI Components Used:
+  - card: Container with base-200 background
+  - badge: Tag badges with outline style and hover effects
+
+Mobile-responsive with proper wrapping
+{% endcomment %}
+
+{% if tags %}
+<div class="card bg-base-200">
+  <div class="card-body">
+    <h3 class="card-title text-lg mb-4">Popular Tags</h3>
+    <div class="flex flex-wrap gap-2">
+      {% for tag in tags %}
+      <a href="{% url 'blog_tag_archive' tag.slug %}" 
+         class="badge badge-lg badge-outline hover:badge-primary transition-colors"
+         aria-label="View posts tagged with {{ tag.name }}">
+        #{{ tag.name }}
+      </a>
+      {% endfor %}
+    </div>
+    {% if show_all_link|default:True %}
+    <div class="mt-4">
+      <a href="{% url 'blog_tag_archive' %}" 
+         class="link link-primary text-sm">
+        View all tags →
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

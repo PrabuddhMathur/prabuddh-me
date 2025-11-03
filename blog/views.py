@@ -59,14 +59,23 @@ def blog_tag_archive(request, tag_slug):
     # Get the tag
     tag = get_object_or_404(Tag, slug=tag_slug)
     
+    # Get view preference from session (default to 'masonry')
+    view_mode = request.session.get('blog_view_mode', 'masonry')
+    
+    # Update view mode if requested
+    if 'view' in request.GET:
+        view_mode = request.GET.get('view')
+        request.session['blog_view_mode'] = view_mode
+    
     # Get all published blog posts with this tag
     # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         tags__slug=tag_slug
     ).select_related('owner').order_by('-date')
     
-    # Paginate results
-    paginator = Paginator(posts, 10)
+    # Paginate results - adjust per page based on view mode
+    posts_per_page = 12 if view_mode == 'masonry' else 10
+    paginator = Paginator(posts, posts_per_page)
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
@@ -82,6 +91,7 @@ def blog_tag_archive(request, tag_slug):
         'paginator': paginator,
         'archive_type': 'tag',
         'tag': tag,
+        'view_mode': view_mode,
     })
 
 
@@ -106,14 +116,23 @@ def blog_year_archive(request, year):
     """
     View function for displaying blog posts from a specific year.
     """
+    # Get view preference from session (default to 'masonry')
+    view_mode = request.session.get('blog_view_mode', 'masonry')
+    
+    # Update view mode if requested
+    if 'view' in request.GET:
+        view_mode = request.GET.get('view')
+        request.session['blog_view_mode'] = view_mode
+    
     # Get all published blog posts for the year
     # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
         date__year=year
     ).select_related('owner').order_by('-date')
     
-    # Paginate results
-    paginator = Paginator(posts, 10)  # 10 posts per page
+    # Paginate results - adjust per page based on view mode
+    posts_per_page = 12 if view_mode == 'masonry' else 10
+    paginator = Paginator(posts, posts_per_page)
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
@@ -129,6 +148,7 @@ def blog_year_archive(request, year):
         'paginator': paginator,
         'year': year,
         'archive_type': 'year',
+        'view_mode': view_mode,
     })
 
 
@@ -138,6 +158,14 @@ def blog_month_archive(request, year, month):
     """
     from datetime import date
     
+    # Get view preference from session (default to 'masonry')
+    view_mode = request.session.get('blog_view_mode', 'masonry')
+    
+    # Update view mode if requested
+    if 'view' in request.GET:
+        view_mode = request.GET.get('view')
+        request.session['blog_view_mode'] = view_mode
+    
     # Get all published blog posts for the month
     # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
@@ -145,8 +173,9 @@ def blog_month_archive(request, year, month):
         date__month=month
     ).select_related('owner').order_by('-date')
     
-    # Paginate results
-    paginator = Paginator(posts, 10)  # 10 posts per page
+    # Paginate results - adjust per page based on view mode
+    posts_per_page = 12 if view_mode == 'masonry' else 10
+    paginator = Paginator(posts, posts_per_page)
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
@@ -168,6 +197,7 @@ def blog_month_archive(request, year, month):
         'month': month,
         'month_name': month_name,
         'archive_type': 'month',
+        'view_mode': view_mode,
     })
 
 
@@ -177,6 +207,14 @@ def blog_day_archive(request, year, month, day):
     """
     from datetime import date
     
+    # Get view preference from session (default to 'masonry')
+    view_mode = request.session.get('blog_view_mode', 'masonry')
+    
+    # Update view mode if requested
+    if 'view' in request.GET:
+        view_mode = request.GET.get('view')
+        request.session['blog_view_mode'] = view_mode
+    
     # Get all published blog posts for the day
     # Performance: Use select_related('owner') to avoid N+1 queries when accessing post authors
     posts = BlogPage.objects.live().public().filter(
@@ -185,8 +223,9 @@ def blog_day_archive(request, year, month, day):
         date__day=day
     ).select_related('owner').order_by('-date')
     
-    # Paginate results
-    paginator = Paginator(posts, 10)  # 10 posts per page
+    # Paginate results - adjust per page based on view mode
+    posts_per_page = 12 if view_mode == 'masonry' else 10
+    paginator = Paginator(posts, posts_per_page)
     page_number = request.GET.get('page', 1)
     posts_page = paginator.get_page(page_number)
     
@@ -210,4 +249,5 @@ def blog_day_archive(request, year, month, day):
         'month_name': month_name,
         'day': day,
         'archive_type': 'day',
+        'view_mode': view_mode,
     })

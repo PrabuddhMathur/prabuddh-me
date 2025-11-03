@@ -921,26 +921,14 @@ class FooterSettings(BaseSiteSetting):
         help_text="Footer link URL"
     )
     
-    # Social Media
-    show_social_links = models.BooleanField(
+    # Section Visibility Toggles
+    show_newsletter = models.BooleanField(
         default=True,
-        help_text="Display social media links in footer"
+        help_text="Display newsletter signup section"
     )
-    twitter_url = models.URLField(
-        blank=True,
-        help_text="Twitter profile URL"
-    )
-    github_url = models.URLField(
-        blank=True,
-        help_text="GitHub profile URL"
-    )
-    linkedin_url = models.URLField(
-        blank=True,
-        help_text="LinkedIn profile URL"
-    )
-    email_address = models.EmailField(
-        blank=True,
-        help_text="Contact email address"
+    show_quick_links = models.BooleanField(
+        default=True,
+        help_text="Display quick links section"
     )
     
     # Additional Info
@@ -969,12 +957,9 @@ class FooterSettings(BaseSiteSetting):
         ], heading="Footer Links"),
         
         MultiFieldPanel([
-            FieldPanel('show_social_links'),
-            FieldPanel('twitter_url'),
-            FieldPanel('github_url'),
-            FieldPanel('linkedin_url'),
-            FieldPanel('email_address'),
-        ], heading="Social Media"),
+            FieldPanel('show_newsletter'),
+            FieldPanel('show_quick_links'),
+        ], heading="Section Visibility"),
     ]
     
     class Meta:
@@ -995,35 +980,6 @@ class FooterSettings(BaseSiteSetting):
             links.append({'text': self.footer_link_3_text, 'url': self.footer_link_3_url})
         if self.footer_link_4_text and self.footer_link_4_url:
             links.append({'text': self.footer_link_4_text, 'url': self.footer_link_4_url})
-        return links
-    
-    def get_social_links(self):
-        """Return social media links as a list for template iteration."""
-        links = []
-        if self.twitter_url:
-            links.append({
-                'name': 'Twitter',
-                'url': self.twitter_url,
-                'icon': 'twitter'
-            })
-        if self.github_url:
-            links.append({
-                'name': 'GitHub',
-                'url': self.github_url,
-                'icon': 'github'
-            })
-        if self.linkedin_url:
-            links.append({
-                'name': 'LinkedIn',
-                'url': self.linkedin_url,
-                'icon': 'linkedin'
-            })
-        if self.email_address:
-            links.append({
-                'name': 'Email',
-                'url': f'mailto:{self.email_address}',
-                'icon': 'email'
-            })
         return links
 
 

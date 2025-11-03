@@ -1,44 +1,42 @@
 {% load static wagtailcore_tags %}
 
 <!-- Footer -->
-<footer class="border-t border-base-200 bg-base-100 mt-24">
-    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        <!-- Main Content - Centered -->
-        <div class="max-w-2xl mx-auto text-center mb-12">
-            <!-- Author Name -->
-            {% if settings.core.AuthorSettings.author_name %}
-            <h2 class="text-lg font-semibold text-base-content mb-6">{{ settings.core.AuthorSettings.author_name }}</h2>
-            {% endif %}
-            
-            <!-- Social Links - Using Component -->
-            {% if settings.core.AuthorSettings.get_social_links %}
-            <div class="mb-8 flex justify-center">
-                {% include "core/components/social-links.html" with links=settings.core.AuthorSettings.get_social_links size="md" %}
-            </div>
-            {% elif settings.core.FooterSettings.show_social_links and settings.core.FooterSettings.get_social_links %}
-            <div class="mb-8 flex justify-center">
-                {% include "core/components/social-links.html" with links=settings.core.FooterSettings.get_social_links size="md" %}
-            </div>
-            {% endif %}
-            
-            <!-- Quick Links - Inline Centered -->
-            {% if settings.core.FooterSettings.get_footer_links %}
-            <nav class="flex flex-wrap gap-6 justify-center text-sm">
-                {% for link in settings.core.FooterSettings.get_footer_links %}
-                <a href="{{ link.url }}" class="text-base-content/60 hover:text-base-content transition-colors">{{ link.text }}</a>
-                {% endfor %}
-            </nav>
-            {% endif %}
-        </div>
-        
-        <!-- Copyright Bar -->
-        <div class="border-t border-base-200 pt-8 text-center">
-            <p class="text-sm text-base-content/60">
-                {% if settings.core.FooterSettings.show_year %}
-                © {% now "Y" %} 
-                {% endif %}
-                {{ settings.core.FooterSettings.copyright_text }}
-            </p>
-        </div>
+<footer class="footer bg-base-200 border-t border-base-300 mt-12">
+  <div class="max-w-4xl mx-auto px-6 py-8 flex flex-col items-center text-center space-y-8">
+
+    {% if settings.core.FooterSettings.show_newsletter %}
+      {% include "core/sections/newsletter-signup.html" %}
+    {% endif %}
+
+    {% if settings.core.FooterSettings.show_quick_links and settings.core.FooterSettings.get_footer_links %}
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+        <nav class="flex flex-wrap justify-center gap-x-3 gap-y-2" aria-label="Footer navigation">
+          {% for link in settings.core.FooterSettings.get_footer_links %}
+          <a href="{{ link.url }}"
+             class="text-sm text-base-content/70 hover:text-primary transition-colors">
+            {{ link.text }}
+          </a>
+          {% if not forloop.last %}
+          <span class="text-base-content/40" aria-hidden="true">•</span>
+          {% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    {% endif %}
+
+    <div>
+      <p class="text-sm text-base-content/60">
+        {% if settings.core.FooterSettings.show_year %}
+        © {% now "Y" %}
+        {% endif %}
+        {% if settings.core.AuthorSettings.author_name %}
+        {{ settings.core.AuthorSettings.author_name }}
+        {% endif %}
+        {% if settings.core.FooterSettings.copyright_text %}
+        • {{ settings.core.FooterSettings.copyright_text }}
+        {% endif %}
+      </p>
     </div>
+  </div>
 </footer>

@@ -1,53 +1,144 @@
 {% extends "core/base.html" %}
 {% load static wagtailcore_tags %}
 
-{% block title %}Search{% endblock %}
+{% block title %}Search{% if search_query %} - {{ search_query }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-6 lg:px-12 py-12">
-    <h1 class="text-4xl font-bold mb-8">Search</h1>
+    {# Page Header #}
+    <div class="mb-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 text-base-content">Search</h1>
+        <p class="text-lg text-base-content/70">Find posts, pages, and content across the site</p>
+    </div>
 
-    <form action="{% url 'search' %}" method="get" class="mb-8">
-        <div class="flex gap-2">
-            <input type="text" name="query"{% if search_query %} value="{{ search_query }}"{% endif %} 
-                   class="input input-bordered flex-1" placeholder="Enter search query...">
-            <button type="submit" class="px-6 py-2 border border-base-300 hover:bg-base-200 transition-colors">Search</button>
+    {# Enhanced Search Form #}
+    <form action="{% url 'search' %}" method="get" class="mb-12" role="search">
+        <div class="flex flex-col sm:flex-row gap-3">
+            <div class="form-control flex-1">
+                <input type="text" 
+                       name="query"
+                       {% if search_query %}value="{{ search_query }}"{% endif %} 
+                       class="input input-bordered input-lg w-full min-h-[44px]" 
+                       placeholder="What are you looking for?"
+                       aria-label="Search query"
+                       required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg gap-2 min-h-[44px]" aria-label="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Search
+            </button>
         </div>
     </form>
 
+    {# Search Results #}
     {% if search_results %}
-    <div class="space-y-6">
-        {% for result in search_results %}
-        <div class="card bg-base-200">
-            <div class="card-body">
-                <h4 class="card-title">
-                    <a href="{% pageurl result %}" class="link link-hover">{{ result }}</a>
-                </h4>
-                {% if result.search_description %}
-                <p>{{ result.search_description }}</p>
+        {# Results count #}
+        <div class="mb-6">
+            <p class="text-base-content/70">
+                Found <span class="font-semibold text-base-content">{{ search_results|length }}</span> 
+                result{{ search_results|length|pluralize }} for 
+                "<span class="font-semibold text-primary">{{ search_query }}</span>"
+            </p>
+        </div>
+
+        {# Results list with enhanced cards #}
+        <div class="space-y-4">
+            {% for result in search_results %}
+            <article class="card bg-base-100 border border-base-content/10 hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+                <div class="card-body p-6">
+                    <h2 class="card-title text-xl md:text-2xl hover:text-primary transition-colors">
+                        <a href="{% pageurl result %}" class="hover:underline">{{ result }}</a>
+                    </h2>
+                    {% if result.search_description %}
+                    <p class="text-base-content/80 leading-relaxed line-clamp-2">
+                        {{ result.search_description }}
+                    </p>
+                    {% endif %}
+                    <div class="card-actions justify-between items-center mt-2">
+                        <span class="badge badge-outline">
+                            {{ result.content_type.model|title }}
+                        </span>
+                        <a href="{% pageurl result %}" 
+                           class="link link-primary text-sm gap-1 inline-flex items-center">
+                            Read more
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        {# Enhanced Pagination #}
+        {% if search_results.has_other_pages %}
+        <div class="flex justify-center mt-12">
+            <div class="join">
+                {% if search_results.has_previous %}
+                <a href="{% url 'search' %}?query={{ search_query|urlencode }}&amp;page={{ search_results.previous_page_number }}" 
+                   class="join-item btn btn-outline min-h-[44px]"
+                   aria-label="Previous page">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span class="hidden sm:inline">Previous</span>
+                </a>
+                {% endif %}
+                
+                <button class="join-item btn btn-outline pointer-events-none min-h-[44px]">
+                    Page {{ search_results.number }} of {{ search_results.paginator.num_pages }}
+                </button>
+                
+                {% if search_results.has_next %}
+                <a href="{% url 'search' %}?query={{ search_query|urlencode }}&amp;page={{ search_results.next_page_number }}" 
+                   class="join-item btn btn-outline min-h-[44px]"
+                   aria-label="Next page">
+                    <span class="hidden sm:inline">Next</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
                 {% endif %}
             </div>
         </div>
-        {% endfor %}
-    </div>
-
-    <div class="flex justify-between mt-8">
-        {% if search_results.has_previous %}
-        <a href="{% url 'search' %}?query={{ search_query|urlencode }}&amp;page={{ search_results.previous_page_number }}" 
-           class="btn btn-outline">Previous</a>
-        {% else %}
-        <div></div>
         {% endif %}
-
-        {% if search_results.has_next %}
-        <a href="{% url 'search' %}?query={{ search_query|urlencode }}&amp;page={{ search_results.next_page_number }}" 
-           class="btn btn-outline">Next</a>
-        {% endif %}
-    </div>
+        
     {% elif search_query %}
-    <div class="alert alert-info">
-        <span>No results found for "{{ search_query }}"</span>
-    </div>
+        {# Enhanced No Results State #}
+        <div class="text-center py-16 px-6">
+            <div class="text-8xl mb-6">🔍</div>
+            <h2 class="text-3xl font-bold mb-4 text-base-content">No results found</h2>
+            <p class="text-lg text-base-content/70 mb-8 max-w-md mx-auto leading-relaxed">
+                We couldn't find anything matching "<span class="font-semibold text-primary">{{ search_query }}</span>". 
+                Try different keywords or browse our content.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{% url 'search' %}" class="btn btn-primary gap-2 min-h-[44px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    New Search
+                </a>
+                <a href="/blog/" class="btn btn-outline gap-2 min-h-[44px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                    Browse Blog
+                </a>
+            </div>
+        </div>
+    {% else %}
+        {# Initial State - No search performed yet #}
+        <div class="text-center py-16 px-6">
+            <div class="text-8xl mb-6">📚</div>
+            <h2 class="text-2xl font-bold mb-4 text-base-content">Start Your Search</h2>
+            <p class="text-lg text-base-content/70 max-w-md mx-auto leading-relaxed">
+                Enter keywords above to find posts, pages, and content across the site.
+            </p>
+        </div>
     {% endif %}
 </div>
 {% endblock %}

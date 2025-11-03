@@ -3,72 +3,97 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
-    {# Page Header #}
-    <div class="mb-16">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ page.title }}</h1>
+    {# Hero Section with Page Header #}
+    <div class="mb-16 text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-base-content">{{ page.title }}</h1>
         {% if page.intro %}
-            <div class="prose prose-lg max-w-none">
-                {{ page.intro|richtext }}
-            </div>
+        <div class="prose prose-lg max-w-none text-base-content/80 mx-auto">
+            {{ page.intro|richtext }}
+        </div>
         {% endif %}
     </div>
 
     {# Featured Posts Section #}
     {% if page.show_featured_posts and featured_posts %}
     <section class="mb-16">
-        <h2 class="text-3xl font-bold mb-8">Featured Posts</h2>
-        <div class="grid grid-cols-1 md:grid-cols-{{ featured_posts|length|add:"-1"|add:"1" }} gap-8">
+        <div class="flex items-center gap-3 mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <h2 class="text-3xl font-bold text-base-content">Featured Posts</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {% for post in featured_posts %}
-            <article class="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <a href="{% pageurl post %}" class="block bg-base-100 hover:bg-base-200 rounded-xl border-2 border-base-content/10 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group">
+                
+                {# Image section #}
                 {% if post.featured_image %}
-                <figure>
-                    {% image post.featured_image fill-800x400 as featured_img %}
-                    <img src="{{ featured_img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-64 object-cover">
-                </figure>
+                <div class="relative">
+                    <div class="absolute top-4 left-4 z-10 px-3 py-1 bg-primary text-primary-content rounded-lg shadow-lg text-sm font-bold flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        Featured
+                    </div>
+                    {% image post.featured_image fill-800x450 as featured_img %}
+                    <img src="{{ featured_img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500">
+                </div>
                 {% endif %}
-                <div class="card-body">
-                    <div class="badge badge-accent font-sans">Featured</div>
-                    <h3 class="card-title text-2xl">
-                        <a href="{% pageurl post %}" class="hover:text-primary transition-colors">
-                            {{ post.title }}
-                        </a>
+                
+                {# Content section #}
+                <div class="p-6 space-y-4">
+                    {# Title #}
+                    <h3 class="text-xl md:text-2xl font-bold text-base-content group-hover:text-primary transition-colors line-clamp-2">
+                        {{ post.title }}
                     </h3>
-                    <p class="text-base-content/70">{{ post.intro }}</p>
-                    <div class="flex flex-wrap gap-2 items-center text-sm text-base-content/60 mt-4 font-sans">
-                        <span>{{ settings.core.AuthorSettings.author_name }}</span>
-                        <span>•</span>
-                        <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"F j, Y" }}</time>
+                    
+                    {# Meta info #}
+                    <div class="flex items-center gap-2 text-sm text-base-content/60">
+                        <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"M d, Y" }}</time>
                         {% if post.estimated_reading_time %}
                         <span>•</span>
                         <span>{{ post.estimated_reading_time }} min read</span>
                         {% endif %}
                     </div>
-                    <div class="card-actions justify-end mt-4">
-                        <a href="{% pageurl post %}" class="btn btn-primary btn-sm font-sans">Read More</a>
-                    </div>
+                    
+                    {# Excerpt #}
+                    {% if post.intro %}
+                    <p class="text-base text-base-content/70 line-clamp-3 leading-relaxed">
+                        {{ post.intro }}
+                    </p>
+                    {% endif %}
                 </div>
-            </article>
+            </a>
             {% endfor %}
         </div>
     </section>
+    <div class="divider my-12"></div>
     {% endif %}
 
     {# Main Content Area with Sidebar #}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
         {# Blog Posts Listing #}
         <div class="lg:col-span-2">
-            <h2 class="text-3xl font-bold text-primary mb-8">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold text-base-content">
+                    {% if current_tag %}
+                        Posts tagged "{{ current_tag }}"
+                    {% else %}
+                        All Posts
+                    {% endif %}
+                </h2>
                 {% if current_tag %}
-                    Posts tagged "{{ current_tag }}"
-                {% else %}
-                    All Posts
+                <a href="{{ page.url }}" class="btn btn-sm btn-ghost gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear Filter
+                </a>
                 {% endif %}
-            </h2>
+            </div>
 
             {% if posts %}
-                {# Grid Layout #}
+                {# Grid Layout - Responsive #}
                 {% if page.layout_style == 'grid' %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                     {% for post in posts %}
                     {% include "blog/includes/post_card.html" with post=post %}
                     {% endfor %}
@@ -82,7 +107,7 @@
                     {% endfor %}
                 </div>
 
-                {# Masonry Layout #}
+                {# Masonry Layout (Default) #}
                 {% else %}
                 <div class="columns-1 md:columns-2 gap-6 space-y-6">
                     {% for post in posts %}
@@ -91,54 +116,86 @@
                 </div>
                 {% endif %}
 
-                {# Pagination #}
+                {# Enhanced Pagination #}
                 {% if posts.has_other_pages %}
                 <div class="flex justify-center mt-12">
-                    <div class="btn-group">
+                    <div class="join">
                         {% if posts.has_previous %}
                         <a href="?page={{ posts.previous_page_number }}{% if current_tag %}&tag={{ current_tag }}{% endif %}" 
-                           class="btn btn-outline">
-                            « Previous
+                           class="join-item btn btn-outline">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Previous
                         </a>
                         {% endif %}
                         
-                        <button class="btn btn-outline">
+                        <button class="join-item btn btn-outline pointer-events-none">
                             Page {{ posts.number }} of {{ paginator.num_pages }}
                         </button>
                         
                         {% if posts.has_next %}
                         <a href="?page={{ posts.next_page_number }}{% if current_tag %}&tag={{ current_tag }}{% endif %}" 
-                           class="btn btn-outline">
-                            Next »
+                           class="join-item btn btn-outline">
+                            Next
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
                         </a>
                         {% endif %}
                     </div>
                 </div>
                 {% endif %}
             {% else %}
-                <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>No blog posts found{% if current_tag %} for tag "{{ current_tag }}"{% endif %}.</span>
+                {# Enhanced Empty State #}
+                <div class="text-center py-16 px-6">
+                    <div class="text-6xl mb-6">📝</div>
+                    <h3 class="text-2xl font-bold mb-3 text-base-content">
+                        {% if current_tag %}
+                            No posts found for "{{ current_tag }}"
+                        {% else %}
+                            No posts yet
+                        {% endif %}
+                    </h3>
+                    <p class="text-base-content/70 mb-8 max-w-md mx-auto">
+                        {% if current_tag %}
+                            Try browsing other tags or return to view all posts.
+                        {% else %}
+                            Check back soon for new content!
+                        {% endif %}
+                    </p>
+                    <a href="{% if current_tag %}{{ page.url }}{% else %}/{% endif %}" 
+                       class="btn btn-primary gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        {% if current_tag %}View All Posts{% else %}Back to Home{% endif %}
+                    </a>
                 </div>
             {% endif %}
         </div>
 
-        {# Sidebar #}
-        <aside class="lg:col-span-1">
-            {# Tags Filter #}
+        {# Enhanced Sidebar #}
+        <aside class="lg:col-span-1 space-y-6">
+            {# Tags Filter Card #}
             {% if all_tags %}
-            <div class="card bg-base-200 shadow-xl mb-6">
+            <div class="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div class="card-body">
-                    <h3 class="card-title text-xl mb-4">Browse by Tag</h3>
+                    <h3 class="card-title text-xl mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        Browse by Tag
+                    </h3>
                     <div class="flex flex-wrap gap-2">
                         {% if current_tag %}
-                        <a href="{{ page.url }}" class="badge badge-outline">
+                        <a href="{{ page.url }}" class="badge badge-lg badge-outline hover:badge-primary transition-colors">
                             All Posts
                         </a>
                         {% endif %}
                         {% for tag in all_tags %}
                         <a href="?tag={{ tag }}" 
-                           class="badge {% if current_tag == tag %}badge-primary{% else %}badge-outline{% endif %}">
+                           class="badge badge-lg {% if current_tag == tag %}badge-primary{% else %}badge-outline hover:badge-primary{% endif %} transition-colors">
                             {{ tag }}
                         </a>
                         {% endfor %}
@@ -147,11 +204,16 @@
             </div>
             {% endif %}
 
-            {# About Section (Optional) #}
-            <div class="card bg-base-200 shadow-xl">
+            {# About Section Card #}
+            <div class="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div class="card-body">
-                    <h3 class="card-title text-xl mb-4">About This Blog</h3>
-                    <p class="text-base-content/70">
+                    <h3 class="card-title text-xl mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        About This Blog
+                    </h3>
+                    <p class="text-base-content/80 leading-relaxed">
                         Welcome to my blog! Here I share my thoughts, experiences, and insights on various topics.
                     </p>
                 </div>

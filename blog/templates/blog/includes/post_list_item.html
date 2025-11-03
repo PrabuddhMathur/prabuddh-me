@@ -1,40 +1,39 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
-<article class="relative group flex flex-col sm:flex-row gap-5 sm:gap-6 p-5 sm:p-6 bg-base-100 border border-base-content/10 hover:border-base-content/20 hover:bg-base-200 transition-all duration-300 rounded-lg shadow-sm hover:shadow-md mb-6">
-    <a href="{{ post.get_date_url }}" class="absolute inset-0" aria-label="Read {{ post.title }}"></a>
+<a href="{{ post.get_date_url }}" class="flex flex-col md:flex-row bg-base-100 hover:bg-base-200 rounded-xl border-2 border-base-content/10 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group">
+    
+    {# Image #}
     {% if post.featured_image %}
-    <div class="w-full sm:w-48 flex-shrink-0 overflow-hidden rounded-lg">
-        {% image post.featured_image fill-300x200 as post_img %}
-        <img src="{{ post_img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-48 sm:h-36 object-cover group-hover:scale-105 transition-transform duration-300">
+    <div class="md:w-64 flex-shrink-0">
+        {% image post.featured_image fill-400x300 as img %}
+        <img src="{{ img.url }}" alt="{{ post.featured_image.title }}" class="w-full h-48 md:h-full object-cover group-hover:scale-105 transition-transform duration-500">
     </div>
     {% endif %}
     
-    <div class="flex-1 min-w-0 space-y-3">
+    {# Content #}
+    <div class="p-6 flex-1 space-y-3">
         {% if post.featured %}
-        <div class="badge badge-primary badge-sm">Featured</div>
+        <div class="inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-content rounded text-xs font-bold">
+            ⭐ Featured
+        </div>
         {% endif %}
         
-        <h2 class="text-xl sm:text-2xl font-bold group-hover:text-primary transition-colors leading-snug">
+        <h3 class="text-lg md:text-xl font-bold text-base-content group-hover:text-primary transition-colors line-clamp-2">
             {{ post.title }}
-        </h2>
+        </h3>
         
-        {# Post Meta using core component #}
-        {% include "core/components/post-meta.html" with post=post %}
+        <div class="flex items-center gap-2 text-sm text-base-content/60">
+            <time datetime="{{ post.date|date:'Y-m-d' }}">{{ post.date|date:"M d, Y" }}</time>
+            {% if post.estimated_reading_time %}
+            <span>•</span>
+            <span>{{ post.estimated_reading_time }} min read</span>
+            {% endif %}
+        </div>
         
-        {# Intro excerpt - fallback to body text if intro is empty #}
         {% if post.intro %}
-        <p class="text-sm sm:text-base text-base-content/70 leading-relaxed line-clamp-2">
-            {{ post.intro|truncatewords:30 }}
+        <p class="text-sm text-base-content/70 line-clamp-2">
+            {{ post.intro }}
         </p>
-        {% elif post.body %}
-        <p class="text-sm sm:text-base text-base-content/70 leading-relaxed line-clamp-2">
-            {{ post.body|striptags|truncatewords:30 }}
-        </p>
-        {% endif %}
-        
-        {# Tags using core component #}
-        {% if post.tags.all %}
-            {% include "core/components/post-tags.html" with post=post max_tags=4 show_inline=True %}
         {% endif %}
     </div>
-</article>
+</a>

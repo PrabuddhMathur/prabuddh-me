@@ -1,0 +1,37 @@
+{% comment %}
+Loading skeleton for post card component
+Usage: {% include "blog/includes/post_card_skeleton.html" %}
+Matches the structure of post_card.html for consistent loading states
+{% endcomment %}
+
+<article class="card bg-base-100 shadow-md" aria-busy="true" aria-label="Loading post">
+    {# Image skeleton - matches aspect-video #}
+    <figure class="aspect-video overflow-hidden bg-base-300">
+        <div class="skeleton h-full w-full"></div>
+    </figure>
+    
+    <div class="card-body p-6 gap-4">
+        {# Title skeleton #}
+        <div class="skeleton h-7 w-3/4"></div>
+        
+        {# Meta skeleton - date and reading time #}
+        <div class="flex gap-2">
+            <div class="skeleton h-4 w-24"></div>
+            <div class="skeleton h-4 w-20"></div>
+        </div>
+        
+        {# Intro text skeleton - 3 lines #}
+        <div class="space-y-2">
+            <div class="skeleton h-4 w-full"></div>
+            <div class="skeleton h-4 w-full"></div>
+            <div class="skeleton h-4 w-2/3"></div>
+        </div>
+        
+        {# Tags skeleton #}
+        <div class="flex gap-2 mt-2">
+            <div class="skeleton h-6 w-16"></div>
+            <div class="skeleton h-6 w-20"></div>
+            <div class="skeleton h-6 w-18"></div>
+        </div>
+    </div>
+</article>

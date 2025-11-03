@@ -32,6 +32,9 @@
     {# Spoiler feature CSS (used in rich text blocks) #}
     <link rel="stylesheet" href="{% static 'core/css/spoiler.css' %}">
     
+    {# Mobile header hide-on-scroll CSS #}
+    <link rel="stylesheet" href="{% static 'core/css/mobile-header-scroll.css' %}">
+    
     {# Custom CSS #}
     {% block extra_css %}{% endblock %}
     
@@ -100,6 +103,9 @@
     
     {# Spoiler feature JavaScript (used in rich text blocks) #}
     <script src="{% static 'core/js/spoiler.js' %}" defer></script>
+    
+    {# Mobile header hide-on-scroll JavaScript #}
+    <script src="{% static 'core/js/mobile-header-scroll.js' %}" defer></script>
     
     {# Extra JavaScript #}
     {% block extra_js %}{% endblock %}

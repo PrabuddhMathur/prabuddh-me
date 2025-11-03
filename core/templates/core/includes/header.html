@@ -1,7 +1,7 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
 <!-- Navigation Header -->
-<nav class="bg-base-100 border-b border-base-200 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50{% endif %}">
+<nav id="main-navbar" class="bg-base-100 border-b border-base-200 {% if settings.core.HeaderSettings.header_style == 'sticky' %}sticky top-0 z-50 transition-transform duration-300{% endif %}">
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
         <!-- Logo / Site Title -->
         <a href="/" class="text-lg font-semibold tracking-tight hover:text-base-content/70 transition-colors">
@@ -42,3 +42,42 @@
         </div>
     </div>
 </nav>
+
+{% if settings.core.HeaderSettings.header_style == 'sticky' %}
+<script>
+    // Hide/show navbar on scroll
+    (function() {
+        const navbar = document.getElementById('main-navbar');
+        if (!navbar) return;
+        
+        let lastScrollTop = 0;
+        let isScrolling = false;
+        
+        window.addEventListener('scroll', function() {
+            if (!isScrolling) {
+                window.requestAnimationFrame(function() {
+                    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    // Don't hide navbar at the very top of the page
+                    if (currentScroll <= 100) {
+                        navbar.style.transform = 'translateY(0)';
+                    } 
+                    // Scrolling down - hide navbar
+                    else if (currentScroll > lastScrollTop && currentScroll > 100) {
+                        navbar.style.transform = 'translateY(-100%)';
+                    } 
+                    // Scrolling up - show navbar
+                    else if (currentScroll < lastScrollTop) {
+                        navbar.style.transform = 'translateY(0)';
+                    }
+                    
+                    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+                    isScrolling = false;
+                });
+                
+                isScrolling = true;
+            }
+        }, { passive: true });
+    })();
+</script>
+{% endif %}
