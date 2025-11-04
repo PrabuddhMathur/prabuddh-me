@@ -12,10 +12,9 @@
     
     <!-- Theme initialization script (must run before body renders to prevent flash) -->
     <script>
-        // Initialize theme from localStorage or system preference before page renders
+        // Initialize theme from localStorage or default to light (ignore system preference)
         (function() {
-            const theme = localStorage.getItem('theme') ||
-                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dim' : 'light');
+            const theme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>

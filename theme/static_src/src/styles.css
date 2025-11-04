@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@plugin "daisyui"{
-  themes: light, dim;
+@plugin "daisyui" {
+  themes: light --default, dim;
 };
 /* Paths Tailwind should scan for class names */
 @source "../../../**/*.{html,py,js}";

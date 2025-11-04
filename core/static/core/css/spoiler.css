@@ -34,7 +34,7 @@
         
         /* Default - use theme's neutral color for background */
         background-color: var(--spoiler-bg-color);
-        color: var(--spoiler-color);
+        color: transparent;
         
         /* Rounded corners for visual appeal */
         border-radius: 0.375rem;
