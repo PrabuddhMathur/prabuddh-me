@@ -4,6 +4,18 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+    {% if not DEBUG %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HK794PP9QT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-HK794PP9QT');
+    </script>
+    {% endif %}
+    
     <meta charset="utf-8" />
     <title>Internal Server Error</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
