@@ -8,7 +8,7 @@ import os
 DEBUG = config("DEBUG", default=True, cast=bool)
 SECRET_KEY = config(
     "SECRET_KEY",
-    default="django-insecure-ge&!nl%%ub%bujv(!4$2dey6u7@qdhovcp*f1hev3(h*z+ej%j",
+    default="django-insecure-dev-key-change-in-production",
 )
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,*", cast=Csv())
 
@@ -41,35 +41,33 @@ MIDDLEWARE = [
 # =====================================================
 # ✅ Static & Media Storage
 # =====================================================
-# Force local filesystem for development - use simple static files storage
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
-    },
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 
-# Override static files configuration for development
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Different from STATICFILES_DIRS
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # =====================================================
 # ✅ Database
 # =====================================================
-USE_CLOUD_SQL_PROXY = config("USE_CLOUD_SQL_PROXY", default=False, cast=bool)
+USE_DOCKER_DB = config("USE_DOCKER_DB", default=False, cast=bool)
 
-if USE_CLOUD_SQL_PROXY:
+if USE_DOCKER_DB:
+    # Using Docker Compose postgres
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": config("DB_NAME"),
-            "USER": config("DB_USER"),
-            "PASSWORD": config("DB_PASSWORD"),
-            "HOST": "127.0.0.1",  # Cloud SQL Proxy runs locally
-            "PORT": "5432",
+            "NAME": config("DB_NAME", default="prabuddh_me_db"),
+            "USER": config("DB_USER", default="prabuddh_me_db_user"),
+            "PASSWORD": config("DB_PASSWORD", default="devpassword123"),
+            "HOST": config("DB_HOST", default="localhost"),
+            "PORT": config("DB_PORT", default="5432"),
         }
     }
 else:
+    # Local SQLite for quick development
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -89,11 +87,3 @@ LOGGING = {
         "django": {"handlers": ["console"], "level": "INFO"},
     },
 }
-
-# =====================================================
-# ✅ Optional Local Overrides
-# =====================================================
-try:
-    from .local import *
-except ImportError:
-    pass

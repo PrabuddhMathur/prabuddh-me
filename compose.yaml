@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=prabuddh_me_db
+      - POSTGRES_USER=prabuddh_me_db_user
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
