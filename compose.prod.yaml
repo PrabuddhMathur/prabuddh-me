@@ -27,6 +27,11 @@ services:
     container_name: prabuddh-me-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env.production
     environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+
     restart: unless-stopped
