@@ -7,23 +7,22 @@ import logging
 # =====================================================
 DEBUG = False
 SECRET_KEY = config("SECRET_KEY")
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="blog.prabuddh.in,.prabuddh.in", cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="prabuddh.in", cast=Csv())
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default="https://blog.prabuddh.in,https://*.blog.prabuddh.in",
+    default="https://prabuddh.in,https://www.prabuddh.in",
     cast=Csv(),
 )
 
 # =====================================================
-# ✅ Security Settings (Cloudflare → Firebase → Cloud Run)
+# ✅ Security Settings
 # =====================================================
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# HSTS Configuration (HTTP Strict Transport Security)
-SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
@@ -37,7 +36,7 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 
-CSRF_USE_SESSIONS = True  # store CSRF inside the session
+CSRF_USE_SESSIONS = True
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_DOMAIN = ".prabuddh.in"
 CSRF_COOKIE_PATH = "/"
@@ -48,7 +47,7 @@ CSRF_COOKIE_SAMESITE = "Lax"
 USE_X_FORWARDED_HOST = True
 
 # =====================================================
-# ✅ Database (PostgreSQL on VM with SSL)
+# ✅ Database (PostgreSQL via Docker Compose)
 # =====================================================
 DATABASES = {
     "default": {
@@ -56,44 +55,10 @@ DATABASES = {
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", default="443", cast=int),
-        "OPTIONS": {
-            "sslmode": "verify-full",
-            "sslrootcert": config("DB_SSLROOTCERT"),
-            "sslcert": config("DB_SSLCERT"),
-            "sslkey": config("DB_SSLKEY"),
-        },
+        "HOST": config("DB_HOST", default="db"),
+        "PORT": config("DB_PORT", default="5432", cast=int),
         "CONN_MAX_AGE": 60,
     }
-}
-
-# =====================================================
-# ✅ Storage (Google Cloud Storage)
-# =====================================================
-GS_BUCKET_NAME = config("GS_BUCKET_NAME")
-GS_PROJECT_ID = config("GCP_PROJECT", default="prabuddh-me-5")
-
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        "OPTIONS": {
-            "bucket_name": GS_BUCKET_NAME,
-            "project_id": GS_PROJECT_ID,
-            "file_overwrite": False,
-            "querystring_auth": False,
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        "OPTIONS": {
-            "bucket_name": GS_BUCKET_NAME,
-            "project_id": GS_PROJECT_ID,
-            "location": "static",
-            "file_overwrite": True,
-            "querystring_auth": False,
-        },
-    },
 }
 
 # =====================================================
@@ -102,12 +67,11 @@ STORAGES = {
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 
 # =====================================================
-# ✅ Wagtail / App-Specific
+# ✅ Wagtail
 # =====================================================
-WAGTAILADMIN_BASE_URL = config("WAGTAILADMIN_BASE_URL", default="https://blog.prabuddh.in")
+WAGTAILADMIN_BASE_URL = config("WAGTAILADMIN_BASE_URL", default="https://prabuddh.in")
 
-# File upload limits
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 # =====================================================
@@ -133,11 +97,3 @@ LOGGING = {
         "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }
-
-# =====================================================
-# ✅ Optional Local Overrides
-# =====================================================
-try:
-    from .local import *
-except ImportError:
-    pass

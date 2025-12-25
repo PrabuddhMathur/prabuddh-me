@@ -1,0 +1,32 @@
+services:
+  web:
+    container_name: prabuddh-me-web
+    command: ./start.sh
+    expose:
+      - 8000
+    env_file:
+      - .env.production
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: prabuddh-me-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  db:
+    container_name: prabuddh-me-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped

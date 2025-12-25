@@ -9,8 +9,6 @@ WORKDIR /app
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1 \
-    PORT=8080 \
-    DJANGO_SETTINGS_MODULE=prabuddh_me.settings.production \
     PYTHONDONTWRITEBYTECODE=1
 
 # Install system dependencies
@@ -30,21 +28,17 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy project files (respects .dockerignore)
 COPY --chown=wagtail:wagtail . .
 
-# Make startup scripts executable
-RUN chmod +x entrypoint.sh start.sh
+# Make startup script executable
+RUN chmod +x start.sh
 
 # Create writable directories
-RUN mkdir -p /app/media /tmp/certs && chown -R wagtail:wagtail /app
+RUN mkdir -p /app/media /app/staticfiles && chown -R wagtail:wagtail /app
 
 # Switch to non-root user
 USER wagtail
 
-# Health check for Cloud Run
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8080/', timeout=5)" || exit 1
-
-# Expose Cloud Run default port
-EXPOSE 8080
+# Expose port
+EXPOSE 8000
 
 # Runtime command
 CMD ["./start.sh"]

@@ -216,7 +216,7 @@ prabuddh_me/settings/local.py
 !package*.json
 
 # Environment files
-.env.local
+.env.development
 .env.production
 
 # Static and media files in development
