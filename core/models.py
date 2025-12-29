@@ -54,7 +54,7 @@ class BaseRichTextBlock(blocks.StructBlock):
     text = RichTextBlock(
         required=True,
         help_text="Rich text content with formatting options",
-        features=['bold', 'italic', 'link', 'ol', 'ul', 'h2', 'h3', 'h4', 'spoiler']
+        features=['bold', 'italic', 'link', 'ol', 'ul', 'h2', 'h3', 'h4', 'hr', 'spoiler']
     )
     alignment = blocks.ChoiceBlock(
         choices=[
@@ -163,7 +163,7 @@ class BaseButtonBlock(blocks.StructBlock):
         label = 'Button'
         template = 'core/blocks/button_block.html'
 
-
+# To remove later if not used. [29/12/2025]
 class BaseSpacerBlock(blocks.StructBlock):
     """Reusable spacer block for adding vertical space."""
     height = blocks.ChoiceBlock(
