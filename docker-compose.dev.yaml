@@ -3,10 +3,19 @@
 #   docker compose -f docker-compose.dev.yaml up --build
 #
 # Admin: http://localhost:8000/admin/    Site: http://localhost:3000
+# Inbox (Mailpit catches every email the site sends): http://localhost:8025
 # After changing frontend dependencies, add -V (--renew-anon-volumes) so the
 # container's node_modules is rebuilt.
 
 name: prabuddh-me-dev
+
+# Send every email to the Mailpit container instead of the internet.
+x-email: &email
+  EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+  EMAIL_HOST: mailpit
+  EMAIL_PORT: "1025"
+  EMAIL_USE_TLS: "False"
+  DEFAULT_FROM_EMAIL: "Prabuddh's Blog <newsletter@localhost>"
 
 services:
   backend:
@@ -19,11 +28,38 @@ services:
     env_file:
       - path: backend/.env
         required: false
+    environment: *email
     volumes:
       - ./backend:/app
       # Keep the database off the bind mount: SQLite's WAL mode relies on shared
       # memory, which folders shared with the host don't reliably support.
       - backend_data:/app/data
+
+  # Sends the newsletter queue. Same image, database and settings as the backend;
+  # restarts itself when you edit backend code.
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+      target: backend
+    command: python manage.py newsletter_worker --reload
+    env_file:
+      - path: backend/.env
+        required: false
+    environment: *email
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/data
+    depends_on:
+      - backend
+      - mailpit
+
+  # Local inbox: SMTP on :1025, web UI on :8025.
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
   frontend:
     build:

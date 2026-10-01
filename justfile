@@ -43,6 +43,11 @@ lint:
 makemigrations-check:
     uv run manage.py makemigrations --check --dry-run
 
+# Send queued newsletter emails (restarts on code changes)
+[working-directory: 'backend']
+worker:
+    uv run manage.py newsletter_worker --reload
+
 # Recalculate every post's reading time (add --dry-run to preview)
 [working-directory: 'backend']
 reading-times *args:
@@ -72,7 +77,11 @@ typecheck:
 
 # --- Docker (from the repository root) ---
 
-# Start the dev stack with live reload (site :3000, admin :8000)
+# Start only Mailpit, the local inbox (SMTP :1025, inbox :8025), for `just run` without the full stack
+mailpit:
+    docker compose -f docker-compose.dev.yaml up mailpit
+
+# Start the dev stack with live reload (site :3000, admin :8000, inbox :8025)
 docker-dev:
     docker compose -f docker-compose.dev.yaml up --build
 

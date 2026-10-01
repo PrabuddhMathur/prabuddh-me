@@ -1,0 +1,6 @@
+{% autoescape off %}Please confirm that this address should get new posts from {{ site_name }}.
+
+Confirm your subscription: {{ confirm_url }}
+
+If you didn't ask for this, ignore this email; you won't hear from us again.
+{% endautoescape %}

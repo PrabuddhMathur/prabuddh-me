@@ -20,6 +20,22 @@ services:
       - backend_media:/app/media
     restart: unless-stopped
 
+  # Sends the newsletter queue in the background. Same image, database and media
+  # as the backend. It must not run migrations: the backend container does.
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      target: backend
+    command: python manage.py newsletter_worker
+    env_file: backend/.env
+    volumes:
+      - backend_data:/app/data
+      - backend_media:/app/media
+    depends_on:
+      - backend
+    restart: unless-stopped
+
   frontend:
     build:
       context: .

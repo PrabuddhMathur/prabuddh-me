@@ -7,4 +7,5 @@ SECRET_KEY = env("SECRET_KEY", default="django-insecure-local-development-only")
 
 ALLOWED_HOSTS = ["*"]
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Print emails to the terminal unless a real SMTP server (Mailpit in Docker) is configured.
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
