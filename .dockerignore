@@ -1,67 +1,16 @@
-# Django project
-/media/
-/static/
-!/theme/static/
-*.sqlite3
-db.sqlite3-journal
+# The build context is the repository root, but images only need backend/ and frontend/.
+*
+!backend
+!frontend
 
-# Environment files (SECURITY: Never copy to Docker)
-.env
-.env.*
-!.env.example
-
-# Python and others
-__pycache__
-*.pyc
-.DS_Store
-*.swp
-/venv/
-/tmp/
-/.vagrant/
-/Vagrantfile.local
-node_modules/
-/npm-debug.log
-/.idea/
-.vscode
-coverage
-.python-version
-
-# Context and documentation
-context/
-*.md
-!README.md
-*.har
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# Git
-.git/
-.gitignore
-.gitattributes
-
-# CI/CD (optional - comment out if needed in builds)
-Makefile
-
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-!/theme/static/css/dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Local-only files inside those folders
+**/.env
+**/__pycache__
+**/.ruff_cache
+backend/.venv
+backend/data
+backend/media
+backend/staticfiles
+frontend/node_modules
+frontend/.nuxt
+frontend/.output

@@ -1,0 +1,98 @@
+# syntax=docker/dockerfile:1
+
+# Production images, used by docker-compose.prod.yaml.
+# Build context is the repository root; pick an app with --target backend or --target frontend.
+# Keep base image tags in step with Dockerfile.dev and docs/versions.md.
+
+
+# ===========================================================================
+# Backend: Wagtail admin + API, served by gunicorn
+# ===========================================================================
+
+# --- Build stage: install dependencies and collect static files ------------
+FROM python:3.14.7-slim-trixie AS backend-build
+
+COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/opt/venv
+
+WORKDIR /app
+
+# Dependencies first, so a code change doesn't reinstall them.
+COPY backend/pyproject.toml backend/uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev
+
+COPY backend/ ./
+
+# Production settings refuse to load without these, so collectstatic gets
+# throwaway values. The real ones come from backend/.env at runtime.
+RUN SECRET_KEY=collectstatic-only \
+    ALLOWED_HOSTS=localhost \
+    CSRF_TRUSTED_ORIGINS=http://localhost \
+    WAGTAILADMIN_BASE_URL=http://localhost \
+    FRONTEND_URL=http://localhost \
+    DJANGO_SETTINGS_MODULE=config.settings.production \
+    /opt/venv/bin/python manage.py collectstatic --noinput
+
+
+# --- Runtime stage: Python, the virtualenv and the app, nothing else -------
+FROM python:3.14.7-slim-trixie AS backend
+
+ENV PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    DJANGO_SETTINGS_MODULE=config.settings.production \
+    GUNICORN_CMD_ARGS="--bind 0.0.0.0:8000 --workers 2 --threads 4 --access-logfile -"
+
+RUN useradd --create-home --uid 1000 app
+
+WORKDIR /app
+
+# Code stays root-owned (read-only for the app user); only data and media are writable.
+COPY --from=backend-build /opt/venv /opt/venv
+COPY --from=backend-build /app /app
+# Named volumes mounted on these paths inherit this ownership when first created.
+RUN mkdir -p /app/data /app/media && chown app:app /app/data /app/media
+
+USER app
+
+EXPOSE 8000
+# Apply any new migrations, then hand over to gunicorn (options come from GUNICORN_CMD_ARGS).
+CMD ["sh", "-c", "python manage.py migrate --noinput && exec gunicorn config.wsgi:application"]
+
+
+# ===========================================================================
+# Frontend: Nuxt server (server-side rendering)
+# ===========================================================================
+
+# --- Build stage ------------------------------------------------------------
+FROM node:24.21.0-trixie-slim AS frontend-build
+
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+
+# --- Runtime stage: only Nuxt's self-contained .output folder --------------
+FROM node:24.21.0-trixie-slim AS frontend
+
+ENV NODE_ENV=production \
+    HOST=0.0.0.0 \
+    PORT=3000
+
+WORKDIR /app
+
+COPY --from=frontend-build /app/.output ./.output
+
+USER node
+
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]

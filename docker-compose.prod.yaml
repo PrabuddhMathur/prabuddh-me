@@ -1,0 +1,60 @@
+# Production: Caddy (automatic HTTPS) in front of the Wagtail backend and the Nuxt frontend.
+#
+#   docker compose -f docker-compose.prod.yaml up -d --build
+#
+# Needs two env files on the server (both git-ignored):
+#   .env          DOMAIN=prabuddh.in                 (see .env.example)
+#   backend/.env  Django secrets and URLs            (see backend/.env.example)
+
+name: prabuddh-me
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      target: backend
+    env_file: backend/.env
+    volumes:
+      - backend_data:/app/data
+      - backend_media:/app/media
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      target: frontend
+    environment:
+      # Server-side requests go straight to the backend over the Docker network.
+      NUXT_BACKEND_URL: http://backend:8000
+      # Public address, for canonical and Open Graph URLs.
+      NUXT_PUBLIC_SITE_URL: https://${DOMAIN:?Set DOMAIN in the root .env, e.g. DOMAIN=prabuddh.in}
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.11.4-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in the root .env, e.g. DOMAIN=prabuddh.in}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - backend_media:/srv/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  backend_data:
+  backend_media:
+  # Holds the HTTPS certificates. Don't delete it, or Caddy has to request new ones.
+  caddy_data:
+  caddy_config:
