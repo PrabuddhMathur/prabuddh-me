@@ -1,0 +1,48 @@
+# Local development: Django and Nuxt dev servers with live reload.
+#
+#   docker compose -f docker-compose.dev.yaml up --build
+#
+# Admin: http://localhost:8000/admin/    Site: http://localhost:3000
+# After changing frontend dependencies, add -V (--renew-anon-volumes) so the
+# container's node_modules is rebuilt.
+
+name: prabuddh-me-dev
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+      target: backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: backend/.env
+        required: false
+    volumes:
+      - ./backend:/app
+      # Keep the database off the bind mount: SQLite's WAL mode relies on shared
+      # memory, which folders shared with the host don't reliably support.
+      - backend_data:/app/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+      target: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # Server-side requests go straight to the backend over the Docker network.
+      NUXT_BACKEND_URL: http://backend:8000
+      # The bind mount below sends no file-change events; see nuxt.config.ts.
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./frontend:/app
+      # Keep the container's own node_modules instead of the host's.
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  backend_data:

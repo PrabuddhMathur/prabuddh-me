@@ -1,0 +1,34 @@
+# Serves the site over HTTPS (certificates are obtained and renewed automatically)
+# and splits traffic between the Wagtail backend and the Nuxt frontend.
+# DOMAIN comes from the environment (see the root .env.example).
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Wagtail: admin, API, documents and the admin's static files
+	@backend path /admin /admin/* /api/* /documents/* /static/*
+	handle @backend {
+        reverse_proxy backend:8000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Host {host}
+        }
+	}
+
+	# Uploaded images and files, straight from the backend's media volume
+	handle_path /media/* {
+		root * /srv/media
+		file_server
+	}
+
+	# Everything else is the Nuxt site
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
