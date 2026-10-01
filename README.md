@@ -38,4 +38,5 @@ Needs `.env` (see `.env.example`) and `backend/.env` (see `backend/.env.example`
 - [`docs/local-development.md`](docs/local-development.md): run the project on your machine, set it up, and try the newsletter locally.
 - [`docs/newsletter-production.md`](docs/newsletter-production.md): turn on the newsletter in production with a real email address.
 - [`docs/versions.md`](docs/versions.md): every version in the stack and why it was chosen.
+- [`docs/decisions/`](docs/decisions/README.md): every design decision, why it was made, and what it costs.
 - `legacy-ui/`: the old site's templates, kept only as a reference for the UI.

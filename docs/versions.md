@@ -9,7 +9,7 @@ Last researched: **2026-09-30**
 - Use the LTS line wherever a project has one (Django, Wagtail, Node.js, Ubuntu).
 - Where there is no LTS, use the latest stable release and note its support window.
 - Manifests pin the line (e.g. `Django>=5.2.17,<5.3`). Lock files (`uv.lock`, `package-lock.json`) pin exact versions.
-- Docker images use exact patch tags. Dependabot proposes updates.
+- Docker images use exact patch tags. Nothing proposes updates automatically yet (no Dependabot); the [review calendar](#review-calendar) is the reminder.
 
 ## Runtimes and operating systems
 
@@ -107,7 +107,7 @@ Wagtail 8.0 was not chosen because:
 
 ### SQLite
 
-A blog is almost all reads with one author writing, and Nuxt caches pages, so most visits never reach the database. SQLite handles that comfortably, removes the database container, and a backup is a single file.
+A blog is almost all reads with one author writing: a page view is a few quick reads (the page and the site settings). SQLite handles that comfortably, removes the database container, and a backup is a single file. More in [the design decisions](decisions/data-and-configuration.md#d1-sqlite-as-the-database).
 
 Settings it needs (Django 5.2 supports all of them):
 
