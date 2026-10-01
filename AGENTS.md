@@ -16,14 +16,16 @@ Personal blog for prabuddh.in, rebuilt from scratch starting 2026-10-01.
 | `backend/` | Wagtail as a headless CMS: admin and REST API only, no server-rendered pages. Django 5.2 LTS, Wagtail 7.4 LTS, Python 3.14, managed with uv. SQLite database. |
 | `frontend/` | Nuxt 4 with server-side rendering (not SPA mode) and Tailwind CSS 4 (no daisyUI). |
 | `docs/versions.md` | The single source of truth for every version in the stack and why it was chosen. Update it whenever a version changes. |
+| `docs/local-development.md` | How to run the project locally (Docker or not), set it up and try the newsletter. |
+| `docs/newsletter-production.md` | How to turn on the newsletter in production with a real email address. |
 | `justfile` | Task runner (`just` lists the recipes): backend, frontend and Docker commands. |
 | `legacy-ui/` | The old site's templates, CSS and JS, restored from commit `49cda9c`. Reference only: never import from it or ship it. |
 
 ## Decisions (ask before changing any of these)
 
 - **The UI must look exactly like the old site.** Port templates from `legacy-ui/` to Vue components faithfully. Replace daisyUI classes with plain Tailwind using the same colour values; `legacy-ui/theme/static/css/dist/styles.css` has the exact theme colours. The two themes are `light` and `dim`.
-- **Production:** one Hetzner VM running Docker Compose, with Caddy in front for automatic HTTPS. Everything is served from one domain. Caddy sends `/admin/`, `/api/`, `/documents/` and `/static/` to Wagtail, serves `/media/` directly from the uploads volume (Django doesn't serve media in production), and sends everything else to Nuxt. No CORS setup is needed.
-- **Docker:** all Docker files live together at the root. `docker/Dockerfile.dev` and `docker/Dockerfile.prod` each have a `backend` and a `frontend` target, and the build context is the repository root. `docker-compose.dev.yaml` runs both dev servers with live reload; `docker-compose.prod.yaml` adds Caddy (`docker/Caddyfile`). Base image tags must match across both Dockerfiles and `docs/versions.md`.
+- **Production:** one Hetzner VM running Docker Compose, with Caddy in front for automatic HTTPS. Everything is served from one domain. Caddy sends `/admin/`, `/api/`, `/documents/` and `/static/` to Wagtail, serves `/media/` directly from the uploads volume (Django doesn't serve media in production), and sends everything else to Nuxt. No CORS setup is needed. Caddy also sets `X-Real-IP`, which the newsletter signup throttle reads as the visitor's address.
+- **Docker:** all Docker files live together at the root. `docker/Dockerfile.dev` and `docker/Dockerfile.prod` each have a `backend` and a `frontend` target, and the build context is the repository root. `docker-compose.dev.yaml` runs both dev servers with live reload, the newsletter `worker` and Mailpit (a local inbox that catches every email, at `http://localhost:8025`); `docker-compose.prod.yaml` adds Caddy (`docker/Caddyfile`) and the `worker`. Base image tags must match across both Dockerfiles and `docs/versions.md`.
 - **Internal traffic:** in Docker, the Nuxt server calls the backend directly at `http://backend:8000` (`NUXT_BACKEND_URL`). That's why production `ALLOWED_HOSTS` includes `backend` and Django's own HTTPS redirect is off (Caddy does the redirect).
 - **Task runner:** `just`. No Makefile.
 - **Configuration:** `django-environ`. Secrets live only in environment variables or `.env` files, which are never committed. Each app keeps a `.env.example` up to date.
@@ -45,6 +47,7 @@ Layout:
 - `config/api.py`: the Wagtail REST API (v2) router: `pages` (its `/find/` returns the page instead of redirecting), `images`, and the `page_preview` endpoint used by the frontend's `/preview` page.
 - `core/`: shared code. `SEOFields` mixin, `StaticPage`, the site settings (`SiteSettings`, `HeaderSettings`, `FooterSettings`, `AuthorSettings`, edited under Settings in the admin), the StreamField blocks (`blocks.py`), serializers, the spoiler rich-text feature (`wagtail_hooks.py`), and the `site` and `search` views.
 - `blog/`: `BlogPage` (a post; its public URL is `/YYYY/MM/DD/slug/`, built in `get_url_parts`), the `posts` view (listing, tag and date filters, 12 per page) and the management command `recalculate_reading_times [--dry-run]`.
+- `newsletter/`: the double opt-in newsletter. Models `Subscriber`, `Issue` (one emailed post, "Sent posts" in the admin) and `Delivery` (one issue to one subscriber); the public endpoints `/api/v2/newsletter/subscribe/`, `confirm/` and `unsubscribe/` (`views.py`, registered in `config/urls.py`); the emails (`emails.py`, templates in `templates/newsletter/emails/`); the queue (`sending.py`); the Wagtail admin (`wagtail_hooks.py`, `admin_views.py`: Newsletter menu, "Email subscribers" on live posts); and the deploy check `newsletter.W001`. `manage.py newsletter_worker [--once] [--reload]` sends the queue in the background. It runs as the `worker` service in both compose files and shares the backend's database and media volumes. Only the worker sends post emails; confirmation emails go out from the web request.
 - `home/`: the `HomePage` model.
 - `data/`: the SQLite database. Git-ignored apart from `.gitkeep`.
 
@@ -52,6 +55,7 @@ Rules:
 
 - Every page model must include `HeadlessMixin` (from `wagtail_headless_preview.models`), so previews and "View live" go to the Nuxt frontend.
 - Expose fields to the frontend with `api_fields` on the page model.
+- Email settings (`EMAIL_*`, `DEFAULT_FROM_EMAIL`, `NEWSLETTER_*`) come from env vars, listed in `backend/.env.example`. Links in emails are built from `FRONTEND_URL`. Dev settings default to the console email backend; the dev compose points it at Mailpit.
 - A new StreamField block needs a matching Vue component in `frontend/app/components/blocks/`.
 - The frontend types the API responses by hand in `frontend/app/types/api.ts`. Change both together.
 
@@ -63,7 +67,8 @@ Commands, run from `backend/`:
 | `uv run manage.py migrate` | Apply database migrations |
 | `uv run manage.py createsuperuser` | Create an admin login |
 | `uv run manage.py runserver` | Dev server: admin at `http://localhost:8000/admin/`, API at `/api/v2/pages/` |
-| `uv run manage.py test` | Run the tests (`core/tests.py`, `blog/tests.py`) |
+| `uv run manage.py test` | Run the tests (`core/tests.py`, `blog/tests.py`, `newsletter/tests.py`) |
+| `uv run manage.py newsletter_worker --reload` | Send queued newsletter emails (`just worker`) |
 | `uv run manage.py makemigrations --check --dry-run` | Fails if a model change has no migration |
 | `uv run ruff format . && uv run ruff check .` | Format and lint |
 | `uv run manage.py check --deploy --settings=config.settings.production` | Production checklist (needs the production env vars) |
@@ -75,6 +80,7 @@ Nuxt 4 with SSR, in `frontend/app/` (Nuxt 4 layout, so source is under `app/`).
 - `pages/` (file-based routes; `[x]` is a parameter, `[...slug]` a catch-all):
   - `index.vue` (home page), `blog/index.vue` (listing), `blog/tag/[tag].vue`
   - `[year]/index.vue`, `[year]/[month]/index.vue`, `[year]/[month]/[day]/index.vue` (date archives) and `[year]/[month]/[day]/[slug].vue` (a post)
+  - `newsletter/index.vue`, `newsletter/confirm.vue`, `newsletter/unsubscribe.vue` (the newsletter's landing, confirm and unsubscribe pages; the footer signup is `components/site/NewsletterSignup.vue`)
   - `search.vue`, `preview.vue` (Wagtail preview and "View live" target), `[...slug].vue` (static pages such as `/about/`; a post's `/<slug>/` redirects to its date URL)
 - `components/`, grouped by folder for tidiness but used by file name only (`<PostCard>`), so every file name must be unique: `article/` (post page, image gallery), `blocks/` (one component per StreamField block, plus `StreamField.vue` that picks by block type), `content/` (`RichText`), `home/`, `listing/` (cards, list items, pagination), `page/`, `post/` (meta, tags, social links), `site/` (header, footer, mobile menu, newsletter, theme toggle), `ui/`.
 - `composables/`: `useApi` (`useFetch` against the backend), `useSiteSettings` (header, footer and author, fetched once), `usePageSeo` (title, description, Open Graph, canonical).
@@ -112,7 +118,7 @@ Run from the repository root (`just docker-dev`, `docker-dev-down`, `docker-mana
 
 | Command | What it does |
 |---|---|
-| `docker compose -f docker-compose.dev.yaml up --build` | Dev: admin at `http://localhost:8000/admin/`, site at `http://localhost:3000`. Add `-V` after changing frontend dependencies |
+| `docker compose -f docker-compose.dev.yaml up --build` | Dev: admin at `http://localhost:8000/admin/`, site at `http://localhost:3000`, test inbox (Mailpit) at `http://localhost:8025`. Add `-V` after changing frontend dependencies |
 | `docker compose -f docker-compose.dev.yaml exec backend python manage.py <command>` | Run a Django command in the dev container (e.g. `createsuperuser`, `makemigrations`) |
 | `docker compose -f docker-compose.prod.yaml up -d --build` | Production. Needs `.env` (`DOMAIN`) and `backend/.env` |
 
