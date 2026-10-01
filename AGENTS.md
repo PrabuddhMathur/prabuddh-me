@@ -18,6 +18,7 @@ Personal blog for prabuddh.in, rebuilt from scratch starting 2026-10-01.
 | `docs/versions.md` | The single source of truth for every version in the stack and why it was chosen. Update it whenever a version changes. |
 | `docs/local-development.md` | How to run the project locally (Docker or not), set it up and try the newsletter. |
 | `docs/newsletter-production.md` | How to turn on the newsletter in production with a real email address. |
+| `docs/decisions/` | Every design decision with its reasons, alternatives and costs. Update the matching entry when a decision changes. |
 | `justfile` | Task runner (`just` lists the recipes): backend, frontend and Docker commands. |
 | `legacy-ui/` | The old site's templates, CSS and JS, restored from commit `49cda9c`. Reference only: never import from it or ship it. |
 
