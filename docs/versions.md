@@ -69,6 +69,7 @@ Last researched: **2026-09-30**
 | Docker Engine | 29.x | Latest | — | Dev machine and VM; not pinned |
 | Docker Compose | 5.x | Latest | — | Dev machine and VM; not pinned |
 | just | `1.58.0` | Latest | — | Homebrew locally, system package on the VM |
+| Mailpit | `1.31.3` | 1.x | No fixed EOL | Dev only: local inbox that catches the newsletter emails |
 
 ## Docker images
 
@@ -78,6 +79,7 @@ Last researched: **2026-09-30**
 | `ghcr.io/astral-sh/uv:0.12.21` | Copies the `uv` binary into the backend images | `docker/Dockerfile.dev`, `docker/Dockerfile.prod` |
 | `node:24.21.0-trixie-slim` | Frontend base image | `docker/Dockerfile.dev`, `docker/Dockerfile.prod` |
 | `caddy:2.11.4-alpine` | Reverse proxy and automatic HTTPS | `docker-compose.prod.yaml` |
+| `axllent/mailpit:v1.31.3` | Local inbox for the newsletter emails (dev only) | `docker-compose.dev.yaml` |
 
 ## Why these choices
 
