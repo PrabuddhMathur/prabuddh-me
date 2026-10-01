@@ -330,3 +330,21 @@ export interface SearchResponse {
   per_page: number
   results: SearchResult[]
 }
+
+// Newsletter: /api/v2/newsletter/{subscribe,confirm,unsubscribe}/ (JSON in, JSON out).
+
+/** The `status` of a newsletter response. 'ok' answers a signup; the others are errors or states. */
+export type NewsletterStatus =
+  | 'ok'
+  | 'invalid_email'
+  | 'rate_limited'
+  | 'email_failed'
+  | 'subscribed'
+  | 'unsubscribed'
+  | 'invalid_token'
+
+export interface NewsletterResponse {
+  status: NewsletterStatus
+  /** Only on confirm and unsubscribe answers (subscribed, unsubscribed). */
+  email?: string
+}

@@ -68,7 +68,9 @@ export default defineNuxtConfig({
   // In production Caddy sends these paths to Wagtail before they reach Nuxt.
   $development: {
     routeRules: {
-      '/api/**': { proxy: `${backendUrl}/api/**` },
+      // Hand the backend's redirects to the browser, as Caddy does, instead of following them
+      // here: the newsletter's forms without JavaScript and its unsubscribe link rely on them.
+      '/api/**': { proxy: { to: `${backendUrl}/api/**`, fetchOptions: { redirect: 'manual' } } },
       '/media/**': { proxy: `${backendUrl}/media/**` },
       '/documents/**': { proxy: `${backendUrl}/documents/**` },
     },
