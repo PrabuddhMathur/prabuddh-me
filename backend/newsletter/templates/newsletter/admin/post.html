@@ -1,0 +1,77 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailadmin_tags %}
+{% block titletag %}Email subscribers: {{ post.title }}{% endblock %}
+
+{% block content %}
+    {% include "wagtailadmin/shared/header.html" with title="Email subscribers" subtitle=post.title icon="mail" %}
+
+    <div class="nice-padding">
+        <p class="w-mb-6"><a href="{{ edit_url }}">&larr; Back to editing the post</a></p>
+
+        {% if issue %}
+            {% panel id="status" heading="Progress" icon="doc-full" %}
+                <p>Queued {{ issue.created_at|date:"j F Y, H:i" }}{% if issue.created_by %} by {{ issue.created_by }}{% endif %}.
+                The worker sends the emails in the background, one at a time.</p>
+                <ul>
+                    {% for label, count in counts %}
+                        <li>{{ label }}: <strong>{{ count }}</strong></li>
+                    {% endfor %}
+                    <li>Total: <strong>{{ total }}</strong></li>
+                </ul>
+                {% if failed %}
+                    <form action="" method="post" class="w-mt-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="retry">
+                        <button type="submit" class="button button-secondary">Retry {{ failed }} failed</button>
+                    </form>
+                {% endif %}
+            {% endpanel %}
+
+            {% if errors %}
+                {% panel id="errors" heading="Latest errors" icon="warning" %}
+                    <ul>
+                        {% for delivery in errors %}
+                            <li><strong>{{ delivery.subscriber.email }}</strong> ({{ delivery.get_status_display|lower }}, attempt {{ delivery.attempts }}): {{ delivery.last_error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endpanel %}
+            {% endif %}
+        {% else %}
+            {% if not post.live %}
+                <p class="help-block help-warning">Publish the post first. Only live posts can be emailed.</p>
+            {% endif %}
+
+            {% panel id="preview" heading="Preview" icon="view" %}
+                <p>This is what subscribers get. Links in a test email go to the live site.</p>
+                <iframe title="Email preview" srcdoc="{{ preview_html|force_escape }}" style="width: 100%; height: 780px; border: 1px solid #ddd; border-radius: 3px; background: #fff;"></iframe>
+            {% endpanel %}
+
+            {% panel id="test" heading="Send a test" icon="mail" %}
+                <form action="" method="post" class="w-flex w-items-end w-gap-4 w-flex-wrap">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="test">
+                    <div>
+                        <label for="test-address">Send the test to</label>
+                        <input type="email" id="test-address" name="address" value="{{ test_address }}" required style="min-width: 20rem;">
+                    </div>
+                    <button type="submit" class="button button-secondary">Send a test</button>
+                </form>
+            {% endpanel %}
+
+            {% panel id="send" heading="Send to subscribers" icon="group" %}
+                {% if post.live and subscriber_count %}
+                    <p>{{ subscriber_count }} subscriber{{ subscriber_count|pluralize }} confirmed their address. Each gets one email, sent by the worker in the background.</p>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="send">
+                        <button type="submit" class="button">Send to {{ subscriber_count }} subscriber{{ subscriber_count|pluralize }}</button>
+                    </form>
+                {% elif post.live %}
+                    <p>No one is subscribed yet.</p>
+                {% else %}
+                    <p>Publish the post first.</p>
+                {% endif %}
+            {% endpanel %}
+        {% endif %}
+    </div>
+{% endblock %}

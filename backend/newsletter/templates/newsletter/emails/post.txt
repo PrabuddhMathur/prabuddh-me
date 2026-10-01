@@ -1,0 +1,13 @@
+{% autoescape off %}{{ site_name }} ({{ site_url }})
+
+{{ post.title }}
+{{ post.date|date:"F j, Y" }} - {{ post.estimated_reading_time }} min read
+{% if post.intro %}
+{{ post.intro }}
+{% endif %}
+Read the post: {{ post_url }}
+
+--
+You're getting this because you subscribed at {{ site_host }}.
+Unsubscribe: {{ unsubscribe_url }}
+{% endautoescape %}

@@ -6,6 +6,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from blog import views as blog_views
 from core import views as core_views
+from newsletter import views as newsletter_views
 
 from .api import api_router
 
@@ -16,6 +17,13 @@ urlpatterns = [
     path("api/v2/site/", core_views.site_settings, name="api_site"),
     path("api/v2/posts/", blog_views.posts, name="api_posts"),
     path("api/v2/search/", core_views.search, name="api_search"),
+    path("api/v2/newsletter/subscribe/", newsletter_views.subscribe, name="newsletter_subscribe"),
+    path("api/v2/newsletter/confirm/", newsletter_views.confirm, name="newsletter_confirm"),
+    path(
+        "api/v2/newsletter/unsubscribe/",
+        newsletter_views.unsubscribe,
+        name="newsletter_unsubscribe",
+    ),
     path("api/v2/", api_router.urls),
 ]
 
