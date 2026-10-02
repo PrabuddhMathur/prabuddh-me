@@ -64,7 +64,7 @@ The guiding idea: a personal blog's newsletter is "email me when there's a new p
 
 ## N6. A database queue and a small worker process
 
-**Decision.** Pressing "Send to N subscribers" creates one `Delivery` row per subscriber in the existing SQLite database. The `newsletter_worker` command runs in its own container, built from the same image as the backend. It picks due rows and sends them one by one, then checks again every 10 seconds.
+**Decision.** Pressing "Send to N subscribers" creates one `Delivery` row per subscriber in the existing SQLite database. The `newsletter_worker` command runs in its own container, built from the same image as the backend. It picks due rows and sends them one by one, then checks again every 10 seconds. It's also the site's one background process, so it runs the comments' housekeeping about once an hour ([M13](comments.md#m13-visitor-details-are-kept-for-30-days-at-most)).
 
 **Why.**
 

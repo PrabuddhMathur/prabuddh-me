@@ -24,7 +24,7 @@ Taking the old site's screenshots twice gave zero differing pixels, so any diffe
 
 ## V2. Backend tests
 
-**Decision.** 102 Django tests across `core`, `blog` and `newsletter`, run with `just test`. They cover:
+**Decision.** 309 Django tests across `core`, `blog`, `newsletter` and `comments`, run with `just test`. They cover:
 
 - **API shapes and edge cases:** ordering, pagination, tag and date filters, 404s, search.
 - **Editor features:** the spoiler round-trip through the editor's converter, and reading time over rich text.
@@ -33,6 +33,13 @@ Taking the old site's screenshots twice gave zero differing pixels, so any diffe
   - the email headers and links,
   - the queue and the worker's failure handling: retries, pauses, double-send protection and reconnects,
   - admin permissions and the deploy check.
+- **The comments:**
+  - the public endpoints: the list's shape, threading and hidden replies, every validation error, the honeypot, the form timer, the limit, and the form-post redirects,
+  - Akismet through a stand-in client: each verdict, the details sent, and every kind of failure,
+  - moderation and the emails it causes: reply-alert rules, reports to Akismet, and a failing email that must not undo an approval,
+  - the confirm and stop endpoints, the emails' links and headers, the cleanup, and the worker's hourly run of it,
+  - the admin: the list, row and bulk actions, permissions, the edit and reply pages, and the waiting count.
+- **The shared form and email code.** It moved out of the newsletter into `core` for the comments. The newsletter's own tests passed unchanged, and its confirmation and post emails (text and HTML) were rendered before and after and compared: they were identical.
 
 **Why.** Backend logic is where silent bugs hide, and Django tests are fast and need no running servers. A wrong JSON shape or a double-sent email doesn't show up in a screenshot.
 

@@ -21,8 +21,9 @@ Why the project is built the way it is. Each decision says:
 - django-environ for settings.
 - SQLite, which you asked about; the answer and its limits are in [D1](data-and-configuration.md#d1-sqlite-as-the-database).
 - No AI tool credited in commits or pull requests.
+- For comments: no email verification to post, only your heart as a like, moderating only in the Wagtail admin, and no emails except opt-in reply alerts ([Comments](comments.md#your-decisions)).
 
-**Made while building:** everything else. That includes rendering on the server rather than a single-page app, which you asked about ([A1](architecture.md#a1-headless-wagtail-with-a-server-rendered-nuxt-site)), and the whole newsletter design.
+**Made while building:** everything else. That includes rendering on the server rather than a single-page app, which you asked about ([A1](architecture.md#a1-headless-wagtail-with-a-server-rendered-nuxt-site)), the whole newsletter design, and everything about comments beyond your four choices.
 
 The decisions that shouldn't change without discussion are also listed in [`AGENTS.md`](../../AGENTS.md) under "Decisions".
 
@@ -33,7 +34,7 @@ The decisions that shouldn't change without discussion are also listed in [`AGEN
 3. **Everything on one small server.** No service that needs its own server, password or bill: no PostgreSQL, Redis, Celery or Elasticsearch until there's a real need.
 4. **Safe in production, zero setup locally.** Production refuses to start without its secrets; development runs with no configuration at all.
 5. **Long-supported versions, pinned.** LTS releases, exact lock files, and a calendar for upgrades.
-6. **New dependencies must pay for themselves.** The whole newsletter added none.
+6. **New dependencies must pay for themselves.** The whole newsletter added none, and comments added one: the client for the Akismet spam filter ([M3](comments.md#m3-akismet-checks-every-comment-first)).
 
 ## All decisions
 
@@ -123,10 +124,31 @@ The decisions that shouldn't change without discussion are also listed in [`AGEN
 - [N17. The site runs without email configured](newsletter.md#n17-the-site-runs-without-email-configured): a deploy can't take the site down.
 - [N18. The admin side](newsletter.md#n18-the-admin-side): built-in listings, and one permission to send.
 
+### [Comments](comments.md)
+
+- [M1. Readers comment with a name and an email, no account](comments.md#m1-readers-comment-with-a-name-and-an-email-no-account): most readers come once, and the data stays in your database.
+- [M2. Every comment is reviewed before it shows](comments.md#m2-every-comment-is-reviewed-before-it-shows): not spam isn't the same as welcome.
+- [M3. Akismet checks every comment first](comments.md#m3-akismet-checks-every-comment-first): a filter built for the job, and a failure never loses a comment.
+- [M4. A honeypot, a form timer and a limit](comments.md#m4-a-honeypot-a-form-timer-and-a-limit): simple bots stopped before Akismet is asked.
+- [M5. No email verification to post a comment](comments.md#m5-no-email-verification-to-post-a-comment): your decision; fewer lost comments, and no mail to strangers.
+- [M6. Reply alerts: double opt-in without mailing anyone for an unreviewed comment](comments.md#m6-reply-alerts-double-opt-in-without-mailing-anyone-for-an-unreviewed-comment): a spammer typing a stranger's address causes no email.
+- [M7. No email to you about new comments](comments.md#m7-no-email-to-you-about-new-comments): your decision; the admin shows a count instead.
+- [M8. Only your heart, no public likes](comments.md#m8-only-your-heart-no-public-likes): your decision; no counters to write or attack.
+- [M9. Moderating happens only in the Wagtail admin](comments.md#m9-moderating-happens-only-in-the-wagtail-admin): your decision; the public site never acts with your rights.
+- [M10. Every moderation action goes through one module](comments.md#m10-every-moderation-action-goes-through-one-module): Akismet reports and emails can't be skipped.
+- [M11. Replies are threaded one level deep](comments.md#m11-replies-are-threaded-one-level-deep): readable on a phone, and one query.
+- [M12. Plain text only, with links added by the page](comments.md#m12-plain-text-only-with-links-added-by-the-page): no HTML from strangers ever reaches a page.
+- [M13. Visitor details are kept for 30 days at most](comments.md#m13-visitor-details-are-kept-for-30-days-at-most): kept only for Akismet reports, cleaned by the worker.
+- [M14. It works without JavaScript](comments.md#m14-it-works-without-javascript): real forms with a redirect fallback.
+- [M15. Comments can be switched off everywhere or on one post](comments.md#m15-comments-can-be-switched-off-everywhere-or-on-one-post): stop a spam wave or one touchy post, deleting nothing.
+- [M16. The site runs without Akismet configured](comments.md#m16-the-site-runs-without-akismet-configured): a deploy can't take the site down.
+- [M17. The admin side](comments.md#m17-the-admin-side): a snippet with filters, row buttons and bulk actions.
+- [M18. What was left out on purpose](comments.md#m18-what-was-left-out-on-purpose): Gravatar, accounts, public likes and more, with the reasons.
+
 ### [Verification](verification.md)
 
 - [V1. Screenshots of the old and new site, compared pixel by pixel](verification.md#v1-screenshots-of-the-old-and-new-site-compared-pixel-by-pixel): "looks the same" measured, at most 0.003% different.
-- [V2. Backend tests](verification.md#v2-backend-tests): 102 fast tests for the logic screenshots can't see.
+- [V2. Backend tests](verification.md#v2-backend-tests): 309 fast tests for the logic screenshots can't see.
 - [V3. Frontend checks](verification.md#v3-frontend-checks): type check and build, with behaviour checked by hand-run scripts.
 - [V4. The newsletter tested end to end on real infrastructure](verification.md#v4-the-newsletter-tested-end-to-end-on-real-infrastructure): a real browser, SMTP server and worker.
 
@@ -142,6 +164,8 @@ These aren't done yet. Each is small, and each is described in the linked entry.
 | The domain is typed five times in production settings | A typo in one copy breaks admin logins or email links | [D5](data-and-configuration.md#d5-one-env-file-per-program) |
 | No frontend tests in the repository | Behaviour was checked with scripts that weren't kept | [V3](verification.md#v3-frontend-checks) |
 | Newsletter not yet tried with a real mail provider | No credentials were available while building | [V4](verification.md#v4-the-newsletter-tested-end-to-end-on-real-infrastructure) |
+| Comments not yet tried with a real Akismet key | No key was available while building; the tests use a stand-in client, so the live connection is untested | [M3](comments.md#m3-akismet-checks-every-comment-first), [`comments.md`](../comments.md#try-it-before-you-trust-it) |
+| Comments are not paged | A post loads all its approved comments at once, which is fine for hundreds | [M18](comments.md#m18-what-was-left-out-on-purpose) |
 
 ## When a decision changes
 
