@@ -3,43 +3,17 @@ The newsletter's two emails: the signup confirmation and a post. Each is a plain
 body with an HTML alternative. Links are absolute, built from settings.FRONTEND_URL.
 """
 
-from email.utils import make_msgid
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from wagtail.models import Site
 
-from core.models import SiteSettings
+from core.emails import build_email, frontend_url, html_of, site_name
 
-# The site's light-theme primary colour and its text colour (frontend/app/assets/css/main.css),
-# as hex because email clients don't read oklch().
-BUTTON_COLOR = "#000000"
-BUTTON_TEXT_COLOR = "#e0e7ff"
+# html_of and site_name are re-exported for the admin views and the tests.
+__all__ = ["build_confirmation", "build_issue", "html_of", "send_confirmation", "site_name"]
 
 # Stands in for a subscriber's token in test sends, so no real link is exposed.
 TEST_TOKEN = "test"
-
-
-def frontend_url(path=""):
-    """An absolute link to the public site."""
-    return settings.FRONTEND_URL.rstrip("/") + path
-
-
-def site_name():
-    """The site name from the admin's site settings, or the default one."""
-    site = Site.objects.filter(is_default_site=True).first()
-    if site is not None:
-        name = SiteSettings.for_site(site).site_name
-        if name:
-            return name
-    return settings.WAGTAIL_SITE_NAME
-
-
-def one_line(text):
-    """Header values must not contain line breaks."""
-    return " ".join(str(text).split())
 
 
 def confirm_url(subscriber):
@@ -54,40 +28,11 @@ def unsubscribe_api_url(token):
     return frontend_url(f"/api/v2/newsletter/unsubscribe/?token={quote(token)}")
 
 
-def _build(subject, template, context, headers=None, to=None, connection=None):
-    context = {
-        "site_name": site_name(),
-        "site_url": frontend_url("/"),
-        "site_host": urlsplit(settings.FRONTEND_URL).netloc,
-        "button_color": BUTTON_COLOR,
-        "button_text_color": BUTTON_TEXT_COLOR,
-        "subject": subject,
-        **context,
-    }
-    headers = {
-        # On the site's domain. Django would use this machine's name, which in Docker is a
-        # container ID, and spam filters count a Message-ID without a real domain against it.
-        "Message-ID": make_msgid(domain=urlsplit(settings.FRONTEND_URL).hostname),
-        **(headers or {}),
-    }
-    message = EmailMultiAlternatives(
-        subject=one_line(subject),
-        body=render_to_string(f"newsletter/emails/{template}.txt", context),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=to,
-        headers=headers,
-        connection=connection,
-    )
-    html = render_to_string(f"newsletter/emails/{template}.html", context)
-    message.attach_alternative(html, "text/html")
-    return message
-
-
 def build_confirmation(subscriber):
     name = site_name()
-    return _build(
+    return build_email(
         f"Confirm your subscription to {name}",
-        "confirm",
+        "newsletter/emails/confirm",
         {"confirm_url": confirm_url(subscriber)},
         to=[subscriber.email],
     )
@@ -135,16 +80,11 @@ def build_issue(post, subscriber=None, *, to=None, test=False, connection=None):
         "image_alt": image_alt,
         "unsubscribe_url": unsubscribe_page_url(token),
     }
-    return _build(
+    return build_email(
         f"[Test] {subject}" if test else subject,
-        "post",
+        "newsletter/emails/post",
         context,
         headers=headers,
         to=to,
         connection=connection,
     )
-
-
-def html_of(message):
-    """The HTML alternative of a message built here."""
-    return next(content for content, mimetype in message.alternatives if mimetype == "text/html")
