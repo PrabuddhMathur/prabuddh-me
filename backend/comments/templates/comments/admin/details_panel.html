@@ -1,0 +1,35 @@
+{% load wagtailadmin_tags %}
+{% with comment=self.instance %}
+<fieldset>
+    <legend class="w-sr-only">Details</legend>
+    <ul class="w-list-none w-p-0">
+        <li><strong>Post:</strong> <a href="{{ comment.public_url }}" target="_blank" rel="noreferrer">{{ comment.post.title }}</a></li>
+        {% if comment.parent %}
+            <li><strong>In reply to:</strong> {{ comment.parent.name }}: {{ comment.parent.excerpt }}</li>
+        {% endif %}
+        <li><strong>Status:</strong> {{ comment.get_status_display }}{% if comment.is_author %} (written by you){% endif %}</li>
+        <li><strong>Akismet:</strong> {{ comment.get_spam_check_display }}</li>
+        <li><strong>Email:</strong> {{ comment.email|default:"none" }} (never shown on the site)</li>
+        <li><strong>Reply emails:</strong> {{ comment.get_reply_alerts_display }}</li>
+        <li><strong>Posted:</strong> {{ comment.created_at|date:"j F Y, H:i" }}</li>
+    </ul>
+    <p class="w-mt-4 w-flex w-gap-2 w-flex-wrap">
+        {% if comment.status != "approved" %}
+            {% url 'comments:approve' comment.pk as approve_url %}{% include "comments/admin/_post_button.html" with url=approve_url label="Approve" %}
+        {% endif %}
+        {% if comment.status != "spam" %}
+            {% url 'comments:spam' comment.pk as spam_url %}{% include "comments/admin/_post_button.html" with url=spam_url label="Mark as spam" %}
+        {% endif %}
+        {% if comment.status == "approved" %}
+            {% if comment.liked %}
+                {% url 'comments:unlike' comment.pk as unlike_url %}{% include "comments/admin/_post_button.html" with url=unlike_url label="Remove your like" %}
+            {% else %}
+                {% url 'comments:like' comment.pk as like_url %}{% include "comments/admin/_post_button.html" with url=like_url label="Like" %}
+            {% endif %}
+        {% endif %}
+        {% if comment.status != "spam" %}
+            <a href="{% url 'comments:reply' comment.pk %}" class="button button-small button-secondary">Reply</a>
+        {% endif %}
+    </p>
+</fieldset>
+{% endwith %}

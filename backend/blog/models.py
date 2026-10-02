@@ -107,6 +107,13 @@ class BlogPage(HeadlessMixin, SEOFields, Page):
         editable=False,
         help_text="Estimated reading time in minutes (auto-calculated on save)",
     )
+    allow_comments = models.BooleanField(
+        default=True,
+        help_text=(
+            "Let readers comment on this post. When off, existing comments stay visible "
+            "but no new ones can be added."
+        ),
+    )
     line_height = models.CharField(
         max_length=20,
         default="default",
@@ -142,6 +149,7 @@ class BlogPage(HeadlessMixin, SEOFields, Page):
     settings_panels = Page.settings_panels + [
         MultiFieldPanel([FieldPanel("featured")], heading="Display Options"),
         MultiFieldPanel([FieldPanel("line_height")], heading="Typography"),
+        MultiFieldPanel([FieldPanel("allow_comments")], heading="Comments"),
     ]
     edit_handler = TabbedInterface(
         [

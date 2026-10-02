@@ -1,0 +1,9 @@
+{% autoescape off %}Thanks for commenting on “{{ post.title }}”. Your comment is live:
+{{ comment_url }}
+
+You asked to get an email when someone replies. Turn that on here:
+
+Email me replies: {{ confirm_url }}
+
+If you didn't write this comment, ignore this email; you won't get any more.
+{% endautoescape %}

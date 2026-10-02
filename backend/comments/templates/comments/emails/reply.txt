@@ -1,0 +1,10 @@
+{% autoescape off %}{{ reply.name }}{% if reply.is_author %} (author){% endif %} replied to your comment on “{{ post.title }}”:
+
+{{ reply_excerpt }}
+
+Read the reply: {{ reply_url }}
+
+--
+You're getting this because you asked for replies to your comment on {{ site_host }}.
+Stop these emails: {{ stop_url }}
+{% endautoescape %}

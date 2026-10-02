@@ -1,0 +1,6 @@
+{% load wagtailadmin_tags %}
+
+<li>
+    {% icon name="comment" %}
+    <a href="{{ url }}">{{ count }} comment{{ count|pluralize }} <span class="w-sr-only">waiting for review</span><span aria-hidden="true">waiting for review</span></a>
+</li>

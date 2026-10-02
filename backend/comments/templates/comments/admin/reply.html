@@ -1,0 +1,32 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailadmin_tags %}
+{% block titletag %}Reply to {{ comment.name }}{% endblock %}
+
+{% block content %}
+    {% include "wagtailadmin/shared/header.html" with title="Reply" subtitle=comment.name icon="comment" %}
+
+    <div class="nice-padding">
+        <p class="w-mb-6"><a href="{{ index_url }}">&larr; Back to the comments</a></p>
+
+        {% if comment.status == "pending" %}
+            <p class="help-block help-warning">This comment is waiting for review. Publishing your reply also approves it.</p>
+        {% endif %}
+
+        {% panel id="comment" heading="Comment" icon="comment" %}
+            <p><strong>{{ comment.name }}</strong> on <a href="{{ comment.public_url }}" target="_blank" rel="noreferrer">{{ comment.post.title }}</a>, {{ comment.created_at|date:"j F Y, H:i" }}</p>
+            {% if comment.parent %}
+                <p class="help-block help-info">In reply to {{ comment.parent.name }}: {{ comment.parent.excerpt }}</p>
+            {% endif %}
+            <div style="white-space: pre-line;">{{ comment.body }}</div>
+            <p class="w-mt-4"><a href="{{ edit_url }}">Edit this comment</a></p>
+        {% endpanel %}
+
+        <form action="" method="post" novalidate>
+            {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            {% formattedfield form.body %}
+            <button type="submit" class="button">Publish reply</button>
+            <a href="{{ next|default:index_url }}" class="button button-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "wagtailsnippets/bulk_actions/confirm_bulk_delete.html" %}
+
+{% block items_with_access %}
+    {{ block.super }}
+    {% if items %}
+        <p>Replies to {{ items|length|pluralize:"this comment,these comments" }} are deleted too.</p>
+    {% endif %}
+{% endblock items_with_access %}
