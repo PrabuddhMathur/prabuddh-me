@@ -1,0 +1,8 @@
+{% load wagtailadmin_tags %}
+{# A button that POSTs to the URL (with the CSRF token), using the admin's own w-action controller. #}
+<button type="button" class="{{ button.classname }}" data-controller="w-action" data-action="w-action#post" data-w-action-url-value="{{ button.url }}"{{ button.base_attrs_string }}>
+    {% if button.icon_name %}
+        {% icon name=button.icon_name %}
+    {% endif %}
+    {{ button.label }}
+</button>

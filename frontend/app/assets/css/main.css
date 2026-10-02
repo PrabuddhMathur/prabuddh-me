@@ -192,7 +192,7 @@
 
     These replace the daisyUI classes the old site used (daisyUI is not installed): .btn,
     .btn-primary, .btn-outline, .btn-xs, .btn-sm, .btn-lg, .btn-circle, .join, .join-item,
-    .input, .input-sm and .input-lg. They copy daisyUI 5's rules for these classes, so they
+    .input, .input-sm and .input-lg, plus .textarea and .checkbox (the comment form, new). They copy daisyUI 5's rules for these classes, so they
     look the same in both themes (light has --depth: 1 for the subtle shadows, dim has 0).
     Like daisyUI's, they sit below Tailwind's utilities, so a utility on the same element wins.
     Modifiers come after .btn/.input so they win over it.
@@ -452,6 +452,145 @@
   .input-lg {
     --size: calc(var(--size-field, 0.25rem) * 12);
     font-size: max(var(--font-size, 1.125rem), 1.125rem);
+  }
+
+  /* Multi-line text (the comment form): daisyUI 5's .textarea, built like .input above. */
+  .textarea {
+    --size: calc(var(--size-field, 0.25rem) * 10);
+    --input-color: color-mix(in oklab, var(--color-base-content) 20%, #0000);
+    border: var(--border) solid #0000;
+    min-height: 5rem;
+    flex-shrink: 1;
+    appearance: none;
+    background-color: var(--color-base-100);
+    color: var(--color-base-content);
+    padding-block: calc(var(--size) * 0.25);
+    padding-inline: 0.75rem;
+    width: clamp(3rem, 20rem, 100%);
+    font-size: max(var(--font-size, 0.875rem), 0.875rem);
+    touch-action: manipulation;
+    border-start-start-radius: var(--join-ss, var(--radius-field));
+    border-start-end-radius: var(--join-se, var(--radius-field));
+    border-end-start-radius: var(--join-es, var(--radius-field));
+    border-end-end-radius: var(--join-ee, var(--radius-field));
+    border-color: var(--input-color);
+    box-shadow:
+      0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000) inset,
+      0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+  }
+
+  .textarea:focus,
+  .textarea:focus-within {
+    --input-color: var(--color-base-content);
+    box-shadow: 0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000);
+    outline: 2px solid var(--input-color);
+    outline-offset: 2px;
+    isolation: isolate;
+  }
+
+  /* iOS: 16px text while focused, so Safari doesn't zoom in. */
+  @media (pointer: coarse) {
+    @supports (-webkit-touch-callout: none) {
+      .textarea:focus,
+      .textarea:focus-within {
+        --font-size: 1rem;
+      }
+    }
+  }
+
+  .textarea:is(:disabled, [disabled]) {
+    cursor: not-allowed;
+    border-color: var(--color-base-200);
+    background-color: var(--color-base-200);
+    color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+    box-shadow: none;
+  }
+
+  .textarea:is(:disabled, [disabled])::placeholder {
+    color: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+  }
+
+  /* Checkboxes (the comment form's reply-alerts box): daisyUI 5's .checkbox. */
+  .checkbox {
+    --size: calc(var(--size-selector, 0.25rem) * 6);
+    border: var(--border) solid var(--input-color, color-mix(in oklab, var(--color-base-content) 20%, #0000));
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    appearance: none;
+    border-radius: calc(var(--radius-selector) / 2);
+    padding: 0.25rem;
+    vertical-align: middle;
+    color: var(--color-base-content);
+    box-shadow:
+      0 1px oklch(0% 0 0 / calc(var(--depth) * 0.1)) inset,
+      0 0 #0000 inset,
+      0 0 #0000;
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+    width: var(--size);
+    height: var(--size);
+  }
+
+  .checkbox::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    rotate: 45deg;
+    background-color: currentColor;
+    opacity: 0%;
+    transition: opacity 0.2s;
+    clip-path: polygon(20% 100%, 20% 80%, 50% 80%, 50% 80%, 70% 80%, 70% 100%);
+    box-shadow: 0 3px 0 0 oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+    font-size: 1rem;
+    line-height: 0.75;
+  }
+
+  .checkbox:focus-visible {
+    outline: 2px solid var(--input-color, currentColor);
+    outline-offset: 2px;
+  }
+
+  .checkbox:checked,
+  .checkbox[aria-checked="true"] {
+    background-color: var(--input-color, #0000);
+    box-shadow:
+      0 0 #0000 inset,
+      0 8px 0 -4px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset,
+      0 1px oklch(0% 0 0 / calc(var(--depth) * 0.1));
+  }
+
+  .checkbox:checked::before,
+  .checkbox[aria-checked="true"]::before {
+    clip-path: polygon(20% 100%, 20% 80%, 50% 80%, 50% 0%, 70% 0%, 70% 100%);
+    opacity: 100%;
+  }
+
+  @media (forced-colors: active) {
+    .checkbox:checked::before,
+    .checkbox[aria-checked="true"]::before {
+      rotate: 0deg;
+      background-color: transparent;
+      content: "✔︎";
+      clip-path: none;
+    }
+  }
+
+  @media print {
+    .checkbox:checked::before,
+    .checkbox[aria-checked="true"]::before {
+      rotate: 0deg;
+      background-color: transparent;
+      content: "✔︎";
+      clip-path: none;
+    }
+  }
+
+  .checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 20%;
   }
 }
 

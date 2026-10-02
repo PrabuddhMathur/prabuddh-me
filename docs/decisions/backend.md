@@ -89,7 +89,7 @@ Each of the three views is a short function that mirrors the matching old Django
 **Decision.** Fields that no live template ever displayed were not carried over, for example:
 
 - `SiteSettings`: tagline and contact fields.
-- `HomePage`: comments switch and custom CSS class.
+- `HomePage`: comments switch and custom CSS class. (That switch did nothing. Comments now exist as a real feature, built from scratch with their own settings: see [M15](comments.md#m15-comments-can-be-switched-off-everywhere-or-on-one-post).)
 - `BlogPage`: related-posts switch.
 - Blocks: unused colour and style options.
 - The unfinished "citation" editor feature, whose script never existed.

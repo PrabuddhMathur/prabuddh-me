@@ -1,0 +1,18 @@
+{% extends "core/emails/base.html" %}
+{% block content %}
+<tr>
+<td style="padding:16px 32px 0 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#18181b;">
+<h1 style="margin:0 0 16px 0;font-size:24px;line-height:32px;font-weight:bold;color:#18181b;">New reply to your comment</h1>
+<p style="margin:0 0 16px 0;font-size:16px;line-height:24px;color:#18181b;"><strong>{{ reply.name }}</strong>{% if reply.is_author %} (author){% endif %} replied to your comment on <a href="{{ reply_url }}" style="color:#18181b;">{{ post.title }}</a>:</p>
+<p style="margin:0 0 24px 0;padding:0 0 0 16px;border-left:3px solid #d4d4d8;font-size:16px;line-height:24px;color:#3f3f46;">{{ reply_excerpt|linebreaksbr }}</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td style="background-color:{{ button_color }};border-radius:4px;">
+<a href="{{ reply_url }}" style="display:inline-block;padding:12px 24px;font-size:16px;line-height:24px;font-weight:bold;color:{{ button_text_color }};text-decoration:none;">Read the reply</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+{% endblock %}
+{% block footer %}You're getting this because you asked for replies to your comment on {{ site_host }}.<br><a href="{{ stop_url }}" style="color:#71717a;">Stop these emails</a>{% endblock %}

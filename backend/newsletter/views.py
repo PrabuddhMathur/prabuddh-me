@@ -5,19 +5,17 @@ The Nuxt frontend sends JSON. Plain HTML form posts also work, for visitors with
 JavaScript: they get a 303 redirect to a frontend page that shows the outcome.
 """
 
-import json
 import logging
 from datetime import timedelta
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.core.cache import cache
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
+
+from core.form_posts import clean_email, is_json, read_body, see_other, text, throttled
 
 from . import emails
 from .models import Subscriber
@@ -26,65 +24,8 @@ logger = logging.getLogger(__name__)
 
 # Don't send a pending subscriber another confirmation more often than this.
 RESEND_COOLDOWN = timedelta(minutes=10)
-THROTTLE_WINDOW = 60 * 60  # seconds
-MAX_EMAIL_LENGTH = 254
 
 JSON_STATUS_CODES = {"ok": 200, "invalid_email": 400, "rate_limited": 429, "email_failed": 503}
-
-
-def _is_json(request):
-    return request.content_type == "application/json"
-
-
-def _read_body(request):
-    """The request's fields as a dict, from a JSON body or an HTML form."""
-    if _is_json(request):
-        try:
-            data = json.loads(request.body or b"{}")
-        except ValueError:
-            return {}
-        return data if isinstance(data, dict) else {}
-    return request.POST.dict()
-
-
-def _text(value):
-    return value if isinstance(value, str) else ""
-
-
-def _client_ip(request):
-    # Caddy sets X-Real-IP to the visitor's address; without a proxy fall back to the socket.
-    return request.headers.get("X-Real-IP") or request.META.get("REMOTE_ADDR", "")
-
-
-def _throttled(request):
-    """Counts this request against the client's hourly limit. True when over it."""
-    key = f"newsletter-subscribe:{_client_ip(request)}"
-    cache.add(key, 0, THROTTLE_WINDOW)  # Only sets the expiry when the key is new.
-    try:
-        count = cache.incr(key)
-    except ValueError:  # The key expired between the two calls.
-        cache.set(key, 1, THROTTLE_WINDOW)
-        count = 1
-    return count > settings.NEWSLETTER_SUBSCRIBE_LIMIT
-
-
-def _see_other(url):
-    """A 303 redirect, so the browser follows a POST with a GET."""
-    response = HttpResponse(status=303)
-    response["Location"] = url
-    return response
-
-
-def _clean_email(value):
-    """The normalised address, or None when it isn't a valid one."""
-    email = Subscriber.normalise(_text(value))
-    if not email or len(email) > MAX_EMAIL_LENGTH:
-        return None
-    try:
-        validate_email(email)
-    except ValidationError:
-        return None
-    return email
 
 
 def _send_confirmation(subscriber):
@@ -102,12 +43,12 @@ def _send_confirmation(subscriber):
 
 def _subscribe(request):
     """Handles one signup and returns the status string."""
-    if _throttled(request):
+    if throttled(request, "newsletter-subscribe", settings.NEWSLETTER_SUBSCRIBE_LIMIT):
         return "rate_limited"
-    data = _read_body(request)
-    if _text(data.get("website")).strip():  # The honeypot: only bots fill it in.
+    data = read_body(request)
+    if text(data.get("website")).strip():  # The honeypot: only bots fill it in.
         return "ok"
-    email = _clean_email(data.get("email"))
+    email = clean_email(data.get("email"))
     if email is None:
         return "invalid_email"
 
@@ -129,16 +70,16 @@ def _subscribe(request):
 def subscribe(request):
     """POST /api/v2/newsletter/subscribe/ with {"email", "website"}."""
     status = _subscribe(request)
-    if _is_json(request):
+    if is_json(request):
         return JsonResponse({"status": status}, status=JSON_STATUS_CODES[status])
-    return _see_other(f"/newsletter/?{urlencode({'status': status})}")
+    return see_other(f"/newsletter/?{urlencode({'status': status})}")
 
 
 @csrf_exempt
 @require_POST
 def confirm(request):
     """POST /api/v2/newsletter/confirm/ with {"token"}."""
-    subscriber = Subscriber.find_by_token(_text(_read_body(request).get("token")))
+    subscriber = Subscriber.find_by_token(text(read_body(request).get("token")))
     if subscriber is None:
         return JsonResponse({"status": "invalid_token"}, status=404)
     subscriber.confirm()
@@ -161,8 +102,8 @@ def unsubscribe(request):
         response["Location"] = "/newsletter/unsubscribe/" + (f"?{query}" if query else "")
         return response
 
-    data = _read_body(request)
-    token = _text(request.GET.get("token")) or _text(data.get("token"))
+    data = read_body(request)
+    token = text(request.GET.get("token")) or text(data.get("token"))
     subscriber = Subscriber.find_by_token(token)
     if subscriber is not None:
         subscriber.unsubscribe()
@@ -170,9 +111,9 @@ def unsubscribe(request):
 
     # JSON from the frontend, and the one-click POST from mail clients, get JSON back.
     one_click = data.get("List-Unsubscribe") == "One-Click"
-    if _is_json(request) or one_click:
+    if is_json(request) or one_click:
         body = {"status": status}
         if subscriber:
             body["email"] = subscriber.email
         return JsonResponse(body, status=200 if subscriber else 404)
-    return _see_other(f"/newsletter/unsubscribe/?{urlencode({'status': status})}")
+    return see_other(f"/newsletter/unsubscribe/?{urlencode({'status': status})}")

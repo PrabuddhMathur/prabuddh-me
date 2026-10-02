@@ -1,6 +1,6 @@
 # Run the project locally
 
-How to start the blog on your own machine, set it up in the admin, and try the newsletter without sending a real email. For production, see [`newsletter-production.md`](newsletter-production.md).
+How to start the blog on your own machine, set it up in the admin, and try the newsletter and the comments without sending a real email. For production, see [`newsletter-production.md`](newsletter-production.md) and [`comments.md`](comments.md).
 
 Two ways to run it. Pick one.
 
@@ -56,7 +56,7 @@ The stack has four containers: `backend` (Django, runs the migrations on start),
 
 **Where the data lives.** The database is in the Docker volume `backend_data` (`prabuddh-me-dev_backend_data`), not in `backend/data/`. Uploaded images go to `backend/media/` on your disk. Emails caught by Mailpit are kept in memory and vanish when it restarts.
 
-**Reset the database.** This deletes every post, setting and subscriber in the Docker database. Don't do it by accident.
+**Reset the database.** This deletes every post, setting, subscriber and comment in the Docker database. Don't do it by accident.
 
 ```sh
 docker compose -f docker-compose.dev.yaml down -v
@@ -148,12 +148,34 @@ A post can be emailed only once. To try again, write another post.
 
 Watch the worker with `docker compose -f docker-compose.dev.yaml logs -f worker` (Docker) or in its terminal (Option B). It prints a line like `Batch done: 1 sent, 0 failed attempts, 0 skipped.` when it sends.
 
+## Try the comments locally
+
+This works with both options, and the steps assume the inbox at <http://localhost:8025> like the newsletter ones do. You need a published post. You don't need an Akismet key: with `AKISMET_API_KEY` empty, no request goes to Akismet and every comment simply waits for review as "Not checked".
+
+1. **Comment.** Open a post at <http://localhost:3000> and scroll to **Comments**. Enter a name, an email (any, e.g. `reader@example.com`) and some text, tick **Email me when someone replies**, and press **Post comment**. Wait a few seconds after the page loads first: a form posted within 3 seconds is silently dropped as a bot's. The form is replaced by "Thanks! Your comment is waiting for review…". The comment isn't on the page, and no email has been sent.
+2. **Approve it.** In the admin, the menu says **Comments (1)** and the home page says "1 comment waiting for review". Open **Comments** and press **Approve** in the comment's row. Reload the post: the comment shows.
+3. **Confirm reply alerts.** Because you ticked the box, approving sent one email, "Your comment on … is live", to the inbox. Click **Email me replies**. The page says "Reply emails are on". (This email comes from the backend while you approve, so check the backend's terminal if you aren't using Mailpit.)
+4. **Get a reply alert.** On the post, press **Reply** under your comment and post a reply as someone else (another name and email). Approve it in the admin. The inbox gets "… replied to your comment on …" with a **Read the reply** button and a **Stop these emails** link.
+5. **Reply as the author.** In **Comments**, open the **More** menu of a comment and choose **Reply**. Write something and press **Publish reply**. It shows on the post at once with an **Author** badge. Replying to a comment that is still waiting approves it too.
+6. **Like.** In **More**, choose **Like**. The post shows a heart and "Liked by Prabuddh". Change the wording under **Settings → Comments → Like label**.
+7. **Stop the alerts.** Click **Stop these emails** in the alert email, then the **Stop emails** button on the page. The comment's edit page now shows **Reply emails: Off**.
+8. **Mark one as spam.** Post another comment, then use **Mark as spam**. It leaves the waiting list and shows under the **Spam** status filter. The worker deletes spam 30 days after it was marked (spam Akismet caught on its own: 30 days after it was posted), and clears the visitor details of reviewed comments after 30 days, once an hour. To run that cleanup by hand (it leaves anything younger than 30 days alone):
+
+   ```sh
+   just docker-manage comments_cleanup                  # Docker
+   (cd backend && uv run manage.py comments_cleanup)    # without Docker
+   ```
+
+9. **Close comments.** Untick **Settings → Comments → Enabled** to hide them everywhere, or **Allow comments** in a post's **Settings** tab to close just that post. Old comments stay visible on a closed post.
+
+To try Akismet itself, add `AKISMET_API_KEY=your-key` and `AKISMET_TEST_MODE=True` to `backend/.env` (both options read it), restart the backend (`docker compose -f docker-compose.dev.yaml restart backend`, or stop and start `just run`), and post a comment with the email `akismet-guaranteed-spam@example.com`: Akismet calls it spam. [`comments.md`](comments.md#try-it-before-you-trust-it) has the steps, and how to get a key.
+
 ## Checks before committing
 
 Run these from the repository root. Docker doesn't need to be stopped for the backend checks.
 
 ```sh
-just test                 # backend tests (core, blog and newsletter)
+just test                 # backend tests (core, blog, newsletter and comments)
 just lint                 # ruff format and check
 just makemigrations-check # fails if a model change has no migration
 ```
@@ -179,4 +201,8 @@ just docker-dev           # start it again
 | Emails don't arrive in Mailpit | Confirmation emails are sent by the backend, post emails by the worker. Check `docker compose -f docker-compose.dev.yaml logs worker mailpit`. Without Docker, check that `just mailpit` and `just worker` are running and that `backend/.env` has the Mailpit lines. |
 | Queued emails never go out | The worker isn't running. Docker: `docker compose -f docker-compose.dev.yaml ps worker`. Without Docker: `just worker`. |
 | The signup box is missing | **Settings → Footer Settings → Show newsletter** is off. |
+| Comments don't show, or there is no comment form | **Settings → Comments → Enabled** is off, or the post's **Allow comments** is (that one only removes the form). Also check that the backend is running: the comments load from `/api/v2/comments/`. |
+| I posted a comment and it isn't in the admin | Posted within 3 seconds of the page loading, or with the hidden `website` field filled in: it is dropped without a record. Wait a few seconds and try again. Comments caught as spam are under the **Spam** status filter. |
+| "Too many comments from your connection" | More than 10 comments from one address in an hour. Restart the backend to clear the count: `docker compose -f docker-compose.dev.yaml restart backend`, or stop and start `just run`. |
+| No reply-alert email arrives | The box must be ticked when posting, and the email is sent when you **approve** (not when the comment is posted). A warning in the admin after approving means the email couldn't be sent. Check Mailpit is running. |
 | Links in emails go to the wrong address | `FRONTEND_URL` isn't `http://localhost:3000`. Remove it from `backend/.env` or fix it. |

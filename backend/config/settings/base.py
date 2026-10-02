@@ -48,6 +48,20 @@ NEWSLETTER_SEND_DELAY = env.float("NEWSLETTER_SEND_DELAY", default=1.0)
 NEWSLETTER_SUBSCRIBE_LIMIT = env.int("NEWSLETTER_SUBSCRIBE_LIMIT", default=10)
 
 
+# Comments: readers comment without an account; every comment is checked by Akismet (a
+# spam filter) and then reviewed in the Wagtail admin before it shows.
+
+# Empty: Akismet is off and every comment goes to review unchecked.
+AKISMET_API_KEY = env("AKISMET_API_KEY", default="")
+# Sends is_test=1 with every request, for trying Akismet out (it doesn't learn from those).
+AKISMET_TEST_MODE = env.bool("AKISMET_TEST_MODE", default=False)
+# Comments allowed per client IP per hour.
+COMMENTS_POST_LIMIT = env.int("COMMENTS_POST_LIMIT", default=10)
+# Wagtail's own comments on page drafts in the editor: not needed with one author, and
+# they would be confused with the readers' "Comments".
+WAGTAILADMIN_COMMENTS_ENABLED = False
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,6 +69,7 @@ INSTALLED_APPS = [
     "blog",
     "home",
     "newsletter",
+    "comments",
     "wagtail_headless_preview",
     "wagtail.api.v2",
     "wagtail.contrib.settings",

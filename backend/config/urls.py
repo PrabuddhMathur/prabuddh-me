@@ -5,6 +5,7 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from blog import views as blog_views
+from comments import views as comments_views
 from core import views as core_views
 from newsletter import views as newsletter_views
 
@@ -23,6 +24,17 @@ urlpatterns = [
         "api/v2/newsletter/unsubscribe/",
         newsletter_views.unsubscribe,
         name="newsletter_unsubscribe",
+    ),
+    path("api/v2/comments/", comments_views.comments, name="comments"),
+    path(
+        "api/v2/comments/alerts/confirm/",
+        comments_views.alerts_confirm,
+        name="comments_alerts_confirm",
+    ),
+    path(
+        "api/v2/comments/alerts/stop/",
+        comments_views.alerts_stop,
+        name="comments_alerts_stop",
     ),
     path("api/v2/", api_router.urls),
 ]

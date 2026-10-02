@@ -33,6 +33,7 @@ Last researched: **2026-09-30**
 | `django-environ` | `0.14.0` | Latest | No fixed policy | Reads settings from environment variables |
 | `gunicorn` | `26.2.0` | Latest | No fixed policy | |
 | `whitenoise` | `6.12.0` | Latest | No fixed policy | |
+| `akismet` | `25.10.1` | 25.x (year and month versions) | No fixed policy | Client for the Akismet spam filter used by comments. Brings `httpx` and its helpers. [Why](#akismet) |
 | `ruff` | `0.16.9` | Latest | No fixed policy | Dev only |
 | `uv` | `0.12.21` | Latest | No fixed policy | Tool, not a dependency |
 
@@ -104,6 +105,14 @@ Wagtail 8.0 was not chosen because:
 - It's supported only until 2027-02-02.
 - Its new v3 API is a preview that may change in any release.
 - `wagtail-headless-preview` 0.9.0 lists Wagtail 7 support only.
+
+### akismet
+
+Comments are checked by the [Akismet](https://akismet.com) spam-filtering service ([why: M3](decisions/comments.md#m3-akismet-checks-every-comment-first)). The `akismet` library, by Michael Foord and James Bennett (BSD licence), is a small typed client for it. Version 25.10.1, released 2025-10-21, is the newest on PyPI (checked 2026-10-01) and lists Python 3.14 support. `backend/comments/spam.py` uses its `Config`, `SyncClient` and `CheckResponse`.
+
+- **The range.** `akismet>=25.10,<26`. Its versions are the year and month of the release (24.5, 24.11, 25.10), about one a year. When a 26.x appears, read its changelog before raising the upper limit, because a new release can change the client's API.
+- **What it adds to the lock file.** Five packages: `akismet`, `httpx` `0.28.1`, `httpcore` `1.0.9`, `h11` `0.16.0` and `anyio` `4.15.1`. `certifi`, `idna` and `typing-extensions` were already there.
+- **Fallback.** Akismet's API is four plain HTTP endpoints. If the library ever stops working and isn't fixed, `spam.py` is the only file that would need to change.
 
 ### SQLite
 
