@@ -2,8 +2,10 @@
 import type { BlogPageData } from '~/types/api'
 
 // Old blog/blog_page.html: breadcrumbs, article header, StreamField body, tags, previous/next
-// links and the image gallery.
-const props = defineProps<{ page: BlogPageData }>()
+// links and the image gallery, then (new) the comments. The preview leaves the comments out.
+const props = withDefaults(defineProps<{ page: BlogPageData, showComments?: boolean }>(), {
+  showComments: true,
+})
 
 const { data: site } = await useSiteSettings()
 
@@ -174,6 +176,11 @@ provide(galleryKey, { open: openGallery })
             </div>
         </div>
     </article>
+
+    <div v-if="showComments" class="max-w-4xl mx-auto">
+        <!-- The previous/next block above already has 3rem of padding below it. -->
+        <CommentSection :post-id="page.id" :class="{ 'mt-0!': page.previous_post || page.next_post }" />
+    </div>
 </div>
 
 <ImageGallery ref="gallery" :images="galleryEntries" />

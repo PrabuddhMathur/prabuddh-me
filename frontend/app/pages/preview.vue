@@ -41,6 +41,6 @@ usePageSeo(() => ({
 
 <template>
   <HomePageView v-if="home" :page="home" />
-  <BlogPostView v-else-if="post" :page="post" />
+  <BlogPostView v-else-if="post" :page="post" :show-comments="false" />
   <StaticPageView v-else-if="staticPage" :page="staticPage" />
 </template>

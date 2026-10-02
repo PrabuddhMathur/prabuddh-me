@@ -348,3 +348,66 @@ export interface NewsletterResponse {
   /** Only on confirm and unsubscribe answers (subscribed, unsubscribed). */
   email?: string
 }
+
+// Comments: GET and POST /api/v2/comments/, POST /api/v2/comments/alerts/{confirm,stop}/.
+
+export interface CommentReplyTo {
+  id: number
+  name: string
+}
+
+/** One public comment. */
+export interface CommentData {
+  id: number
+  name: string
+  /** Plain text; may contain line breaks and URLs. */
+  body: string
+  /** ISO 8601 UTC. */
+  created_at: string
+  /** Written by the site owner. */
+  is_author: boolean
+  /** The owner's heart. */
+  liked: boolean
+}
+
+/** A reply, flattened under its thread's top-level comment. */
+export interface CommentReply extends CommentData {
+  /** The comment answered, when it is not the top-level one. */
+  reply_to: CommentReplyTo | null
+}
+
+export interface CommentThread extends CommentData {
+  /** Every reply of the thread (all depths), oldest first. */
+  replies: CommentReply[]
+}
+
+export interface CommentsResponse {
+  /** Comments are switched on for the site. When false, nothing else is worth showing. */
+  enabled: boolean
+  /** Enabled, and this post accepts new comments. */
+  open: boolean
+  /** Text of the owner's heart badge. */
+  like_label: string
+  /** Akismet is configured (for the privacy note). */
+  akismet: boolean
+  /** Visible comments, replies included. */
+  count: number
+  /** Signed time stamp the form posts back. */
+  form_token: string
+  comments: CommentThread[]
+}
+
+export type CommentSubmitStatus = 'pending' | 'invalid' | 'closed' | 'not_found' | 'rate_limited'
+
+export interface CommentSubmitResponse {
+  status: CommentSubmitStatus
+  /** With status "invalid": a sentence per field. */
+  errors?: Partial<Record<'name' | 'email' | 'body' | 'parent', string>>
+}
+
+/** The answer of the reply-alert confirm and stop endpoints. */
+export interface ReplyAlertsResponse {
+  status: 'on' | 'off' | 'invalid_token'
+  /** The comment's post, when the token is known. */
+  post?: { title: string, url: string }
+}
